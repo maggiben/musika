@@ -4,13 +4,20 @@ import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider } from 'styled-components';
 import { RecoilRoot } from 'recoil';
 import Playlist from '@containers/playlist/Playlist';
+import Download from '@containers/download/Download';
 
 const Container = styled.div`
+  width: 100%;
+  height: 100vh;
   color: ${({ theme }) => theme.main};
 `;
 
 const theme = {
   main: 'red',
+  fontFamily: 'Roboto, sans-serif',
+  fontFamilyMonoSpace: '"Roboto Mono", monospace',
+  color: 'white',
+  backgroundColor: '#212121',
   spacing: {
     xxxs: '2px',
     xxs: '4px',
@@ -30,7 +37,7 @@ const App = (): JSX.Element => {
       <RecoilRoot>
         <I18nextProvider i18n={i18n}>
           <Container>
-            <Playlist />
+            <Download />
           </Container>
         </I18nextProvider>
       </RecoilRoot>

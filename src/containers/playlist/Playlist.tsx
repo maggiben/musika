@@ -3,7 +3,12 @@
 import './Playlist.css';
 import styled from 'styled-components';
 import List from '@components/List/List';
+// import InputRange from '@components/InputRange/InputRange';
 // import { useTranslation } from 'react-i18next';
+// import Controls from '@components/Player/Controls';
+import PlayerControls from '@components/PlayerControls/PlayerControls';
+
+
 
 const PlaylistContainer = styled.div`
   user-select: none;
@@ -33,31 +38,31 @@ const PlaylistContainer = styled.div`
 //   padding-bottom: 10px;
 // }
 
-const Controls = styled.div`
-  padding: 10px;
-  margin: 0px 10px 10px 10px;
-  border-bottom: 1px solid #313133;
-  /*background-color: #121212;*/
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  & button {
-    outline: none;
-    border: none;
-    font-family: 'Material Icons';
-    font-size: 25px;
-    line-height: 1;
-    display: inline-block;
-    white-space: nowrap;
-    background-color: transparent;
-    color: #666;
-    text-align: center;
-    &:hover {
-      color: #c1c1c1;
-      background-color: #2f2f2f;
-    }
-  }
-`
+// const Controls = styled.div`
+//   padding: 10px;
+//   margin: 0px 10px 10px 10px;
+//   border-bottom: 1px solid #313133;
+//   /*background-color: #121212;*/
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   & button {
+//     outline: none;
+//     border: none;
+//     font-family: 'Material Icons';
+//     font-size: 25px;
+//     line-height: 1;
+//     display: inline-block;
+//     white-space: nowrap;
+//     background-color: transparent;
+//     color: #666;
+//     text-align: center;
+//     &:hover {
+//       color: #c1c1c1;
+//       background-color: #2f2f2f;
+//     }
+//   }
+// `
 
 // .list-x {
 //   padding: 0px 20px;
@@ -241,7 +246,7 @@ const Controls = styled.div`
 const Playlist = (): JSX.Element => {
   return (
     <div className="playlist">
-      <div className="controls">
+      {/* <div className="controls">
         <div className="volume">
           <button type="button">volume_up</button>
           <div className="slider">
@@ -259,9 +264,11 @@ const Playlist = (): JSX.Element => {
           <input id="shuffle" type="checkbox" />
           <label htmlFor="shuffle">shuffle</label>
         </div>
-        <div id="range"></div>
+        <InputRange />
         <span>3:47</span>
-      </div>
+      </div> */}
+      {/* <Controls /> */}
+      <PlayerControls />
       <div className="list-x" id="list">
         <List />
       </div>

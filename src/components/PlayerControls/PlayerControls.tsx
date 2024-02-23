@@ -1,34 +1,8 @@
 
-/*
-.controls {
-  padding: 10px;
-  border-bottom: 1px solid #313133;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  & button {
-    outline: none;
-    border: none;
-    font-family: 'Material Icons';
-    font-size: 25px;
-    line-height: 1;
-    display: inline-block;
-    white-space: nowrap;
-    background-color: transparent;
-    color: #666;
-    text-align: center;
-    &:hover {
-      color: #c1c1c1;
-      background-color: #2f2f2f;
-    }
-  }
-}
-
-*/
 import styled from 'styled-components';
+import InputRange from '@components/InputRange/InputRange';
 
-const ControlsContainer = styled.div`
-  padding: 10px;
+const PlayerControlsContainer = styled.div`
   border-bottom: 1px solid #313133;
   display: flex;
   justify-content: space-between;
@@ -51,9 +25,14 @@ const ControlsContainer = styled.div`
   }
 `;
 
-const Controls = (): JSX.Element => {
+const PlayTime = styled.span`
+  font-family: "Roboto Mono", monospace;
+  margin-right: ${({ theme }) => theme.spacing.xs};
+`;
+
+const PlayerControls = (): JSX.Element => {
   return (
-    <ControlsContainer>
+    <PlayerControlsContainer>
       <div className="volume">
         <button>volume_up</button>
         <div className="slider">
@@ -71,10 +50,10 @@ const Controls = (): JSX.Element => {
         <input id="shuffle" type="checkbox" />
         <label htmlFor="shuffle">shuffle</label>
       </div>
-      <div id="range"></div>
-      <span>3:47</span>
-    </ControlsContainer>
+      <InputRange />
+      <PlayTime>3:47</PlayTime>
+    </PlayerControlsContainer>
   );
 };
 
-export default Controls;
+export default PlayerControls;

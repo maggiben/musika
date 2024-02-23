@@ -1,39 +1,31 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
-export default class InputRange extends React.Component<{}> {
-  constructor(...args: any) {
-    super(args);
-    this.drawTrack = this.drawTrack.bind(this)
-  }
-  handleChange(event) {
-    this.setState({
-      value: event.target.value
-    });
-    console.log('seekTo: ', event.target.value)
-  }
-  componentDidMount() {
-    this.drawTrack();
-    this.refs.range.addEventListener('change', this.drawTrack, false);
-    this.refs.range.addEventListener('input', this.drawTrack, false);
-  }
-  drawTrack() {
-    let value = this.state.value;
-    let background = `linear-gradient(to right, #ed1e24 0%, #ed1e24 ${value}%, #2f2f2f ${value}%, #2f2f2f 100%)`;
-    this.refs.range.style.background = background;
-  }
-  componentWillUnmount() {
-    this.refs.range.removeEventListener('change', this.drawTrack);
-    this.refs.range.removeEventListener('input', this.drawTrack);
-  }
-  state = {
-    value: 50
-  };
-  static defaultProps = {
-    min: 0,
-    max: 100,
-    step: 1
-  };
-  render() {
-    return <input ref="range" type="range" min={this.props.min} max={this.props.max} value={this.state.value} onChange={this.handleChange.bind(this)} step={this.props.step} />
-  }
+export interface IInputRangeProps {
+  min?: number;
+  max?: number;
+  value?: number;
+  step?: number;
+  onChange?: (value: number) => void;
 }
+const InputRange = (props: IInputRangeProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const drawTrack = (value: number | string, input: HTMLInputElement) => {
+    const background = `linear-gradient(to right, #ed1e24 0%, #ed1e24 ${value}%, #2f2f2f ${value}%, #2f2f2f 100%)`;
+    input.style.background = background;
+  }
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    inputRef.current && drawTrack(parseFloat(event.target.value), inputRef.current);
+    props.onChange && props.onChange(parseFloat(event.target.value));
+  };
+
+  useEffect(() => {
+    inputRef.current && drawTrack(parseFloat(inputRef.current.value), inputRef.current);
+  }, [])
+
+  return (
+    <input type="range" ref={inputRef} min={props.min} max={props.max} defaultValue={props.value} onChange={onChange} step={props.step} />
+  );
+}
+
+export default InputRange;

@@ -117,7 +117,7 @@ const songs: Song[] = [{
 }];
 
 const SongIndex = styled.span`
-  font-family: "Roboto Mono", monospace;
+  font-family: ${({ theme }) => theme.fontFamilyMonoSpace};
   margin-left: ${({ theme }) => theme.spacing.xxs};
 `;
 
@@ -125,7 +125,7 @@ const SongName = styled.p`
   text-align: left;
 `;
 const SongDuration = styled.span`
-  font-family: "Roboto Mono", monospace;
+  font-family: ${({ theme }) => theme.fontFamilyMonoSpace};
   margin-right: ${({ theme }) => theme.spacing.xxs};
 `;
 
