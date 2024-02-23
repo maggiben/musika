@@ -18,7 +18,18 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@containers/*": ["containers/*"],
+      "@types/*": ["types/*"],
+      "@static/*": ["../public/static/*"],
+      "@translation/*": [ "../public/locale/*" ],
+      "@utils/*": ["utils/*"],
+      "@states/*": ["states/*"],
+      "@pjson": ["../package.json"]
+  },
   },
   "include": ["src", "electron"],
   "references": [{ "path": "./tsconfig.node.json" }]

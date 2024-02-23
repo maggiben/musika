@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/electron-vite.animate.svg'
-import './App.css'
+import './App.css';
+import i18n from '@utils/i18n';
+import { I18nextProvider } from 'react-i18next';
+import styled, { ThemeProvider } from 'styled-components';
+import { RecoilRoot } from 'recoil';
+import Playlist from '@containers/playlist/Playlist';
 
-function App() {
-  const [count, setCount] = useState(0)
+const Container = styled.div`
+  color: ${({ theme }) => theme.main};
+`;
 
+const theme = {
+  main: 'red',
+  spacing: {
+    xxxs: '2px',
+    xxs: '4px',
+    xs: '8px',
+    s: '12px',
+    m: '16px',
+    l: '24px',
+    xl: '32px',
+    xxl: '48px',
+    xxxl: '64px',
+  },
+};
+
+const App = (): JSX.Element => {
   return (
-    <>
-      <div>
-        <a href="https://electron-vite.github.io" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <ThemeProvider theme={theme}>
+      <RecoilRoot>
+        <I18nextProvider i18n={i18n}>
+          <Container>
+            <Playlist />
+          </Container>
+        </I18nextProvider>
+      </RecoilRoot>
+    </ThemeProvider>
+  );
+};
 
-export default App
+export default App;
