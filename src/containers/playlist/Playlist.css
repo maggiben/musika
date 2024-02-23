@@ -71,7 +71,6 @@
       flex-grow: 1;
     }
     &:nth-child(5) {
-      min-width: 0;
       flex-basis: 10%;
       text-align: right;
       align-self: flex-end;

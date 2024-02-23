@@ -116,23 +116,31 @@ const songs: Song[] = [{
   "stars": 5
 }];
 
+const SongIndex = styled.span`
+  font-family: "Roboto Mono", monospace;
+  margin-left: ${({ theme }) => theme.spacing.xxs};
+`;
+
 const SongName = styled.p`
   text-align: left;
+`;
+const SongDuration = styled.span`
+  font-family: "Roboto Mono", monospace;
+  margin-right: ${({ theme }) => theme.spacing.xxs};
 `;
 
 const List = (props: IListProps) => {
   const getItem = () => {
     return songs.map((song, index) => {
-      console.log('songs', songs.length)
       return (
         <li className="row" key={index}>
-          <span>{padZeroes(index + 1, songs.length.toString().split('').length)}</span>
+          <SongIndex>{padZeroes(index + 1, songs.length.toString().split('').length)}</SongIndex>
           <span>·</span>
           <span>
             <SongName>{song.title}</SongName>
           </span>
           <Stars stars={song.stars}/>
-          <span className="two">{song.duration}</span><SpaceRight size="xs" />
+          <SongDuration>{song.duration}</SongDuration>
         </li>
       );
     })
