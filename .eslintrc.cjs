@@ -14,13 +14,14 @@ module.exports = {
     sourceType: 'module',
     ecmaVersion: 2021
   },
-  plugins: ['@typescript-eslint', 'solid'],
+  plugins: ['@typescript-eslint', 'react-refresh'],
+  ignorePatterns: ['out', '.eslintrc.cjs'],
   extends: [
     'eslint:recommended',
-    'plugin:solid/typescript',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:prettier/recommended'
+    'plugin:prettier/recommended',
+    'plugin:react-hooks/recommended',
   ],
   rules: {
     '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],
@@ -29,7 +30,12 @@ module.exports = {
     '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-var-requires': 'off'
+    '@typescript-eslint/no-var-requires': 'off',
+    "semi": [2, "always"],
+    'react-refresh/only-export-components': [
+      'warn',
+      { allowConstantExport: true },
+    ],
   },
   overrides: [
     {

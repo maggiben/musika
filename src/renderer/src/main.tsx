@@ -1,5 +1,18 @@
-import { render } from 'solid-js/web'
-import './assets/index.css'
-import App from './App'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+// import './index.css';
 
-render(() => <App />, document.getElementById('root') as HTMLElement)
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+// Remove Preload scripts loading
+postMessage({ payload: 'removeLoading' }, '*')
+
+// Use contextBridge
+window.electron.ipcRenderer.on('main-process-message', (_event, message) => {
+  console.log(message)
+})
