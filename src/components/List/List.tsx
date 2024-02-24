@@ -1,7 +1,6 @@
 import Stars from '@components/Stars/Stars';
 import styled from 'styled-components';
-import type { Song } from '@types/types';
-import { SpaceRight } from '@components/Spacing/Spacing';
+import type { Song } from 'types/types';
 import { padZeroes } from '@utils/string';
 
 interface IListProps {
@@ -123,30 +122,72 @@ const SongIndex = styled.span`
 
 const SongName = styled.p`
   text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0px;
 `;
+
 const SongDuration = styled.span`
   font-family: ${({ theme }) => theme.fontFamilyMonoSpace};
   margin-right: ${({ theme }) => theme.spacing.xxs};
 `;
 
+const ListWrapper = styled.ul`
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  & > li > span {
+    min-width: 0;
+    &:nth-child(1) {
+      text-align: right;
+      font-weight: bold;
+    }
+    &:nth-child(2) {
+      flex-basis: content;
+      margin: 0px 6px;
+      text-align: center;
+      font-weight: bold;
+      color: red;
+    }
+    &:nth-child(3) {
+      flex-basis: 65%;
+      flex-grow: 1;
+    }
+    &:nth-child(5) {
+      flex-basis: 10%;
+      text-align: right;
+      align-self: flex-end;
+    }
+  }
+`;
+
+const ListItemWrapper = styled.li`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 8px 0px;
+`;
+
 const List = (props: IListProps) => {
-  const getItem = () => {
+  const getItem = (): JSX.Element[] => {
     return songs.map((song, index) => {
+      const songIndex = padZeroes(index + 1, songs.length.toString().split('').length);
       return (
-        <li className="row" key={index}>
-          <SongIndex>{padZeroes(index + 1, songs.length.toString().split('').length)}</SongIndex>
+        <ListItemWrapper key={index}>
+          <SongIndex>{songIndex}</SongIndex>
           <span>·</span>
           <span>
             <SongName>{song.title}</SongName>
           </span>
           <Stars stars={song.stars}/>
           <SongDuration>{song.duration}</SongDuration>
-        </li>
+        </ListItemWrapper>
       );
     })
   };
 
-  return (<ul className="container">{getItem()}</ul>);
+  return (<ListWrapper data-testid="list-wrapper">{getItem()}</ListWrapper>);
 };
 
 export default List;

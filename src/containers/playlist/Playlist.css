@@ -1,90 +1,3 @@
-@import "https://fonts.googleapis.com/icon?family=Material+Icons";
-
-.playlist {
-  color: #484848;
-  max-height: 100vh;
-}
-
-.controls {
-  padding: 10px;
-  border-bottom: 1px solid #313133;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  & button {
-    outline: none;
-    border: none;
-    font-family: 'Material Icons';
-    font-size: 25px;
-    line-height: 1;
-    display: inline-block;
-    white-space: nowrap;
-    background-color: transparent;
-    color: #666;
-    text-align: center;
-    &:hover {
-      color: #c1c1c1;
-      background-color: #2f2f2f;
-    }
-  }
-}
-
-.list-x {
-  overflow: hidden;
-  overflow-y: scroll;
-  max-height: 100vh;
-  & ul {
-    list-style: none;
-    padding: 0px;
-    margin: 0px;
-  }
-  & .container {
-    width: 100%;
-    list-style: none;
-    padding: 0px;
-    margin: 0px;
-  }
-  & .row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: 8px 0px;
-  }
-  & ul > li > span {
-    /* This will make it work in Firefox >= 35.0a1 */
-    min-width: 0;
-    &:nth-child(1) {
-      text-align: right;
-      font-weight: bold;
-      flex-grow: 1;
-      flex-basis: 2%;
-    }
-    &:nth-child(2) {
-      flex-basis: content;
-      margin: 0px 6px;
-      text-align: center;
-      font-weight: bold;
-      color: red;
-    }
-    &:nth-child(3) {
-      flex-basis: 65%;
-      flex-grow: 1;
-    }
-    &:nth-child(5) {
-      flex-basis: 10%;
-      text-align: right;
-      align-self: flex-end;
-    }
-    & p {
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      margin: 0px;
-    }
-  }
-}
-
-
 progress {
   display: block;
   float: left;
@@ -115,46 +28,15 @@ progress:not([value])::-webkit-progress-bar{
   background:#fdd;
 }
 
-.stars {
-  color: #484848;
-  display: flex;
-  flex-flow: row;
-  font-weight: lighter;
-  cursor: pointer;
-  & .full {
-    color: #d21d30;
-  }
-}
-
-input[type="range"] {
+/* input[type="range"] {
   appearance: none;
   height: 8px;
   border-radius: 5px;
   background: #2f2f2f;
   outline: none;
-}
+} */
 
-input[type=range]::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all .15s ease-in-out;
-  position: relative;
-  background: radial-gradient(ellipse at center, #2f2f2f 30%, #666 30%, #666 100%);
-  &:hover {
-    background: radial-gradient(ellipse at center, #2f2f2f 30%, #c1c1c1 30%, #c1c1c1 100%);
-  }
-}
 
-input[type="range"]:active::-webkit-slider-thumb {
-  background: radial-gradient(ellipse at center, #2f2f2f 30%, #fff 30%, #fff 100%);
-}
-
-input[type="range"]:focus {
-  outline: none; 
-}
 
 input[type="checkbox"] {
   display: none;

@@ -1,3 +1,15 @@
+import styled from 'styled-components';
+
+const StarsContainer = styled.span`
+  color: #484848;
+  display: flex;
+  flex-flow: row;
+  font-weight: lighter;
+  cursor: pointer;
+  & .full {
+    color: #d21d30;
+  }
+`;
 interface IStarProps {
   stars?: number;
 }
@@ -10,7 +22,7 @@ const Stars = (props: IStarProps): JSX.Element => {
       return (<span className={style} key={index}>{x}</span>);
     });
   };
-  return (<span className="two stars">{makeStars(props.stars)}</span>);
+  return (<StarsContainer>{makeStars(props.stars)}</StarsContainer>);
 };
 
 export default Stars;

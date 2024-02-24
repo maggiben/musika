@@ -3,3 +3,10 @@ export interface Song {
   duration: string;
   stars?: number;
 }
+
+declare global {
+  interface Window {
+    electron: Electron;
+    ipcRenderer: Electron.IpcRenderer;
+  }
+}

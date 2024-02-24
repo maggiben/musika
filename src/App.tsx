@@ -29,6 +29,17 @@ const theme = {
     xxl: '48px',
     xxxl: '64px',
   },
+  borderRadius: {
+    xxxs: '2px',
+    xxs: '4px',
+    xs: '8px',
+    s: '12px',
+    m: '16px',
+    l: '24px',
+    xl: '32px',
+    xxl: '48px',
+    xxxl: '64px',
+  }
 };
 
 const App = (): JSX.Element => {
@@ -37,7 +48,8 @@ const App = (): JSX.Element => {
       <RecoilRoot>
         <I18nextProvider i18n={i18n}>
           <Container>
-            <Download />
+            {/* <Download /> */}
+            <Playlist />
           </Container>
         </I18nextProvider>
       </RecoilRoot>

@@ -1,5 +1,7 @@
-import { app, BrowserWindow } from 'electron'
-import path from 'node:path'
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
+import path from 'node:path';
+import getVideoInfo from './commands/info';
+import download from './commands/download';
 
 // The built directory structure
 //
@@ -24,7 +26,17 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
-  })
+  });
+
+  ipcMain.handle('getVideoInfo', async (event: IpcMainInvokeEvent, url: string) => {
+    const result = await getVideoInfo(url);
+    return result
+  });
+
+  ipcMain.handle('download', async (event: IpcMainInvokeEvent, url: string) => {
+    const result = await download(url, win);
+    return result
+  });
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {

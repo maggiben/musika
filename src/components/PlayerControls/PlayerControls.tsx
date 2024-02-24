@@ -1,4 +1,5 @@
 
+import './PlayerControls.css';
 import styled from 'styled-components';
 import InputRange from '@components/InputRange/InputRange';
 
@@ -11,7 +12,6 @@ const PlayerControlsContainer = styled.div`
     outline: none;
     border: none;
     font-family: 'Material Icons';
-    font-size: 25px;
     line-height: 1;
     display: inline-block;
     white-space: nowrap;
@@ -20,14 +20,14 @@ const PlayerControlsContainer = styled.div`
     text-align: center;
     &:hover {
       color: #c1c1c1;
-      background-color: #2f2f2f;
+      /* background-color: #2f2f2f; */
     }
   }
 `;
 
 const PlayTime = styled.span`
   font-family: "Roboto Mono", monospace;
-  margin-right: ${({ theme }) => theme.spacing.xs};
+  margin-right: ${({ theme }) => theme.spacing.xxs};
 `;
 
 const PlayerControls = (): JSX.Element => {
