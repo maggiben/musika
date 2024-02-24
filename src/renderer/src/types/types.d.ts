@@ -1,11 +1,5 @@
 import 'styled-components';
 
-// export interface IDefaultTheme {
-//   colors: Record<string, string>;
-//   borderRadius: IBorderRadius;
-//   spacing: ISpacing;
-// }
-
 interface IBorderRadius {
   xxxs: string;
   xxs: string;
@@ -27,12 +21,6 @@ interface ISpacing {
   xxxl: string;
 }
 
-export interface Song {
-  title: string;
-  duration: string;
-  stars?: number;
-}
-
 declare global {
   interface Window {
     electron: Electron;
@@ -40,6 +28,7 @@ declare global {
     commands: Record<string, (...args: unknown) => Promise<unknown>>;
   }
 }
+
 declare module 'styled-components' {
   export interface DefaultTheme {
     colors: Record<string, string>;

@@ -25,7 +25,6 @@
       "@renderer/*": [ "src/renderer/src/*"],
       "@components/*": ["src/renderer/src/components/*"],
       "@containers/*": ["src/renderer/src/containers/*"],
-      "@types/*": ["src/renderer/src/types/*"],
       "@assets/*": ["src/renderer/src/assets/*"],
       "@utils/*": ["src/renderer/src/utils/*"],
       "@states/*": ["src/renderer/src/states/*"],

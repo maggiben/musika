@@ -33,18 +33,25 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as ytdl from 'ytdl-core';
-import * as ytpl from '@distube/ytpl';
+import ytdl from 'ytdl-core';
+import ytpl from '@distube/ytpl';
 
 export default async function getVideoInfo(url: string): Promise<Record<string, unknown>> { // Promise<ytdl.videoInfo>
+  const playlistOptions = {
+    gl: 'US',
+    hl: 'en',
+    limit: Infinity,
+  };
   try {
     const playlistId = ytpl.validateID(url) && (await ytpl.getPlaylistID(url));
     const videoId = ytdl.validateURL(url) && ytdl.getVideoID(url);
     const videoInfo = await ytdl.getInfo(url);
+    const playlist = playlistId && (await ytpl(playlistId, playlistOptions));
     return {
       playlistId,
       videoId,
       videoInfo,
+      playlist,
     };
   } catch (error) {
     throw new Error((error as Error).message);

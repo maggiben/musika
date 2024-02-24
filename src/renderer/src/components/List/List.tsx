@@ -1,13 +1,10 @@
 import Stars from '@components/Stars/Stars';
 import styled from 'styled-components';
-import type { Song } from 'types/types';
+import type { ISong } from '@renderer/types/List';
 import { padZeroes } from '@utils/string';
+import type { IPlaylist } from '@renderer/states/atoms';
 
-interface IListProps {
-  data?: Array<any>;
-}
-
-const songs: Song[] = [
+const songs: ISong[] = [
   {
     title: 'Spiderwebs',
     duration: '4:28',
@@ -166,6 +163,7 @@ const ListWrapper = styled.ul`
   list-style: none;
   padding: 0px;
   margin: 0px;
+  overflow-y: scroll;
   & > li > span {
     min-width: 0;
     &:nth-child(1) {
@@ -198,9 +196,15 @@ const ListItemWrapper = styled.li`
   margin: 8px 0px;
 `;
 
+import ytpl from '@distube/ytpl';
+
+interface IListProps {
+  items?: IPlaylist['items'];
+}
+
 const List = (props: IListProps) => {
-  const getItem = (): JSX.Element[] => {
-    return songs.map((song, index) => {
+  const getItem = (items: IPlaylist['items']): JSX.Element[] => {
+    return items.map((song, index) => {
       const songIndex = padZeroes(index + 1, songs.length.toString().split('').length);
       return (
         <ListItemWrapper key={index}>
@@ -209,14 +213,16 @@ const List = (props: IListProps) => {
           <span>
             <SongName>{song.title}</SongName>
           </span>
-          <Stars stars={song.stars} />
+          <Stars stars={3} />
           <SongDuration>{song.duration}</SongDuration>
         </ListItemWrapper>
       );
     });
   };
 
-  return <ListWrapper data-testid="list-wrapper">{getItem()}</ListWrapper>;
+  return props.items ? (
+    <ListWrapper data-testid="list-wrapper">{getItem(props.items)}</ListWrapper>
+  ) : null;
 };
 
 export default List;
