@@ -7,113 +7,142 @@ interface IListProps {
   data?: Array<any>;
 }
 
-const songs: Song[] = [{
-  "title": "Spiderwebs",
-  "duration": "4:28",
-  "stars": 2
-}, {
-  "title": "Excuse Me Mr.fasdfasdfasdfasdfasdfadsf dfasdf adfasdfasdf",
-  "duration": "3:04",
-  "stars": 3
-}, {
-  "title": "Just a Girl",
-  "duration": "3:28",
-  "stars": 1
-}, {
-  "title": "Happy Now?",
-  "duration": "3:43",
-  "stars": 2
-}, {
-  "title": "Different People",
-  "duration": "4:34",
-  "stars": 3
-}, {
-  "title": "Hey You!",
-  "duration": "3:34",
-  "stars": 4
-}, {
-  "title": "The Climb",
-  "duration": "6:37",
-  "stars": 5
-}, {
-  "title": "Sixteen",
-  "duration": "3:21",
-  "stars": 0
-}, {
-  "title": "Sunday Morning",
-  "duration": "4:33",
-  "stars": 0
-}, {
-  "title": "Don't Speak",
-  "duration": "4:23"
-}, {
-  "title": "You Can Do It",
-  "duration": "4:13",
-  "stars": 4
-}, {
-  "title": "World Go 'Round",
-  "duration": "4:09"
-}, {
-  "title": "End It on This",
-  "duration": "3:45"
-}, {
-  "title": "Tragic Kingdom",
-  "duration": "5:31",
-  "stars": 5
-}, {
-  "title": "Spiderwebs",
-  "duration": "4:28",
-  "stars": 2
-}, {
-  "title": "Excuse Me Mr.fasdfasdfasdfasdfasdfadsf dfasdf adfasdfasdf",
-  "duration": "3:04",
-  "stars": 3
-}, {
-  "title": "Just a Girl",
-  "duration": "3:28",
-  "stars": 1
-}, {
-  "title": "Happy Now?",
-  "duration": "3:43",
-  "stars": 2
-}, {
-  "title": "Different People",
-  "duration": "4:34",
-  "stars": 3
-}, {
-  "title": "Hey You!",
-  "duration": "3:34",
-  "stars": 4
-}, {
-  "title": "The Climb",
-  "duration": "6:37",
-  "stars": 5
-}, {
-  "title": "Sixteen",
-  "duration": "3:21",
-  "stars": 0
-}, {
-  "title": "Sunday Morning",
-  "duration": "4:33",
-  "stars": 0
-}, {
-  "title": "Don't Speak",
-  "duration": "4:23"
-}, {
-  "title": "You Can Do It",
-  "duration": "4:13",
-  "stars": 4
-}, {
-  "title": "World Go 'Round",
-  "duration": "4:09"
-}, {
-  "title": "End It on This",
-  "duration": "3:45"
-}, {
-  "title": "Tragic Kingdom",
-  "duration": "5:31",
-  "stars": 5
-}];
+const songs: Song[] = [
+  {
+    title: 'Spiderwebs',
+    duration: '4:28',
+    stars: 2,
+  },
+  {
+    title: 'Excuse Me Mr.fasdfasdfasdfasdfasdfadsf dfasdf adfasdfasdf',
+    duration: '3:04',
+    stars: 3,
+  },
+  {
+    title: 'Just a Girl',
+    duration: '3:28',
+    stars: 1,
+  },
+  {
+    title: 'Happy Now?',
+    duration: '3:43',
+    stars: 2,
+  },
+  {
+    title: 'Different People',
+    duration: '4:34',
+    stars: 3,
+  },
+  {
+    title: 'Hey You!',
+    duration: '3:34',
+    stars: 4,
+  },
+  {
+    title: 'The Climb',
+    duration: '6:37',
+    stars: 5,
+  },
+  {
+    title: 'Sixteen',
+    duration: '3:21',
+    stars: 0,
+  },
+  {
+    title: 'Sunday Morning',
+    duration: '4:33',
+    stars: 0,
+  },
+  {
+    title: "Don't Speak",
+    duration: '4:23',
+  },
+  {
+    title: 'You Can Do It',
+    duration: '4:13',
+    stars: 4,
+  },
+  {
+    title: "World Go 'Round",
+    duration: '4:09',
+  },
+  {
+    title: 'End It on This',
+    duration: '3:45',
+  },
+  {
+    title: 'Tragic Kingdom',
+    duration: '5:31',
+    stars: 5,
+  },
+  {
+    title: 'Spiderwebs',
+    duration: '4:28',
+    stars: 2,
+  },
+  {
+    title: 'Excuse Me Mr.fasdfasdfasdfasdfasdfadsf dfasdf adfasdfasdf',
+    duration: '3:04',
+    stars: 3,
+  },
+  {
+    title: 'Just a Girl',
+    duration: '3:28',
+    stars: 1,
+  },
+  {
+    title: 'Happy Now?',
+    duration: '3:43',
+    stars: 2,
+  },
+  {
+    title: 'Different People',
+    duration: '4:34',
+    stars: 3,
+  },
+  {
+    title: 'Hey You!',
+    duration: '3:34',
+    stars: 4,
+  },
+  {
+    title: 'The Climb',
+    duration: '6:37',
+    stars: 5,
+  },
+  {
+    title: 'Sixteen',
+    duration: '3:21',
+    stars: 0,
+  },
+  {
+    title: 'Sunday Morning',
+    duration: '4:33',
+    stars: 0,
+  },
+  {
+    title: "Don't Speak",
+    duration: '4:23',
+  },
+  {
+    title: 'You Can Do It',
+    duration: '4:13',
+    stars: 4,
+  },
+  {
+    title: "World Go 'Round",
+    duration: '4:09',
+  },
+  {
+    title: 'End It on This',
+    duration: '3:45',
+  },
+  {
+    title: 'Tragic Kingdom',
+    duration: '5:31',
+    stars: 5,
+  },
+];
 
 const SongIndex = styled.span`
   font-family: ${({ theme }) => theme.fontFamilyMonoSpace};
@@ -180,14 +209,14 @@ const List = (props: IListProps) => {
           <span>
             <SongName>{song.title}</SongName>
           </span>
-          <Stars stars={song.stars}/>
+          <Stars stars={song.stars} />
           <SongDuration>{song.duration}</SongDuration>
         </ListItemWrapper>
       );
-    })
+    });
   };
 
-  return (<ListWrapper data-testid="list-wrapper">{getItem()}</ListWrapper>);
+  return <ListWrapper data-testid="list-wrapper">{getItem()}</ListWrapper>;
 };
 
 export default List;

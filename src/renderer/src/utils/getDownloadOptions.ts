@@ -68,7 +68,12 @@ export default function getDownloadOptions(flags: OutputFlags<any>): ytdl.downlo
    * @param {string} regexpStr
    * @param {boolean|undefined} negated
    */
-  const createFilter = (name: string, field: string, regexpStr: string, negated?: boolean): void => {
+  const createFilter = (
+    name: string,
+    field: string,
+    regexpStr: string,
+    negated?: boolean,
+  ): void => {
     const regexp = new RegExp(regexpStr, 'i');
     filters.push([
       name,
@@ -108,26 +113,39 @@ export default function getDownloadOptions(flags: OutputFlags<any>): ytdl.downlo
 
   switch (flags.filter) {
     case 'audioandvideo':
-      filters.push(['audioandvideo', (format: ytdl.videoFormat): boolean => hasVideo(format) && hasAudio(format)]);
+      filters.push([
+        'audioandvideo',
+        (format: ytdl.videoFormat): boolean => hasVideo(format) && hasAudio(format),
+      ]);
       break;
     case 'videoandaudio':
-      filters.push(['videoandaudio', (format: ytdl.videoFormat): boolean => hasVideo(format) && hasAudio(format)]);
+      filters.push([
+        'videoandaudio',
+        (format: ytdl.videoFormat): boolean => hasVideo(format) && hasAudio(format),
+      ]);
       break;
     case 'video':
       filters.push(['video', hasVideo]);
       break;
     case 'videoonly':
-      filters.push(['videoonly', (format: ytdl.videoFormat): boolean => hasVideo(format) && !hasAudio(format)]);
+      filters.push([
+        'videoonly',
+        (format: ytdl.videoFormat): boolean => hasVideo(format) && !hasAudio(format),
+      ]);
       break;
     case 'audio':
       filters.push(['audio', hasAudio]);
       break;
     case 'audioonly':
-      filters.push(['audioonly', (format: ytdl.videoFormat): boolean => !hasVideo(format) && hasAudio(format)]);
+      filters.push([
+        'audioonly',
+        (format: ytdl.videoFormat): boolean => !hasVideo(format) && hasAudio(format),
+      ]);
       break;
   }
 
-  options.filter = (format: ytdl.videoFormat): boolean => filters.every((filter) => filter[1](format));
+  options.filter = (format: ytdl.videoFormat): boolean =>
+    filters.every((filter) => filter[1](format));
 
   return options;
 }

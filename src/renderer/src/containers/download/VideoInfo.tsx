@@ -1,7 +1,6 @@
 import * as ytdl from 'ytdl-core';
 import * as utils from '@utils/utils';
 
-
 export interface IOutputVideoMeta {
   label: string;
   path: string;
@@ -54,7 +53,9 @@ class Info {
       {
         label: 'length',
         path: 'lengthSeconds',
-        requires: utils.getValueFrom<ytdl.videoFormat[]>(this.videoInfo, 'formats').some((format) => format.isLive),
+        requires: utils
+          .getValueFrom<ytdl.videoFormat[]>(this.videoInfo, 'formats')
+          .some((format) => format.isLive),
         transformValue: utils.toHumanTime,
       },
     ];
@@ -79,7 +80,11 @@ class Info {
   private printVideoMeta(): void {
     this.prepareVideoMetaBatch().forEach((outputVideoMeta: IOutputVideoMeta) => {
       const { label } = outputVideoMeta;
-      const value = utils.getValueFrom<string>(this.videoInfo, `videoDetails.${outputVideoMeta.path}`, '');
+      const value = utils.getValueFrom<string>(
+        this.videoInfo,
+        `videoDetails.${outputVideoMeta.path}`,
+        '',
+      );
       if (!outputVideoMeta.requires) {
         if (outputVideoMeta.transformValue) {
           return this.logStyledProp(label, outputVideoMeta.transformValue(parseInt(value, 10)));
@@ -101,9 +106,27 @@ class Info {
       quality: utils.getValueFrom<string>(format, 'qualityLabel', ''),
       codecs: this.getCodec(format),
       /* istanbul ignore else */
-      bitrate: utils.getValueFromMeta(format, 'bitrate', format.qualityLabel, '', utils.toHumanSize),
-      'audio bitrate': utils.getValueFromMeta(format, 'audioBitrate', format.audioBitrate, '', utils.toHumanSize),
-      size: utils.getValueFromMeta(format, 'contentLength', format.contentLength, '', utils.toHumanSize),
+      bitrate: utils.getValueFromMeta(
+        format,
+        'bitrate',
+        format.qualityLabel,
+        '',
+        utils.toHumanSize,
+      ),
+      'audio bitrate': utils.getValueFromMeta(
+        format,
+        'audioBitrate',
+        format.audioBitrate,
+        '',
+        utils.toHumanSize,
+      ),
+      size: utils.getValueFromMeta(
+        format,
+        'contentLength',
+        format.contentLength,
+        '',
+        utils.toHumanSize,
+      ),
     }));
   }
 

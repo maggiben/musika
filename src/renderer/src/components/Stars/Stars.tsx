@@ -17,12 +17,20 @@ interface IStarProps {
 const Stars = (props: IStarProps): JSX.Element => {
   const maxStars = 5;
   const makeStars = (stars: number = 0) => {
-    return '☆'.repeat(maxStars).split('').fill('★', 0, stars).map((x, index) => {
-      let style = x === '★' ? 'full' : 'empty';
-      return (<span className={style} key={index}>{x}</span>);
-    });
+    return '☆'
+      .repeat(maxStars)
+      .split('')
+      .fill('★', 0, stars)
+      .map((x, index) => {
+        const style = x === '★' ? 'full' : 'empty';
+        return (
+          <span className={style} key={index}>
+            {x}
+          </span>
+        );
+      });
   };
-  return (<StarsContainer>{makeStars(props.stars)}</StarsContainer>);
+  return <StarsContainer>{makeStars(props.stars)}</StarsContainer>;
 };
 
 export default Stars;

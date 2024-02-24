@@ -120,14 +120,19 @@ export function fromHumanSize(size: string): number {
 // };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ThrottledFunction<T extends (...args: any[]) => any> = (...args: Parameters<T>) => ReturnType<T>;
+export type ThrottledFunction<T extends (...args: any[]) => any> = (
+  ...args: Parameters<T>
+) => ReturnType<T>;
 
 /**
  * Creates a throttled function that only invokes the provided function (`func`) at most once per within a given number of milliseconds
  * (`limit`)
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function throttle<T extends (...args: any) => any>(func: T, limit: number): ThrottledFunction<T> {
+export function throttle<T extends (...args: any) => any>(
+  func: T,
+  limit: number,
+): ThrottledFunction<T> {
   let inThrottle: boolean;
   let lastResult: ReturnType<T>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -182,7 +187,7 @@ export function getValueFromMeta<T>(
   exists?: unknown,
   defaultValue?: unknown,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transform?: (input: any) => T
+  transform?: (input: any) => T,
 ): T {
   if (exists) {
     if (transform) {
@@ -195,7 +200,7 @@ export function getValueFromMeta<T>(
 
 export function getYoutubeVideoId(url: string): string | undefined {
   const regExp = new RegExp(
-    /(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w-]{11})[a-z0-9;:@#?&%=+/$_.-]*/
+    /(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w-]{11})[a-z0-9;:@#?&%=+/$_.-]*/,
   );
   const match = url.match(regExp);
   if (match && match[1]) {
@@ -210,7 +215,7 @@ export function getYoutubeVideoId(url: string): string | undefined {
  */
 export function getYoutubePlaylistId(url: string): string | undefined {
   const regExp = new RegExp(
-    /(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w-]{12,})[a-z0-9;:@#?&%=+/$_.-]*/
+    /(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w-]{12,})[a-z0-9;:@#?&%=+/$_.-]*/,
   );
   if (url.includes('list=')) {
     const match = url.match(regExp);

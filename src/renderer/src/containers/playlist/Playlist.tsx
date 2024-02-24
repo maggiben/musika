@@ -1,5 +1,3 @@
-
-
 import './Playlist.css';
 import styled from 'styled-components';
 import List from '@components/List/List';
@@ -26,7 +24,7 @@ const Playlist = (): JSX.Element => {
         <List />
       </ListContainer>
     </PlaylistContainer>
-  )
-}
+  );
+};
 
 export default Playlist;

@@ -52,7 +52,7 @@ export declare interface IOutputVideoMeta {
 export default function videoMeta(
   videoInfo?: ytdl.videoInfo,
   videoFormat?: ytdl.videoFormat,
-  output?: string
+  output?: string,
 ): IOutputVideoMeta[] {
   return [
     {
@@ -84,8 +84,11 @@ export default function videoMeta(
       label: 'length',
       from: videoInfo,
       path: 'videoDetails.lengthSeconds',
-      requires: utils.getValueFrom<ytdl.videoFormat[]>(videoInfo, 'formats').some((format) => format.isLive),
-      transformValue: (value: number | string): string => utils.toHumanTime(parseInt(value as string, 10)),
+      requires: utils
+        .getValueFrom<ytdl.videoFormat[]>(videoInfo, 'formats')
+        .some((format) => format.isLive),
+      transformValue: (value: number | string): string =>
+        utils.toHumanTime(parseInt(value as string, 10)),
     },
     {
       label: 'quality',

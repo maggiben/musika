@@ -10,13 +10,13 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/main/index.ts'),
-          child: resolve(__dirname, 'src/main/child.ts')
-        }
-      }
-    }
+          child: resolve(__dirname, 'src/main/child.ts'),
+        },
+      },
+    },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
   },
   renderer: {
     // resolve: {
@@ -26,6 +26,6 @@ export default defineConfig({
     //     "@utils": resolve('src/renderer/src/utils'),
     //   }
     // },
-    plugins: [react(), tsconfigPaths()]
+    plugins: [react(), tsconfigPaths()],
   },
-})
+});

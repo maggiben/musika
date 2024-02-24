@@ -29,7 +29,7 @@
       "@assets/*": ["src/renderer/src/assets/*"],
       "@utils/*": ["src/renderer/src/utils/*"],
       "@states/*": ["src/renderer/src/states/*"],
-      "@translation/*": [ "public/locale/*" ],
+      "@translation/*": [ "src/renderer/src/assets/locale/*" ],
       "@pjson": ["package.json"],
     }
   }

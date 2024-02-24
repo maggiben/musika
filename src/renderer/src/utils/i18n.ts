@@ -1,7 +1,6 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 import translationES from '@translation/es/translation.json';
-
 
 // (We only need to initialize i18next once).
 i18n

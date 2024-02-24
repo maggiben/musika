@@ -1,7 +1,7 @@
 export default async function scheduler<T, K>(
   maxconnections: number,
   items: K[],
-  functor: (item: K) => Promise<T>
+  functor: (item: K) => Promise<T>,
 ): Promise<Array<T | undefined>> {
   const workers: Array<T | undefined> = [];
   for await (const result of runTasks<T>(maxconnections, tasks(items, functor))) {
@@ -10,26 +10,32 @@ export default async function scheduler<T, K>(
   return workers;
 }
 
-function tasks<T, K>(items: K[], functor: (item: K) => Promise<T>): IterableIterator<() => Promise<T>> {
+function tasks<T, K>(
+  items: K[],
+  functor: (item: K) => Promise<T>,
+): IterableIterator<() => Promise<T>> {
   return items
-    .reduce((previousValue, currentValue) => {
-      return [
-        ...previousValue,
-        async (): Promise<T> => {
-          try {
-            return await functor(currentValue);
-          } catch (error) {
-            return Promise.reject(error);
-          }
-        },
-      ];
-    }, [] as Array<() => Promise<T>>)
+    .reduce(
+      (previousValue, currentValue) => {
+        return [
+          ...previousValue,
+          async (): Promise<T> => {
+            try {
+              return await functor(currentValue);
+            } catch (error) {
+              return Promise.reject(error);
+            }
+          },
+        ];
+      },
+      [] as Array<() => Promise<T>>,
+    )
     .values() as IterableIterator<() => Promise<T>>;
 }
 
 async function* runTasks<T>(
   maxConcurrency: number,
-  iterator: IterableIterator<() => Promise<T>>
+  iterator: IterableIterator<() => Promise<T>>,
 ): AsyncGenerator<T | undefined, void, unknown> {
   // Each worker is an async generator that polls for tasks
   // from the shared iterator.
@@ -46,9 +52,12 @@ async function* runTasks<T>(
 }
 
 async function* raceAsyncIterators<T>(
-  iterators: Array<AsyncIterator<T>>
+  iterators: Array<AsyncIterator<T>>,
 ): AsyncGenerator<T | undefined, void, unknown> {
-  async function queueNext(iteratorResult: { result?: IteratorResult<T>; iterator: AsyncIterator<T> }): Promise<{
+  async function queueNext(iteratorResult: {
+    result?: IteratorResult<T>;
+    iterator: AsyncIterator<T>;
+  }): Promise<{
     result?: IteratorResult<T>;
     iterator: AsyncIterator<T>;
   }> {

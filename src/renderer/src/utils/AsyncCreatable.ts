@@ -53,7 +53,10 @@ export abstract class AsyncCreatable<O = object> {
    *
    * @param options An options object providing initialization params to the async constructor.
    */
-  public static async create<P, T extends AsyncCreatable<P>>(this: new (opts: P) => T, options: P): Promise<T> {
+  public static async create<P, T extends AsyncCreatable<P>>(
+    this: new (opts: P) => T,
+    options: P,
+  ): Promise<T> {
     const instance = new this(options);
     await instance.init();
     return instance;

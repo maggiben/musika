@@ -1,4 +1,3 @@
-
 import './PlayerControls.css';
 import styled from 'styled-components';
 import InputRange from '@components/InputRange/InputRange';
@@ -26,7 +25,7 @@ const PlayerControlsContainer = styled.div`
 `;
 
 const PlayTime = styled.span`
-  font-family: "Roboto Mono", monospace;
+  font-family: 'Roboto Mono', monospace;
   margin-right: ${({ theme }) => theme.spacing.xxs};
 `;
 
@@ -46,7 +45,7 @@ const PlayerControls = (): JSX.Element => {
         <button className="play">play_arrow</button>
         <button>fast_forward</button>
       </div>
-      <div style={{lineHeight: '1'}}>
+      <div style={{ lineHeight: '1' }}>
         <input id="loop" type="checkbox" />
         <label htmlFor="loop">loop</label>
         <input id="shuffle" type="checkbox" />
