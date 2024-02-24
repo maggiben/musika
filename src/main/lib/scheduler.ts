@@ -1,5 +1,5 @@
 /*
- * @file         : scheduler.ts
+ * @file         : Scheduler.ts
  * @summary      : Playlist thread scheduler
  * @version      : 1.0.0
  * @project      : YtKit
@@ -37,66 +37,61 @@ import * as path from 'path';
 import { EventEmitter } from 'stream';
 import { Worker, WorkerOptions } from 'worker_threads';
 import ytpl from '@distube/ytpl';
-import { DownloadWorker } from './DownloadWorker';
-import { EncoderStream } from './EncoderStream';
+// import { EncoderStream } from './EncoderStream';
+import type { IDownloadWorkerMessage } from './DownloadWorker';
 
-export namespace Scheduler {
+export interface ISchedulerOptions {
   /**
-   * Constructor options for Scheduler.
+   * Youtube playlist id.
    */
-  export interface Options {
-    /**
-     * Youtube playlist id.
-     */
-    playlistId: string;
-    /**
-     * Output file name.
-     */
-    output?: string;
-    /**
-     * Property specifies the maximum number of simultaneous connections to a server.
-     */
-    maxconnections?: number;
-    /**
-     * Total number of connection attempts, including the initial connection attempt.
-     */
-    retries?: number;
-    /**
-     * Timeout value prevents network operations from blocking indefinitely.
-     */
-    timeout?: number;
-    /**
-     * Video download options.
-     */
-    playlistOptions?: ytpl.options;
-    /**
-     * Flags
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    flags?: any;
-    /**
-     * Media encoder options
-     */
-    encoderOptions?: EncoderStream.EncodeOptions;
-  }
+  playlistId: string;
+  /**
+   * Output file name.
+   */
+  output?: string;
+  /**
+   * Property specifies the maximum number of simultaneous connections to a server.
+   */
+  maxconnections?: number;
+  /**
+   * Total number of connection attempts, including the initial connection attempt.
+   */
+  retries?: number;
+  /**
+   * Timeout value prevents network operations from blocking indefinitely.
+   */
+  timeout?: number;
+  /**
+   * Video download options.
+   */
+  playlistOptions?: ytpl.options;
+  /**
+   * Flags
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  flags?: any;
+  /**
+   * Media encoder options
+   */
+  // encoderOptions?: EncoderStream.EncodeOptions;
+}
 
-  export interface Message {
-    type: string;
-    source: ytpl.result;
-    error?: Error;
-    details?: Record<string, unknown>;
-  }
+export interface ISchedulerMessage {
+  type: string;
+  source: ytpl.result;
+  error?: Error;
+  details?: Record<string, unknown>;
+}
 
-  export interface RetryItems {
-    item: any;
-    left: number;
-  }
+export interface ISchedulerRetryItems {
+  item: ytpl.result['items'][0];
+  left: number;
+}
 
-  export interface Result {
-    item: any;
-    code: number | boolean;
-    error?: Error | string;
-  }
+export interface ISchedulerResult {
+  item: ytpl.result['items'][0];
+  code: number | boolean;
+  error?: Error | string;
 }
 
 /*
@@ -105,7 +100,7 @@ export namespace Scheduler {
 */
 export class Scheduler extends EventEmitter {
   private workers = new Map<string, Worker>();
-  private retryItems = new Map<string, Scheduler.RetryItems>();
+  private retryItems = new Map<string, ISchedulerRetryItems>();
   private playlistId: string;
   private output: string;
   private maxconnections: number;
@@ -114,9 +109,9 @@ export class Scheduler extends EventEmitter {
   private playlistOptions?: ytpl.options;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private flags?: any;
-  private encoderOptions?: EncoderStream.EncodeOptions;
+  // private encoderOptions?: EncoderStream.EncodeOptions;
 
-  public constructor(options: Scheduler.Options) {
+  public constructor(options: ISchedulerOptions) {
     super();
     this.playlistId = options.playlistId;
     this.output = options.output ?? '{videoDetails.title}';
@@ -131,7 +126,7 @@ export class Scheduler extends EventEmitter {
   /**
    * Initializes an instance of the Downloader class.
    */
-  public async download(): Promise<Array<Scheduler.Result | undefined>> {
+  public async download(): Promise<Array<ISchedulerResult | undefined>> {
     console.log('ytpl', typeof ytpl, Object.keys(ytpl));
     const playlist = await ytpl(this.playlistId, this.playlistOptions);
     this.emit('playlistItems', { source: playlist, details: { playlistItems: playlist.items } });
@@ -154,9 +149,14 @@ export class Scheduler extends EventEmitter {
   }
   */
 
-  private async scheduler(items: ytpl.result['items']): Promise<Array<Scheduler.Result | undefined>> {
-    const workers: Array<Scheduler.Result | undefined> = [];
-    for await (const result of this.runTasks<Scheduler.Result>(this.maxconnections, this.tasks(items))) {
+  private async scheduler(
+    items: ytpl.result['items'],
+  ): Promise<Array<ISchedulerResult | undefined>> {
+    const workers: Array<ISchedulerResult | undefined> = [];
+    for await (const result of this.runTasks<ISchedulerResult>(
+      this.maxconnections,
+      this.tasks(items),
+    )) {
       workers.push(result);
     }
     return workers;
@@ -165,8 +165,10 @@ export class Scheduler extends EventEmitter {
   /*
     from: https://stackoverflow.com/questions/40639432/what-is-the-best-way-to-limit-concurrency-when-using-es6s-promise-all
   */
-  private tasks<T extends Scheduler.Result>(items: ytpl.result['items']): IterableIterator<() => Promise<T>> {
-    const tasks = [];
+  private tasks<T extends ISchedulerResult>(
+    items: ytpl.result['items'],
+  ): IterableIterator<() => Promise<T>> {
+    const tasks = [] as Array<() => Promise<T>>;
     for (const item of items) {
       const task = async (): Promise<T> => {
         try {
@@ -185,9 +187,12 @@ export class Scheduler extends EventEmitter {
   }
 
   private async *raceAsyncIterators<T>(
-    iterators: Array<AsyncIterator<T>>
+    iterators: Array<AsyncIterator<T>>,
   ): AsyncGenerator<T | undefined, void, unknown> {
-    async function queueNext(iteratorResult: { result?: IteratorResult<T>; iterator: AsyncIterator<T> }): Promise<{
+    async function queueNext(iteratorResult: {
+      result?: IteratorResult<T>;
+      iterator: AsyncIterator<T>;
+    }): Promise<{
       result?: IteratorResult<T>;
       iterator: AsyncIterator<T>;
     }> {
@@ -195,7 +200,9 @@ export class Scheduler extends EventEmitter {
       iteratorResult.result = await iteratorResult.iterator.next();
       return iteratorResult;
     }
-    const iteratorResults = new Map(iterators.map((iterator) => [iterator, queueNext({ iterator })]));
+    const iteratorResults = new Map(
+      iterators.map((iterator) => [iterator, queueNext({ iterator })]),
+    );
     while (iteratorResults.size) {
       const winner: {
         result?: IteratorResult<T>;
@@ -213,7 +220,7 @@ export class Scheduler extends EventEmitter {
 
   private async *runTasks<T>(
     maxConcurrency: number,
-    iterator: IterableIterator<() => Promise<T>>
+    iterator: IterableIterator<() => Promise<T>>,
   ): AsyncGenerator<T | undefined, void, unknown> {
     // Each worker is an async generator that polls for tasks
     // from the shared iterator.
@@ -239,7 +246,7 @@ export class Scheduler extends EventEmitter {
    * @param {Worker} worker the worker currently executing
    * @returns {boolean} returns false if exceeded the maximum allowed retries otherwise returns true
    */
-  private async retryDownloadWorker<T extends Scheduler.Result>(item: ytpl.Item): Promise<T> {
+  private async retryDownloadWorker<T extends ISchedulerResult>(item: ytpl.Item): Promise<T> {
     if (!this.retryItems.has(item.id)) {
       this.retryItems.set(item.id, {
         item,
@@ -277,7 +284,7 @@ export class Scheduler extends EventEmitter {
     });
   }
 
-  private async downloadWorkers<T extends Scheduler.Result>(item: ytpl.Item): Promise<T> {
+  private async downloadWorkers<T extends ISchedulerResult>(item: ytpl.Item): Promise<T> {
     const workerOptions: WorkerOptions = {
       workerData: {
         item,
@@ -298,13 +305,13 @@ export class Scheduler extends EventEmitter {
     });
   }
 
-  private handleWorkerEvents<T extends Scheduler.Result>(
+  private handleWorkerEvents<T extends ISchedulerResult>(
     worker: Worker,
-    item: ytpl.Item,
+    item: ytpl.result['items'][0],
     resolve: (value: T) => void,
-    reject: (reason?: Error | number | unknown) => void
+    reject: (reason?: Error | number | unknown) => void,
   ): void {
-    worker.on('message', (message: DownloadWorker.Message) => {
+    worker.on('message', (message: IDownloadWorkerMessage) => {
       this.emit(message.type, message);
     });
     worker.once('online', () => {

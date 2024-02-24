@@ -36,7 +36,8 @@
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 
-export default async function getVideoInfo(url: string): Promise<Record<string, unknown>> { // Promise<ytdl.videoInfo>
+export default async function getVideoInfo(url: string): Promise<Record<string, unknown>> {
+  // Promise<ytdl.videoInfo>
   const playlistOptions = {
     gl: 'US',
     hl: 'en',

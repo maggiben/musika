@@ -16,7 +16,7 @@ interface IStarProps {
 
 const Stars = (props: IStarProps): JSX.Element => {
   const maxStars = 5;
-  const makeStars = (stars: number = 0) => {
+  const makeStars = (stars: number = 0): JSX.Element[] => {
     return '☆'
       .repeat(maxStars)
       .split('')

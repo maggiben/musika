@@ -6,10 +6,10 @@
  * @description  : Starts an async worker
  * @author       : Benjamin Maggi
  * @email        : benjaminmaggi@gmail.com
- * @date         : 06 Dec 2021
+ * @date         : 24 Feb 2024
  * @license:     : MIT
  *
- * Copyright 2021 Benjamin Maggi <benjaminmaggi@gmail.com>
+ * Copyright 2024 Benjamin Maggi <benjaminmaggi@gmail.com>
  *
  *
  * License:
@@ -34,9 +34,9 @@
  */
 
 import { workerData, isMainThread, parentPort } from 'worker_threads';
-import { DownloadWorker } from './DownloadWorker';
+import { DownloadWorker, Options as DownloadWorkerOptions } from './DownloadWorker';
 
-export default void (async (options: DownloadWorker.Options): Promise<DownloadWorker> => {
+export default void (async (options: DownloadWorkerOptions): Promise<DownloadWorker> => {
   process
     .once('unhandledRejection', (reason: Error, promise: PromiseLike<unknown>) => {
       // eslint-disable-next-line no-console
@@ -56,4 +56,4 @@ export default void (async (options: DownloadWorker.Options): Promise<DownloadWo
     }
   }
   process.exit(1);
-})(workerData as DownloadWorker.Options);
+})(workerData as DownloadWorkerOptions);

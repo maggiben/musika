@@ -53,7 +53,7 @@ export default class TimeoutStream extends Writable {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public _write(
-    chunk: any,
+    chunk: unknown,
     encoding: BufferEncoding,
     callback: (error?: Error | null) => void,
   ): void {

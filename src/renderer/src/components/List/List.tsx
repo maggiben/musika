@@ -197,13 +197,11 @@ const ListItemWrapper = styled.li`
   margin: 8px 0px;
 `;
 
-import ytpl from '@distube/ytpl';
-
 interface IListProps {
   items?: IPlaylist['items'];
 }
 
-const List = (props: IListProps) => {
+const List = (props: IListProps): JSX.Element | null => {
   const getItem = (items: IPlaylist['items']): JSX.Element[] => {
     return items.map((song, index) => {
       const songIndex = padZeroes(index + 1, songs.length.toString().split('').length);

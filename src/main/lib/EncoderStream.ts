@@ -127,16 +127,25 @@ export class EncoderStream extends AsyncCreatable<EncoderStream.Options> {
     return ffmpeg();
   }
 
-  public static async validateEncoderOptions(encodeOptions: EncoderStream.EncodeOptions): Promise<boolean> {
+  public static async validateEncoderOptions(
+    encodeOptions: EncoderStream.EncodeOptions,
+  ): Promise<boolean> {
     const formats = await EncoderStream.getAvailableFormats();
     const codecs = await EncoderStream.getAvailableCodecs();
     const format = Object.entries(formats).find(([name]) => name === encodeOptions.format);
     const audioCodec =
-      encodeOptions.audioCodec && Object.entries(codecs).filter(([value]) => value === encodeOptions.audioCodec);
+      encodeOptions.audioCodec &&
+      Object.entries(codecs).filter(([value]) => value === encodeOptions.audioCodec);
     const videoCodec =
-      encodeOptions.videoCodec && Object.entries(codecs).filter(([value]) => value === encodeOptions.videoCodec);
-    const codec = [encodeOptions.audioCodec && audioCodec, encodeOptions.videoCodec && videoCodec].filter(Boolean);
-    const canEncode = codec.every((value) => Boolean(value && value.length && value[0][1].canEncode));
+      encodeOptions.videoCodec &&
+      Object.entries(codecs).filter(([value]) => value === encodeOptions.videoCodec);
+    const codec = [
+      encodeOptions.audioCodec && audioCodec,
+      encodeOptions.videoCodec && videoCodec,
+    ].filter(Boolean);
+    const canEncode = codec.every((value) =>
+      Boolean(value && value.length && value[0][1].canEncode),
+    );
     const canMux = format && format[1].canMux;
     if (canMux && canEncode) {
       return true;
@@ -163,21 +172,25 @@ export class EncoderStream extends AsyncCreatable<EncoderStream.Options> {
     encoder = encodeOptions.audioBitrate
       ? encoder.audioBitrate(encodeOptions.audioBitrate)
       : metadata.videoFormat.audioBitrate
-      ? encoder.audioBitrate(metadata.videoFormat.audioBitrate)
-      : encoder;
+        ? encoder.audioBitrate(metadata.videoFormat.audioBitrate)
+        : encoder;
     encoder = encodeOptions.videoBitrate
       ? encoder.videoBitrate(encodeOptions.videoBitrate)
       : metadata.videoFormat.bitrate
-      ? encoder.videoBitrate(metadata.videoFormat.bitrate)
-      : encoder;
+        ? encoder.videoBitrate(metadata.videoFormat.bitrate)
+        : encoder;
     encoder = encoder.format(encodeOptions.format);
     encoder = this.setMetadata(metadata, encoder);
     this.ffmpegCommand = encoder;
     this.stream = this.ffmpegCommand.pipe(outputStream, { end: true });
   }
 
-  private setMetadata(metadata: EncoderStream.Metadata, encoder: ffmpeg.FfmpegCommand): ffmpeg.FfmpegCommand {
-    const { videoId, title, author, shortDescription } = metadata.videoInfo.player_response.videoDetails;
+  private setMetadata(
+    metadata: EncoderStream.Metadata,
+    encoder: ffmpeg.FfmpegCommand,
+  ): ffmpeg.FfmpegCommand {
+    const { videoId, title, author, shortDescription } =
+      metadata.videoInfo.player_response.videoDetails;
     return encoder
       .outputOptions('-metadata', `title=${title}`)
       .outputOptions('-metadata', `author=${author}`)

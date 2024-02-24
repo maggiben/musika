@@ -37,14 +37,14 @@ export interface IInputRangeProps {
   step?: number | string;
   onChange?: (value: number) => void;
 }
-const InputRange = (props: IInputRangeProps) => {
+const InputRange = (props: IInputRangeProps): JSX.Element => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const drawTrack = (value: number | string, input: HTMLInputElement) => {
+  const drawTrack = (value: number | string, input: HTMLInputElement): void => {
     const background = `linear-gradient(to right, #ed1e24 0%, #ed1e24 ${value}%, #2f2f2f ${value}%, #2f2f2f 100%)`;
     input.style.background = background;
   };
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     inputRef.current && drawTrack(parseFloat(event.target.value), inputRef.current);
     props.onChange && props.onChange(parseFloat(event.target.value));
   };

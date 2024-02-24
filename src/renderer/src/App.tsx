@@ -62,14 +62,12 @@ const theme: DefaultTheme = {
     m: '16px',
     l: '24px',
     xl: '32px',
-    xxl: '48px',
-    xxxl: '64px',
   },
 };
 
 const App = (): JSX.Element => {
   useEffect(() => {
-    const handlePaste = (event: ClipboardEvent) => {
+    const handlePaste = (event: ClipboardEvent): void => {
       // Get the clipboard content
       const text = event.clipboardData?.getData('text');
       console.log('Clipboard content:', text);

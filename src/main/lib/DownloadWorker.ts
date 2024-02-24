@@ -45,7 +45,7 @@ import getDownloadOptions from '@shared/getDownloadOptions';
 import { AsyncCreatable } from '@shared/AsyncCreatable';
 import TimeoutStream from './TimeoutStream';
 
-export interface Options {
+export interface IDownloadWorkerOptions {
   /**
    * Playlist item.
    */
@@ -73,14 +73,14 @@ export interface Options {
   parentPort: MessagePort;
 }
 
-export interface Message {
+export interface IDownloadWorkerMessage {
   type: string;
-  source: ytpl.result['items'];
+  source: ytpl.result;
   error: Error;
   details: Record<string, unknown>;
 }
 
-export class DownloadWorker extends AsyncCreatable<Options> {
+export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private downloadStream!: Readable;
   private parentPort: MessagePort;
   private item: ytpl.result['items'][0];
@@ -95,7 +95,7 @@ export class DownloadWorker extends AsyncCreatable<Options> {
   private outputStream!: fs.WriteStream;
   private contentLength?: number;
 
-  public constructor(options: Options) {
+  public constructor(options: IDownloadWorkerOptions) {
     super(options);
     this.item = options.item;
     this.parentPort = options.parentPort;
@@ -121,7 +121,9 @@ export class DownloadWorker extends AsyncCreatable<Options> {
   private handleMessages(): void {
     this.parentPort.on('message', (base64Message: string) => {
       try {
-        const message = JSON.parse(Buffer.from(base64Message, 'base64').toString()) as Message;
+        const message = JSON.parse(
+          Buffer.from(base64Message, 'base64').toString(),
+        ) as IDownloadWorkerMessage;
         switch (message.type) {
           case 'kill': {
             this.endStreams();
