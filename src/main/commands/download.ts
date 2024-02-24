@@ -36,10 +36,10 @@
 import * as ytpl from '@distube/ytpl';
 import * as ytdl from 'ytdl-core';
 import { BrowserWindow } from 'electron';
-// import { utils, getEncoderOptions } from '../../utils';
-import { Scheduler } from '../lib/scheduler';
-import { EncoderStream } from '../lib/EncoderStream';
-// import * as progressStream from 'progress-stream';
+import { Scheduler } from '../lib/Scheduler';
+import * as utils from '@shared/utils';
+import type { IDownloadWorkerMessage } from '../lib/DownloadWorker';
+import progressStream from 'progress-stream';
 
 interface IDownloadOptions {
   output: string;
@@ -79,35 +79,41 @@ export default async function download(
   const videoId = ytdl.validateURL(url) && ytdl.getVideoID(url);
   const { output, maxconnections, retries, flags } = options;
   console.log('getEncoderOptions(flags)', getEncoderOptions(flags));
-  // if(playlistId) {
-  // const scheduler = new Scheduler({
-  //   playlistId,
-  //   playlistOptions: {
-  //     gl: 'US',
-  //     hl: 'en',
-  //     limit: Infinity,
-  //   },
-  //   output,
-  //   maxconnections,
-  //   retries: retries,
-  //   flags,
-  //   encoderOptions: getEncoderOptions(flags) as EncoderStream.EncodeOptions,
-  // });
-  // scheduler
-  //   .once('playlistItems', (message: Scheduler.Message) => {
-  //     const length = (message.details?.playlistItems as ytpl.Item[])?.length;
-  //     console.log(`total items: ${length}`);
-  //     mainWindow.webContents.send('progress', 'Hello from main process!');
-  //   })
-  //   .on('exit', (message: Scheduler.Message) => {
-  //     console.log('message', message);
-  //   })
-  //   .on('progress', (message: Scheduler.Message) => {
-  //     console.log('progress', message);
-  //     mainWindow.webContents.send('progress', message);
-  //   });
-  // scheduler.download();
-  // }
+  if (playlistId) {
+    const scheduler = new Scheduler({
+      playlistId,
+      playlistOptions: {
+        gl: 'US',
+        hl: 'en',
+        limit: Infinity,
+      },
+      output,
+      maxconnections,
+      retries: retries,
+      flags,
+    });
+    scheduler
+      .once('playlistItems', (message: IDownloadWorkerMessage) => {
+        const length = (message.details?.playlistItems as ytpl.result['items'])?.length;
+        console.log(`total items: ${length}`);
+        mainWindow?.webContents.send('progress', 'Hello from main process!');
+      })
+      .on('exit', (message: IDownloadWorkerMessage) => {
+        console.log('message', message);
+      })
+      .on('progress', (message: IDownloadWorkerMessage) => {
+        const progress = message.details?.progress as progressStream.Progress;
+        const payload = {
+          timeleft: utils.toHumanTime(progress.eta),
+          percentage: progress.percentage,
+          title: message.source.title,
+          speed: utils.toHumanSize(progress.speed),
+        };
+        console.log('progress', payload);
+        mainWindow?.webContents.send('progress', payload);
+      });
+    scheduler.download();
+  }
   return {
     playlistId,
     videoId,
@@ -214,11 +220,11 @@ export default async function download(
 //     });
 
 //     scheduler
-//       .once('playlistItems', (message: Scheduler.Message) => {
+//       .once('playlistItems', (message: IDownloadWorkerMessage) => {
 //         const length = (message.details?.playlistItems as ytpl.Item[])?.length;
 //         this.ux.cli.action.stop(`total items: ${this.ux.chalk.yellow(length)}`);
 //       })
-//       .on('contentLength', (message: Scheduler.Message) => {
+//       .on('contentLength', (message: IDownloadWorkerMessage) => {
 //         const progressBar = multibar.create(message.details?.contentLength as number, 0, {
 //           timeleft: 'N/A',
 //           percentage: '0',
@@ -229,28 +235,28 @@ export default async function download(
 //         });
 //         progressbars.set(message.source.id, progressBar);
 //       })
-//       .on('end', (message: Scheduler.Message) => {
+//       .on('end', (message: IDownloadWorkerMessage) => {
 //         const progressbar = progressbars.get(message.source.id);
 //         if (progressbar) {
 //           progressbar.stop();
 //           multibar.remove(progressbar);
 //         }
 //       })
-//       .on('timeout', (message: Scheduler.Message) => {
+//       .on('timeout', (message: IDownloadWorkerMessage) => {
 //         const progressbar = progressbars.get(message.source.id);
 //         if (progressbar) {
 //           progressbar.stop();
 //           multibar.remove(progressbar);
 //         }
 //       })
-//       .on('exit', (message: Scheduler.Message) => {
+//       .on('exit', (message: IDownloadWorkerMessage) => {
 //         const progressbar = progressbars.get(message.source.id);
 //         if (progressbar) {
 //           progressbar.stop();
 //           multibar.remove(progressbar);
 //         }
 //       })
-//       .on('progress', (message: Scheduler.Message) => {
+//       .on('progress', (message: IDownloadWorkerMessage) => {
 //         const progress = message.details?.progress as progressStream.Progress;
 //         const progressbar = progressbars.get(message.source.id);
 //         progressbar?.update(progress.transferred, {

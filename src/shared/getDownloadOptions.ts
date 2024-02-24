@@ -2,14 +2,14 @@
  * @file         : getDownloadOptions.ts
  * @summary      : Get downloadOptions from flags
  * @version      : 1.0.0
- * @project      : YtKit
+ * @project      : Musika
  * @description  : Builds downloadOptions (filter) giver a set of flags
  * @author       : Benjamin Maggi
  * @email        : benjaminmaggi@gmail.com
- * @date         : 01 Jan 2022
+ * @date         : 24 Feb 2024
  * @license:     : MIT
  *
- * Copyright 2021 Benjamin Maggi <benjaminmaggi@gmail.com>
+ * Copyright 2024 Benjamin Maggi <benjaminmaggi@gmail.com>
  *
  *
  * License:
@@ -34,8 +34,6 @@
  */
 
 import * as ytdl from 'ytdl-core';
-import { OutputFlags } from '@oclif/parser';
-import { get } from '@salesforce/ts-types';
 
 /**
  * Builds download options based on the following input flags
@@ -43,11 +41,11 @@ import { get } from '@salesforce/ts-types';
  * @returns {ytdl.downloadOptions}
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function getDownloadOptions(flags: OutputFlags<any>): ytdl.downloadOptions {
+export default function getDownloadOptions(flags: Record<string, unknown>): ytdl.downloadOptions {
   const options: ytdl.downloadOptions = {};
-  const qualityFlag = get(flags, 'quality') as string;
+  const qualityFlag = flags.quality as string;
   const quality = /,/.test(qualityFlag) ? qualityFlag.split(',') : qualityFlag;
-  const range = get(flags, 'range') as string;
+  const range = flags.range as string;
 
   // range: A byte range in the form INT-INT that specifies part of the file to download
   if (range) {
@@ -94,14 +92,14 @@ export default function getDownloadOptions(flags: OutputFlags<any>): ytdl.downlo
     let [fieldName, fieldKey] = field.split(':');
     fieldKey = fieldKey || fieldName;
     let optsKey = `filter-${fieldName}`;
-    const value = get(flags, optsKey) as string;
+    const value = flags[optsKey] as string;
     const name = `${fieldName}=${value}`;
     if (value) {
       createFilter(name, fieldKey, value, false);
     }
     optsKey = 'un' + optsKey;
     if (get(flags, optsKey)) {
-      const optsValue = get(flags, optsKey) as string;
+      const optsValue = flags[optsKey] as string;
       createFilter(name, fieldKey, optsValue, true);
     }
   });

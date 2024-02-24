@@ -3,7 +3,7 @@ import * as path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
-import creatWorker from './workers/worker?nodeWorker';
+import creatWorker from './workers/worker-simple?nodeWorker';
 // import callFork from './fork'
 
 function createWindow(): void {

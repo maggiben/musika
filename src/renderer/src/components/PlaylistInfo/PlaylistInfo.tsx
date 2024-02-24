@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const PlaylistInfoContainer = styled.div`
   width: 100%;
-  height: 220px;
+  height: 160px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -12,7 +12,7 @@ const PlaylistInfoContainer = styled.div`
 
 const StyledImg = styled.img`
   width: auto;
-  max-height: 220px;
+  max-height: 160px;
 `;
 
 const InfoGroup = styled.div`
@@ -86,8 +86,8 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
         alt={t('thumbnail')}
       />
       <InfoGroup data-testid="info-group">
-        {description.map(({ label, value }) => (
-          <InfoItem {...{ label, value }} />
+        {description.map(({ label, value }, index) => (
+          <InfoItem {...{ label, value }} key={index} />
         ))}
       </InfoGroup>
     </PlaylistInfoContainer>

@@ -1,145 +1,7 @@
 import Stars from '@components/Stars/Stars';
 import styled from 'styled-components';
-import type { ISong } from '@renderer/types/List';
 import { padZeroes } from '@utils/string';
 import type { IPlaylist } from '@renderer/states/atoms';
-
-const songs: ISong[] = [
-  {
-    title: 'Spiderwebs',
-    duration: '4:28',
-    stars: 2,
-  },
-  {
-    title: 'Excuse Me Mr.fasdfasdfasdfasdfasdfadsf dfasdf adfasdfasdf',
-    duration: '3:04',
-    stars: 3,
-  },
-  {
-    title: 'Just a Girl',
-    duration: '3:28',
-    stars: 1,
-  },
-  {
-    title: 'Happy Now?',
-    duration: '3:43',
-    stars: 2,
-  },
-  {
-    title: 'Different People',
-    duration: '4:34',
-    stars: 3,
-  },
-  {
-    title: 'Hey You!',
-    duration: '3:34',
-    stars: 4,
-  },
-  {
-    title: 'The Climb',
-    duration: '6:37',
-    stars: 5,
-  },
-  {
-    title: 'Sixteen',
-    duration: '3:21',
-    stars: 0,
-  },
-  {
-    title: 'Sunday Morning',
-    duration: '4:33',
-    stars: 0,
-  },
-  {
-    title: "Don't Speak",
-    duration: '4:23',
-  },
-  {
-    title: 'You Can Do It',
-    duration: '4:13',
-    stars: 4,
-  },
-  {
-    title: "World Go 'Round",
-    duration: '4:09',
-  },
-  {
-    title: 'End It on This',
-    duration: '3:45',
-  },
-  {
-    title: 'Tragic Kingdom',
-    duration: '5:31',
-    stars: 5,
-  },
-  {
-    title: 'Spiderwebs',
-    duration: '4:28',
-    stars: 2,
-  },
-  {
-    title: 'Excuse Me Mr.fasdfasdfasdfasdfasdfadsf dfasdf adfasdfasdf',
-    duration: '3:04',
-    stars: 3,
-  },
-  {
-    title: 'Just a Girl',
-    duration: '3:28',
-    stars: 1,
-  },
-  {
-    title: 'Happy Now?',
-    duration: '3:43',
-    stars: 2,
-  },
-  {
-    title: 'Different People',
-    duration: '4:34',
-    stars: 3,
-  },
-  {
-    title: 'Hey You!',
-    duration: '3:34',
-    stars: 4,
-  },
-  {
-    title: 'The Climb',
-    duration: '6:37',
-    stars: 5,
-  },
-  {
-    title: 'Sixteen',
-    duration: '3:21',
-    stars: 0,
-  },
-  {
-    title: 'Sunday Morning',
-    duration: '4:33',
-    stars: 0,
-  },
-  {
-    title: "Don't Speak",
-    duration: '4:23',
-  },
-  {
-    title: 'You Can Do It',
-    duration: '4:13',
-    stars: 4,
-  },
-  {
-    title: "World Go 'Round",
-    duration: '4:09',
-  },
-  {
-    title: 'End It on This',
-    duration: '3:45',
-  },
-  {
-    title: 'Tragic Kingdom',
-    duration: '5:31',
-    stars: 5,
-  },
-];
 
 const SongIndex = styled.span`
   font-family: ${({ theme }) => theme.fontFamily.mono};
@@ -160,6 +22,7 @@ const SongDuration = styled.span`
 `;
 
 const ListWrapper = styled.ul`
+  flex-grow: 1;
   list-style: none;
   padding: 0px;
   margin: 0px;
@@ -204,7 +67,7 @@ interface IListProps {
 const List = (props: IListProps): JSX.Element | null => {
   const getItem = (items: IPlaylist['items']): JSX.Element[] => {
     return items.map((song, index) => {
-      const songIndex = padZeroes(index + 1, songs.length.toString().split('').length);
+      const songIndex = padZeroes(index + 1, items.length.toString().split('').length);
       return (
         <ListItemWrapper key={index}>
           <SongIndex>{songIndex}</SongIndex>

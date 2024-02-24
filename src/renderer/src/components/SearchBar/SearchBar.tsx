@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import ytpl from '@distube/ytpl';
+import ytdl from 'ytdl-core';
 import styled from 'styled-components';
 
 const SearchBarContainer = styled.div`
@@ -56,7 +58,7 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
   const { t } = useTranslation();
   const [searchLoadingClass, setSearchLoadingClass] = useState<string>('');
   const [search, setSearch] = useState<string>(
-    'https://www.youtube.com/watch?v=q2ZHjSA8mkY&list=PLF48AC0919899FFED',
+    'https://youtube.com/watch?v=nRfDgXdInoM&list=PL_xObc8HwOwtwHHn7dZCsst07KMv6lzo9&index=2',
   );
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -67,7 +69,15 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
   const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>): Promise<void> => {
     if (event.key === 'Enter') {
       setSearchLoadingClass('loading');
-      const datum = await window.commands.getVideoInfo(search);
+      const datum = (await window.commands.getVideoInfo(search)) as {
+        playlistId: string;
+        videoId: string;
+        playlist: ytpl.result;
+        videoInfo: ytdl.videoInfo;
+      };
+      console.log('datum', datum);
+      const download = await window.commands.download(search);
+      console.log('download', download);
       onSearch(datum);
       setSearchLoadingClass('');
     }
@@ -94,7 +104,7 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
         data-testid="search-input"
         onChange={handleOnChange}
         onKeyDown={handleKeyDown}
-        defaultValue="https://www.youtube.com/watch?v=q2ZHjSA8mkY&list=PLF48AC0919899FFED"
+        defaultValue="https://youtube.com/watch?v=nRfDgXdInoM&list=PL_xObc8HwOwtwHHn7dZCsst07KMv6lzo9&index=2"
         className={searchLoadingClass}
       />
     </SearchBarContainer>

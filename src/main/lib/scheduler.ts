@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * @file         : Scheduler.ts
  * @summary      : Playlist thread scheduler
@@ -33,12 +34,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as path from 'path';
 import { EventEmitter } from 'stream';
 import { Worker, WorkerOptions } from 'worker_threads';
 import ytpl from '@distube/ytpl';
 // import { EncoderStream } from './EncoderStream';
 import type { IDownloadWorkerMessage } from './DownloadWorker';
+import creatWorker from '../workers/worker?nodeWorker';
 
 export interface ISchedulerOptions {
   /**
@@ -94,6 +95,12 @@ export interface ISchedulerResult {
   error?: Error | string;
 }
 
+export interface ISchedulerWorkerOptions extends WorkerOptions {
+  item: ytpl.result['items'][0];
+  output: string;
+  timeout: number;
+}
+
 /*
   blender playlist: https://www.youtube.com/playlist?list=PL6B3937A5D230E335
   live items playlist: https://www.youtube.com/watch?v=5qap5aO4i9A&list=RDLV5qap5aO4i9A&start_radio=1&rv=5qap5aO4i9A&t=15666341
@@ -120,7 +127,6 @@ export class Scheduler extends EventEmitter {
     this.timeout = options.timeout ?? 120 * 1000; // 120 seconds
     this.flags = options.flags;
     this.playlistOptions = options.playlistOptions;
-    this.encoderOptions = options.encoderOptions;
   }
 
   /**
@@ -242,11 +248,11 @@ export class Scheduler extends EventEmitter {
    * @name retryDownloadWorker
    * @memberOf Scheduler:retryDownloadWorker
    * @category Control Flow
-   * @param {ytpl.Item} item the playlist item
+   * @param {ytpl.result['items'][0]} item the playlist item
    * @param {Worker} worker the worker currently executing
    * @returns {boolean} returns false if exceeded the maximum allowed retries otherwise returns true
    */
-  private async retryDownloadWorker<T extends ISchedulerResult>(item: ytpl.Item): Promise<T> {
+  private async retryDownloadWorker<T extends ISchedulerResult>(item: ytpl.result['items'][0]): Promise<T> {
     if (!this.retryItems.has(item.id)) {
       this.retryItems.set(item.id, {
         item,
@@ -272,7 +278,7 @@ export class Scheduler extends EventEmitter {
     throw new Error(`Could not retry id: ${item.id} retries left: ${retryItem && retryItem.left}`);
   }
 
-  private async terminateDownloadWorker(item: ytpl.Item): Promise<void> {
+  private async terminateDownloadWorker(item: ytpl.result['items'][0]): Promise<void> {
     const worker = this.workers.get(item.id);
     const code = worker && (await worker.terminate());
     this.workers.delete(item.id);
@@ -284,22 +290,18 @@ export class Scheduler extends EventEmitter {
     });
   }
 
-  private async downloadWorkers<T extends ISchedulerResult>(item: ytpl.Item): Promise<T> {
-    const workerOptions: WorkerOptions = {
-      workerData: {
-        item,
-        path: './worker.ts',
-        output: this.output,
-        timeout: this.timeout,
-        flags: this.flags,
-        encoderOptions: this.encoderOptions,
-      },
+  private async downloadWorkers<T extends ISchedulerResult>(item: ytpl.result['items'][0]): Promise<T> {
+    const workerData: ISchedulerWorkerOptions = {
+      item,
+      output: this.output,
+      timeout: this.timeout,
     };
     if (this.workers.has(item.id)) {
       await this.terminateDownloadWorker(item);
     }
     return new Promise<T>((resolve, reject) => {
-      const worker = new Worker(path.join(__dirname, 'runner.js'), workerOptions);
+      // const worker = new Worker(path.join(__dirname, 'runner.js'), workerOptions);
+      const worker = creatWorker({ workerData });
       this.workers.set(item.id, worker);
       return this.handleWorkerEvents<T>(worker, item, resolve, reject);
     });
