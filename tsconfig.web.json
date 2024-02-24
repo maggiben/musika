@@ -8,12 +8,29 @@
   ],
   "compilerOptions": {
     "composite": true,
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
     "jsx": "react-jsx",
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@renderer/*": [
-        "src/renderer/src/*"
-      ]
+      "@renderer/*": [ "src/renderer/src/*"],
+      "@components/*": ["src/renderer/src/components/*"],
+      "@containers/*": ["src/renderer/src/containers/*"],
+      "@types/*": ["src/renderer/src/types/*"],
+      "@assets/*": ["src/renderer/src/assets/*"],
+      "@utils/*": ["src/renderer/src/utils/*"],
+      "@states/*": ["src/renderer/src/states/*"],
+      "@translation/*": [ "public/locale/*" ],
+      "@pjson": ["package.json"],
     }
   }
 }
