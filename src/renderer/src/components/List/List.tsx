@@ -142,7 +142,7 @@ const songs: ISong[] = [
 ];
 
 const SongIndex = styled.span`
-  font-family: ${({ theme }) => theme.fontFamilyMonoSpace};
+  font-family: ${({ theme }) => theme.fontFamily.mono};
   margin-left: ${({ theme }) => theme.spacing.xxs};
 `;
 
@@ -155,7 +155,7 @@ const SongName = styled.p`
 `;
 
 const SongDuration = styled.span`
-  font-family: ${({ theme }) => theme.fontFamilyMonoSpace};
+  font-family: ${({ theme }) => theme.fontFamily.mono};
   margin-right: ${({ theme }) => theme.spacing.xxs};
 `;
 
@@ -163,6 +163,7 @@ const ListWrapper = styled.ul`
   list-style: none;
   padding: 0px;
   margin: 0px;
+  width: 100%;
   overflow-y: scroll;
   & > li > span {
     min-width: 0;

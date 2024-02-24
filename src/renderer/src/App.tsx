@@ -24,8 +24,20 @@ const Container = styled.div`
 
 const theme: DefaultTheme = {
   main: 'red',
-  fontFamily: 'Roboto, sans-serif',
-  fontFamilyMonoSpace: '"Roboto Mono", monospace',
+  fontFamily: {
+    primary: 'Roboto, sans-serif',
+    mono: '"Roboto Mono", monospace',
+  },
+  fontSizes: {
+    xxxs: '10px',
+    xxs: '12px',
+    xs: '14px',
+    s: '16px',
+    m: '20px',
+    l: '24px',
+    xl: '32px',
+    xxl: '40px',
+  },
   colors: {
     white: 'white',
     red: '#d21d30',

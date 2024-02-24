@@ -10,19 +10,50 @@ const PlaylistInfoContainer = styled.div`
   align-items: center;
 `;
 
-const StyledHeading = styled.h1`
-  /* width: 100%;
-  height: 100%; */
-  /* color: ${({ theme }) => theme.colors.white}; */
-`;
-
 const StyledImg = styled.img`
   width: auto;
   max-height: 220px;
-  /* width: 100%;
-  height: 100%; */
-  /* color: ${({ theme }) => theme.colors.white}; */
 `;
+
+const InfoGroup = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  margin-left: ${({ theme }) => theme.spacing.xs};
+  margin-right: ${({ theme }) => theme.spacing.xs};
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+`;
+
+const StyledDescriptionList = styled.dl`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  margin: ${({ theme }) => theme.spacing.xxs};
+`;
+
+const StyledDefinitionTerm = styled.dt`
+  float: left;
+  clear: left;
+  width: 6em;
+`;
+
+const StyledDefinitionDescription = styled.dd`
+  float: left;
+  margin: 0px;
+`;
+
+const InfoItem = ({ label, value }: { label: string; value: string | number }): JSX.Element => {
+  return (
+    <StyledDescriptionList>
+      <StyledDefinitionTerm>{label}</StyledDefinitionTerm>
+      <StyledDefinitionDescription>{value.toString()}</StyledDefinitionDescription>
+    </StyledDescriptionList>
+  );
+};
 
 interface IPlaylistInfoProps {
   thumbnail: {
@@ -36,16 +67,29 @@ interface IPlaylistInfoProps {
 
 const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   const { t } = useTranslation();
-  console.log('props', props);
+  const description = [
+    {
+      label: 'title',
+      value: props.title,
+    },
+    {
+      label: 'views',
+      value: props.views,
+    },
+  ];
   return (
     <PlaylistInfoContainer>
       <StyledImg
         src={props.thumbnail.url}
         width={props.thumbnail.width}
         height={props.thumbnail.height}
-        alt="Description of the image"
+        alt={t('thumbnail')}
       />
-      <StyledHeading>{props.title}</StyledHeading>
+      <InfoGroup data-testid="info-group">
+        {description.map(({ label, value }) => (
+          <InfoItem {...{ label, value }} />
+        ))}
+      </InfoGroup>
     </PlaylistInfoContainer>
   );
 };

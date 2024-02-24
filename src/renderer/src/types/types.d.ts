@@ -21,6 +21,17 @@ interface ISpacing {
   xxxl: string;
 }
 
+interface IFontSizes {
+  xxxs: string;
+  xxs: string;
+  xs: string;
+  s: string;
+  m: string;
+  l: string;
+  xl: string;
+  xxl: string;
+}
+
 declare global {
   interface Window {
     electron: Electron;
@@ -34,5 +45,10 @@ declare module 'styled-components' {
     colors: Record<string, string>;
     borderRadius: IBorderRadius;
     spacing: ISpacing;
+    fontSizes: IFontSizes;
+    fontFamily: {
+      primary: string;
+      mono: string;
+    };
   }
 }
