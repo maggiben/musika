@@ -36,85 +36,72 @@
 import { MessagePort } from 'worker_threads';
 import { Readable, Writable } from 'stream';
 import * as path from 'path';
-import * as fs from 'fs';
-import * as ytdl from 'ytdl-core';
-import * as ffmpegStatic from 'ffmpeg-static';
-import * as ffmpeg from 'fluent-ffmpeg';
-import * as ytpl from 'ytpl';
-import * as ProgressStream from 'progress-stream';
-import { OutputFlags } from '@oclif/parser';
-import * as utils from '../utils/utils';
-import getDownloadOptions from '../utils/getDownloadOptions';
-import { AsyncCreatable } from '../utils';
+import fs from 'fs';
+import ytdl from 'ytdl-core';
+import ytpl from '@distube/ytpl';
+import ProgressStream from 'progress-stream';
+import * as utils from '@shared/utils';
+import getDownloadOptions from '@shared/getDownloadOptions';
+import { AsyncCreatable } from '@shared/AsyncCreatable';
 import TimeoutStream from './TimeoutStream';
-import { EncoderStream } from './EncoderStream';
 
-ffmpeg.setFfmpegPath(ffmpegStatic);
-
-export namespace DownloadWorker {
+export interface Options {
   /**
-   * Constructor options for DownloadWorker.
+   * Playlist item.
    */
-  export interface Options {
-    /**
-     * Playlist item.
-     */
-    item: ytpl.Item;
-    /**
-     * Output file name.
-     */
-    output?: string;
-    /**
-     * Timeout value prevents network operations from blocking indefinitely.
-     */
-    timeout?: number;
-    /**
-     * Flags
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    flags?: OutputFlags<any>;
-    /**
-     * Media encoder options
-     */
-    encoderOptions?: EncoderStream.EncodeOptions;
-    /**
-     * This is a MessagePort allowing communication with the parent thread.
-     */
-    parentPort: MessagePort;
-  }
-
-  export interface Message {
-    type: string;
-    source: ytpl.Item;
-    error: Error;
-    details: Record<string, unknown>;
-  }
+  item: ytpl.result['items'][0];
+  /**
+   * Output file name.
+   */
+  output?: string;
+  /**
+   * Timeout value prevents network operations from blocking indefinitely.
+   */
+  timeout?: number;
+  /**
+   * Flags
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  flags?: any;
+  /**
+   * Media encoder options
+   */
+  // encoderOptions?: EncoderStream.EncodeOptions;
+  /**
+   * This is a MessagePort allowing communication with the parent thread.
+   */
+  parentPort: MessagePort;
 }
 
-export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
+export interface Message {
+  type: string;
+  source: ytpl.result['items'];
+  error: Error;
+  details: Record<string, unknown>;
+}
+
+export class DownloadWorker extends AsyncCreatable<Options> {
   private downloadStream!: Readable;
   private parentPort: MessagePort;
-  private item: ytpl.Item;
+  private item: ytpl.result['items'][0];
   private output!: string;
   private timeout: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private flags?: OutputFlags<any>;
+  private flags?: any;
   private downloadOptions?: ytdl.downloadOptions;
-  private encoderOptions?: EncoderStream.EncodeOptions;
   private videoInfo!: ytdl.videoInfo;
   private videoFormat!: ytdl.videoFormat;
   private timeoutStream!: TimeoutStream;
   private outputStream!: fs.WriteStream;
   private contentLength?: number;
 
-  public constructor(options: DownloadWorker.Options) {
+  public constructor(options: Options) {
     super(options);
     this.item = options.item;
     this.parentPort = options.parentPort;
     this.timeout = options.timeout ?? 120 * 1000;
     this.output = options.output ?? '{videoDetails.title}';
     this.flags = options.flags;
-    this.encoderOptions = options.encoderOptions;
     this.downloadOptions = this.flags && getDownloadOptions(this.flags);
   }
 
@@ -134,7 +121,7 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
   private handleMessages(): void {
     this.parentPort.on('message', (base64Message: string) => {
       try {
-        const message = JSON.parse(Buffer.from(base64Message, 'base64').toString()) as DownloadWorker.Message;
+        const message = JSON.parse(Buffer.from(base64Message, 'base64').toString()) as Message;
         switch (message.type) {
           case 'kill': {
             this.endStreams();
@@ -151,7 +138,9 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
   /**
    * Downloads a video
    */
-  private async downloadVideo(): Promise<{ videoInfo: ytdl.videoInfo; videoFormat: ytdl.videoFormat } | undefined> {
+  private async downloadVideo(): Promise<
+    { videoInfo: ytdl.videoInfo; videoFormat: ytdl.videoFormat } | undefined
+  > {
     const videoInfo = await this.getVideoInfo();
     this.parentPort.postMessage({
       type: 'videoInfo',
@@ -183,10 +172,11 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
   }
 
   private async downloadFromInfo(
-    videoInfo: ytdl.videoInfo
+    videoInfo: ytdl.videoInfo,
   ): Promise<{ videoInfo: ytdl.videoInfo; videoFormat: ytdl.videoFormat } | undefined> {
     this.downloadStream = ytdl.downloadFromInfo(videoInfo, this.downloadOptions);
-    ({ videoInfo: this.videoInfo, videoFormat: this.videoFormat } = await this.setVideInfoAndVideoFormat());
+    ({ videoInfo: this.videoInfo, videoFormat: this.videoFormat } =
+      await this.setVideInfoAndVideoFormat());
     const videoSize = await this.getVideoSize();
     /* live streams are unsupported */
     if (videoSize) {
@@ -208,26 +198,9 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
    *
    * @returns {void}
    */
-  private async setVideoOutput(): Promise<fs.WriteStream | NodeJS.WriteStream | Writable | undefined> {
-    /* transcode stream */
-    if (this.encoderOptions) {
-      const file = this.getOutputFile({
-        format: this.encoderOptions.format,
-      });
-      this.outputStream = fs.createWriteStream(file);
-      const encoderStreamOptions: EncoderStream.Options = {
-        encodeOptions: this.encoderOptions,
-        metadata: {
-          videoInfo: this.videoInfo,
-          videoFormat: this.videoFormat,
-        },
-        inputStream: this.downloadStream,
-        outputStream: this.outputStream,
-      };
-      const { stream, ffmpegCommand } = await EncoderStream.create(encoderStreamOptions);
-      ffmpegCommand.once('error', this.error.bind(this));
-      return stream;
-    }
+  private async setVideoOutput(): Promise<
+    fs.WriteStream | NodeJS.WriteStream | Writable | undefined
+  > {
     /* stream to file in native format */
     this.outputStream = fs.createWriteStream(this.getOutputFile());
     return this.downloadStream.pipe(this.outputStream);
@@ -241,20 +214,19 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
    */
   private async getVideoSize(): Promise<number | undefined> {
     const sizeUnknown =
-      !utils.getValueFrom(this.videoFormat, 'clen') &&
-      (utils.getValueFrom(this.videoFormat, 'isLive') ||
-        utils.getValueFrom(this.videoFormat, 'isHLS') ||
-        utils.getValueFrom(this.videoFormat, 'isDashMPD'));
+      (!('clen' in this.videoFormat) && this.videoFormat.isLive) ||
+      this.videoFormat.isHLS ||
+      this.videoFormat.isDashMPD;
 
     if (sizeUnknown) {
       return undefined;
-    } else if (utils.getValueFrom(this.videoFormat, 'contentLength')) {
-      return parseInt(utils.getValueFrom(this.videoFormat, 'contentLength'), 10);
+    } else if (this.videoFormat.contentLength) {
+      return parseInt(this.videoFormat.contentLength, 10);
     } else {
       return new Promise((resolve, reject) => {
         this.downloadStream.once('response', (response) => {
-          if (utils.getValueFrom(response, 'headers.content-length')) {
-            const size = parseInt(utils.getValueFrom(response, 'headers.content-length'), 10);
+          if (response['headers.content-length']) {
+            const size = parseInt(response['headers.content-length'], 10);
             return resolve(size);
           } else {
             return resolve(undefined);
@@ -310,7 +282,10 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
     this.downloadStream.pipe(this.timeoutStream);
     this.timeoutStream.once('timeout', () => {
       this.downloadStream.unpipe(this.timeoutStream);
-      this.error(new Error(`stream timeout for workerId: ${this.item.id} title: ${this.item.title}`), 'timeout');
+      this.error(
+        new Error(`stream timeout for workerId: ${this.item.id} title: ${this.item.title}`),
+        'timeout',
+      );
     });
   }
 
@@ -334,10 +309,15 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
       output: this.output,
       videoInfo: this.videoInfo,
       videoFormat: this.videoFormat,
-      format: utils.getValueFrom<string>(this.videoFormat, 'container', ''),
-    }
+      format: this.videoFormat.container,
+    },
   ): string {
-    const { output = this.output, videoInfo = this.videoInfo, videoFormat = this.videoFormat, format } = options;
+    const {
+      output = this.output,
+      videoInfo = this.videoInfo,
+      videoFormat = this.videoFormat,
+      format,
+    } = options;
     // fs.appendFileSync('output.txt', `output: ${output}\nformat: ${options.format}`);
     return path.format({
       name: utils.tmpl(output, [videoInfo, videoFormat]),
@@ -351,21 +331,27 @@ export class DownloadWorker extends AsyncCreatable<DownloadWorker.Options> {
    *
    * @returns {string} output file
    */
-  private setVideInfoAndVideoFormat(): Promise<{ videoInfo: ytdl.videoInfo; videoFormat: ytdl.videoFormat }> {
+  private setVideInfoAndVideoFormat(): Promise<{
+    videoInfo: ytdl.videoInfo;
+    videoFormat: ytdl.videoFormat;
+  }> {
     return new Promise((resolve, reject) => {
-      this.downloadStream.once('info', (videoInfo: ytdl.videoInfo, videoFormat: ytdl.videoFormat): void => {
-        this.parentPort.postMessage({
-          type: 'info',
-          source: this.item,
-          details: {
-            videoInfo,
-            videoFormat,
-          },
-        });
-        return videoInfo && videoFormat
-          ? resolve({ videoInfo, videoFormat })
-          : reject(new Error('failed to get video info and format'));
-      });
+      this.downloadStream.once(
+        'info',
+        (videoInfo: ytdl.videoInfo, videoFormat: ytdl.videoFormat): void => {
+          this.parentPort.postMessage({
+            type: 'info',
+            source: this.item,
+            details: {
+              videoInfo,
+              videoFormat,
+            },
+          });
+          return videoInfo && videoFormat
+            ? resolve({ videoInfo, videoFormat })
+            : reject(new Error('failed to get video info and format'));
+        },
+      );
       this.downloadStream.once('error', reject);
     });
   }

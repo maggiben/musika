@@ -1,5 +1,5 @@
 import * as ytdl from 'ytdl-core';
-import * as utils from '@utils/utils';
+import * as utils from '@shared/utils';
 
 export interface IOutputVideoMeta {
   label: string;

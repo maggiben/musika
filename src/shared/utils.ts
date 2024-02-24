@@ -6,7 +6,7 @@
  * @description  : micelaneous utilities used thought the project
  * @author       : Benjamin Maggi
  * @email        : benjaminmaggi@gmail.com
- * @date         : 05 Jul 2021
+ * @date         : 24 Fef 2024
  * @license:     : MIT
  *
  * Copyright 2021 Benjamin Maggi <benjaminmaggi@gmail.com>
@@ -33,8 +33,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// import sanitizeName from 'sanitize-filename';
-// import { get } from '@salesforce/ts-types';
+import sanitizeName from 'sanitize-filename';
 
 /**
  * Converts seconds into human readable time hh:mm:ss
@@ -106,18 +105,18 @@ export function fromHumanSize(size: string): number {
  * @return {string}
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// export const tmpl = (str: string, objs: any[]): string => {
-//   return str.replace(/\{([\w.-]+)\}/g, (match: string, prop: string) => {
-//     const name = objs
-//       .map((result: Record<string, unknown>) => {
-//         const value = getValueFrom<string>(result, prop);
-//         return value ? sanitizeName(value, { replacement: '-' }) : undefined;
-//       })
-//       .filter(Boolean)
-//       .pop();
-//     return name ?? match;
-//   });
-// };
+export const tmpl = (str: string, objs: any[]): string => {
+  return str.replace(/\{([\w.-]+)\}/g, (match: string, prop: string) => {
+    const name = objs
+      .map((result: Record<string, unknown>) => {
+        const value = result[prop] as string;
+        return value ? sanitizeName(value, { replacement: '-' }) : undefined;
+      })
+      .filter(Boolean)
+      .pop();
+    return name ?? match;
+  });
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ThrottledFunction<T extends (...args: any[]) => any> = (
@@ -160,42 +159,6 @@ export function throttle<T extends (...args: any) => any>(
  */
 export function cloneJson<T extends Record<string, unknown>>(obj: T): T {
   return JSON.parse(JSON.stringify(obj)) as T;
-}
-
-/**
- * Helper method used to retrieve a typed value of a flag from
- * the flags object
- *
- * @param {string} flagName the name of the flag
- * @param {unknown} an optional default value
- * @returns {T} the returned type
- */
-// export function getValueFrom<T>(from: unknown, path: string, defaultValue?: unknown): T {
-//   return get(from, path, defaultValue) as T;
-// }
-
-/**
- * Prints video size with a progress bar as it downloads.
- *
- * @param {unknown} from an object like who's properties you need to extract
- * @param {string} location the objects path
- * @param {unknown} exists if false always return the default value
- */
-export function getValueFromMeta<T>(
-  from: unknown,
-  path: string,
-  exists?: unknown,
-  defaultValue?: unknown,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transform?: (input: any) => T,
-): T {
-  if (exists) {
-    if (transform) {
-      return transform(getValueFrom<T>(from, path, defaultValue));
-    }
-    return getValueFrom<T>(from, path, defaultValue);
-  }
-  return defaultValue as T;
 }
 
 export function getYoutubeVideoId(url: string): string | undefined {

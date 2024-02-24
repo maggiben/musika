@@ -4,8 +4,9 @@
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.tsx",
-    "src/preload/*.d.ts"
-  ],
+    "src/preload/*.d.ts",
+    "src/shared/*"
+, "src/shared/getDownloadOptions.ts", "src/shared/AsyncCreatable.ts", "src/shared/getEncoderOptions.ts"  ],
   "compilerOptions": {
     "composite": true,
     /* Bundler mode */
@@ -28,6 +29,7 @@
       "@assets/*": ["src/renderer/src/assets/*"],
       "@utils/*": ["src/renderer/src/utils/*"],
       "@states/*": ["src/renderer/src/states/*"],
+      "@shared/*": ["src/shared/*"],
       "@translation/*": [ "src/renderer/src/assets/locale/*" ],
       "@pjson": ["package.json"],
     }

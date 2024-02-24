@@ -35,7 +35,7 @@
 
 import { performance } from 'perf_hooks';
 import { Writable, WritableOptions, Readable } from 'stream';
-import * as utils from '../utils/utils';
+import * as utils from '@shared/utils';
 
 export interface TimeoutStreamOptions extends WritableOptions {
   timeout: number;
@@ -52,7 +52,11 @@ export default class TimeoutStream extends Writable {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public _write(chunk: any, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+  public _write(
+    chunk: any,
+    encoding: BufferEncoding,
+    callback: (error?: Error | null) => void,
+  ): void {
     this.clearTimeout();
     this.setTimeout();
     return callback();
