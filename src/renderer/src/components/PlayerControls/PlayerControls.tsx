@@ -47,7 +47,7 @@ const PlayerControls = (): JSX.Element => {
         <button>fast_forward</button>
       </div>
       <div style={{lineHeight: '1'}}>
-        <input id="loop" type="checkbox" checked />
+        <input id="loop" type="checkbox" />
         <label htmlFor="loop">loop</label>
         <input id="shuffle" type="checkbox" />
         <label htmlFor="shuffle">shuffle</label>
