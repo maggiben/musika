@@ -83,18 +83,18 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
     }
   };
 
-  useEffect(() => {
-    const messageHandler = async (
-      event: Electron.IpcRendererEvent,
-      message: string,
-    ): Promise<void> => {
-      console.log('Message from main process:', message);
-    };
-    window.electron.ipcRenderer.on('progress', messageHandler);
-    return () => {
-      window.electron.ipcRenderer.removeListener('progress', messageHandler);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const messageHandler = async (
+  //     event: Electron.IpcRendererEvent,
+  //     message: string,
+  //   ): Promise<void> => {
+  //     console.log('Message from main process:', message);
+  //   };
+  //   window.electron.ipcRenderer.on('progress', messageHandler);
+  //   return () => {
+  //     window.electron.ipcRenderer.removeListener('progress', messageHandler);
+  //   };
+  // }, []);
 
   return (
     <SearchBarContainer data-testid="search-wrapper">

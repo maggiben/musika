@@ -30,6 +30,7 @@
       "@utils/*": ["src/renderer/src/utils/*"],
       "@states/*": ["src/renderer/src/states/*"],
       "@shared/*": ["src/shared/*"],
+      "types/*": ["src/types/*"],
       "@translation/*": [ "src/renderer/src/assets/locale/*" ],
       "@pjson": ["package.json"],
     }

@@ -1,4 +1,15 @@
 import 'styled-components';
+export { IDownloadWorkerMessage } from '../main/lib/DownloadWorker';
+
+interface IAnimation {
+  duration: string;
+  timingFunction: string;
+}
+
+interface ITransition {
+  duration: string;
+  timingFunction: string;
+}
 
 interface IBorderRadius {
   xxxs: string;
@@ -46,6 +57,8 @@ declare module 'styled-components' {
     borderRadius: IBorderRadius;
     spacing: ISpacing;
     fontSizes: IFontSizes;
+    animation: IAnimation;
+    transition: ITransition;
     fontFamily: {
       primary: string;
       mono: string;

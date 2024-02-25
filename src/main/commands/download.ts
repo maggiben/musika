@@ -40,6 +40,7 @@ import { Scheduler } from '../lib/Scheduler';
 import * as utils from '@shared/utils';
 import type { IDownloadWorkerMessage } from '../lib/DownloadWorker';
 import progressStream from 'progress-stream';
+import type { Progress } from 'progress-stream';
 
 interface IDownloadOptions {
   output: string;
@@ -94,23 +95,22 @@ export default async function download(
     });
     scheduler
       .once('playlistItems', (message: IDownloadWorkerMessage) => {
-        const length = (message.details?.playlistItems as ytpl.result['items'])?.length;
-        console.log(`total items: ${length}`);
-        mainWindow?.webContents.send('progress', 'Hello from main process!');
+        mainWindow?.webContents.send('playlistItems', message);
+      })
+      .on('contentLength', (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send('contentLength', message);
+      })
+      .on('end', (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send('end', message);
+      })
+      .on('timeout', (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send('timeout', message);
       })
       .on('exit', (message: IDownloadWorkerMessage) => {
-        console.log('message', message);
+        mainWindow?.webContents.send('exit', message);
       })
       .on('progress', (message: IDownloadWorkerMessage) => {
-        const progress = message.details?.progress as progressStream.Progress;
-        const payload = {
-          timeleft: utils.toHumanTime(progress.eta),
-          percentage: progress.percentage,
-          title: message.source.title,
-          speed: utils.toHumanSize(progress.speed),
-        };
-        console.log('progress', payload);
-        mainWindow?.webContents.send('progress', payload);
+        mainWindow?.webContents.send('progress', message);
       });
     scheduler.download();
   }

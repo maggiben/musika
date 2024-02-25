@@ -28,6 +28,14 @@ const theme: DefaultTheme = {
     primary: 'Roboto, sans-serif',
     mono: '"Roboto Mono", monospace',
   },
+  animation: {
+    duration: '200ms',
+    timingFunction: 'ease-in-out',
+  },
+  transition: {
+    duration: '200ms',
+    timingFunction: 'ease-in-out',
+  },
   fontSizes: {
     xxxs: '10px',
     xxs: '12px',
@@ -41,8 +49,11 @@ const theme: DefaultTheme = {
   colors: {
     white: 'white',
     red: '#d21d30',
+    darkGray: '#212121',
+    midGray: '#484848',
+    lightGray: '#858585',
+    violet: '#6400ff',
   },
-  backgroundColor: '#212121',
   spacing: {
     xxxs: '2px',
     xxs: '4px',

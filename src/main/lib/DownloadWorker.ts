@@ -75,7 +75,7 @@ export interface IDownloadWorkerOptions {
 
 export interface IDownloadWorkerMessage {
   type: string;
-  source: ytpl.result;
+  source: ytpl.result['items'][0];
   error: Error;
   details: Record<string, unknown>;
 }

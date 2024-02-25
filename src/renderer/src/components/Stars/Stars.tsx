@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 
 const StarsContainer = styled.span`
-  color: #484848;
+  /* color: ${({ theme }) => theme.colors.lightGray}; */
   display: flex;
   flex-flow: row;
   font-weight: lighter;
   cursor: pointer;
-  & .full {
+  /* & .full {
     color: ${({ theme }) => theme.colors.red};
-  }
+  } */
 `;
 interface IStarProps {
   stars?: number;

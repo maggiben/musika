@@ -1,5 +1,4 @@
 // import { useState, useEffect } from 'react';
-// import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { playlistState } from '@states/atoms';
@@ -19,16 +18,6 @@ const DownloadContainer = styled.div`
   align-items: center;
 `;
 
-// const StyledPre = styled.pre`
-//   color: white;
-//   background-color: red;
-//   text-align: left;
-//   width: 100%;
-//   height: 100%;
-//   overflow: hidden;
-//   overflow-y: scroll;
-// `;
-
 const Download = (): JSX.Element => {
   // const resetPlaylist = useResetRecoilState(playlistState);
   const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
@@ -38,12 +27,9 @@ const Download = (): JSX.Element => {
     });
   };
 
-  console.log('playlist', playlist);
-
   return (
     <DownloadContainer>
       <SearchBar onSearch={onSearch} />
-      {/* <StyledPre>{JSON.stringify(playlist, null, 2)}</StyledPre> */}
       {playlist ? (
         <>
           <PlaylistInfo
