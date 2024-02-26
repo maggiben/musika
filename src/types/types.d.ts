@@ -65,3 +65,11 @@ declare module 'styled-components' {
     };
   }
 }
+
+export interface IPreferences {
+  behaviour?: Record<string, unknown>;
+  advanced?: Record<string, unknown>;
+  downloads?: {
+    savePath: string;
+  };
+}

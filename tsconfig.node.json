@@ -1,6 +1,12 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["electron.vite.config.*", "src/main/*", "src/main/commands/*", "src/preload/*", "src/main/workers/worker-simple.ts", "src/shared/*", "src/main/lib/*", "src/main/workers/*"],
+  "include": [
+    "electron.vite.config.*",
+    "src/main/*",
+    "src/main/commands/*",
+    "src/preload/*",
+    "src/main/workers/worker-simple.ts",
+    "src/shared/*", "src/main/lib/*", "src/main/workers/*"],
   "compilerOptions": {
     "composite": true,
     "isolatedModules": false,
@@ -16,6 +22,7 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
+      "types/*": ["src/types/*"],
       "@shared/*": ["src/shared/*"],
       "@pjson": ["package.json"],
     }

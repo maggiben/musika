@@ -1,4 +1,6 @@
 import { atom } from 'recoil';
+import type { IPreferences } from 'types/types';
+import { app } from 'electron';
 import ytpl from '@distube/ytpl';
 
 export interface IPlaylist extends Omit<ytpl.result, 'views'> {
@@ -403,6 +405,11 @@ const mockPlaylist: IPlaylist = {
 export const playlistState = atom<{ playlist: IPlaylist | undefined }>({
   key: 'playlistState',
   default: {
-    playlist: mockPlaylist,
+    playlist: undefined,
   },
+});
+
+export const preferencesState = atom<IPreferences | undefined>({
+  key: 'preferencesState',
+  default: undefined,
 });
