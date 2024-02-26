@@ -4,6 +4,6 @@
   "search placeholder": "Search youtube",
   "welcome home": "Welcome to Musika",
   "thumbnail": "thumbnail",
-  "title": "title"
-
+  "title": "title",
+  "restart required message": "Changing Interface settings requires application restart"
 }

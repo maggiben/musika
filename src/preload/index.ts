@@ -1,4 +1,4 @@
-import { ipcRenderer, contextBridge } from 'electron';
+import { ipcRenderer, contextBridge, dialog } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 import type { IPreferences } from 'types/types';
 
@@ -16,6 +16,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('commands', {
       getVideoInfo: (url: string) => ipcRenderer.invoke('getVideoInfo', url),
       download: (url: string) => ipcRenderer.invoke('download', url),
+      dialogs: (type: string) => ipcRenderer.invoke('dialogs', type),
     });
   } catch (error) {
     console.error(error);

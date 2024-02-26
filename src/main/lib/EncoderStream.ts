@@ -37,72 +37,70 @@ import { Readable, Writable } from 'stream';
 import * as ytdl from 'ytdl-core';
 import * as ffmpegStatic from 'ffmpeg-static';
 import * as ffmpeg from 'fluent-ffmpeg';
-import { AsyncCreatable } from '../utils/AsyncCreatable';
+import { AsyncCreatable } from '@shared/AsyncCreatable';
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
-export namespace EncoderStream {
-  export interface Metadata {
-    /**
-     * video info.
-     */
-    videoInfo: ytdl.videoInfo;
-    /**
-     * video format.
-     */
-    videoFormat: ytdl.videoFormat;
-  }
-
-  export interface EncodeOptions {
-    /**
-     * Set audio codec
-     */
-    audioCodec?: string;
-    /**
-     * Set video codec
-     */
-    videoCodec?: string;
-    /**
-     * Set audio bitrate
-     */
-    videoBitrate?: number;
-    /**
-     * Set audio bitrate
-     */
-    audioBitrate?: number;
-    /**
-     * Set output format
-     */
-    format: string;
-  }
-
+export interface EncoderStreamMetadata {
   /**
-   * Constructor options for EncoderStream.
+   * video info.
    */
-  export interface Options extends ffmpeg.FfmpegCommandOptions {
-    /**
-     * Input stream
-     */
-    inputStream: Readable;
-    /**
-     * Output stream
-     */
-    outputStream: Writable;
-    /**
-     * Media encoder options
-     */
-    encodeOptions: EncoderStream.EncodeOptions;
-    /**
-     * Vide metadata
-     */
-    metadata: EncoderStream.Metadata;
-  }
+  videoInfo: ytdl.videoInfo;
+  /**
+   * video format.
+   */
+  videoFormat: ytdl.videoFormat;
 }
 
-export class EncoderStream extends AsyncCreatable<EncoderStream.Options> {
+export interface EncoderStreamEncodeOptions {
+  /**
+   * Set audio codec
+   */
+  audioCodec?: string;
+  /**
+   * Set video codec
+   */
+  videoCodec?: string;
+  /**
+   * Set audio bitrate
+   */
+  videoBitrate?: number;
+  /**
+   * Set audio bitrate
+   */
+  audioBitrate?: number;
+  /**
+   * Set output format
+   */
+  format: string;
+}
+
+/**
+ * Constructor options for EncoderStream.
+ */
+export interface EncoderStreamOptions extends ffmpeg.FfmpegCommandOptions {
+  /**
+   * Input stream
+   */
+  inputStream: Readable;
+  /**
+   * Output stream
+   */
+  outputStream: Writable;
+  /**
+   * Media encoder options
+   */
+  encodeOptions: EncoderStreamEncodeOptions;
+  /**
+   * Video metadata
+   */
+  metadata: EncoderStreamMetadata;
+}
+
+export class EncoderStream extends AsyncCreatable<EncoderStreamOptions> {
   public stream!: Writable;
   public ffmpegCommand!: ffmpeg.FfmpegCommand;
 
-  public constructor(private options: EncoderStream.Options) {
+  public constructor(private options: EncoderStreamOptions) {
     super(options);
   }
 
@@ -128,7 +126,7 @@ export class EncoderStream extends AsyncCreatable<EncoderStream.Options> {
   }
 
   public static async validateEncoderOptions(
-    encodeOptions: EncoderStream.EncodeOptions,
+    encodeOptions: EncoderStreamEncodeOptions,
   ): Promise<boolean> {
     const formats = await EncoderStream.getAvailableFormats();
     const codecs = await EncoderStream.getAvailableCodecs();
@@ -186,7 +184,7 @@ export class EncoderStream extends AsyncCreatable<EncoderStream.Options> {
   }
 
   private setMetadata(
-    metadata: EncoderStream.Metadata,
+    metadata: EncoderStreamMetadata,
     encoder: ffmpeg.FfmpegCommand,
   ): ffmpeg.FfmpegCommand {
     const { videoId, title, author, shortDescription } =

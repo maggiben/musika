@@ -1,5 +1,7 @@
-import { useEffect, Suspense, useState } from 'react';
+import React, { useEffect, Suspense, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
+import type { IpcMainInvokeEvent } from 'electron';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { preferencesSelector } from '@states/selectors';
@@ -25,16 +27,6 @@ const SidePannelContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.darkGray};
   color: ${({ theme }) => theme.colors.midGray};
   /* padding: ${({ theme }) => theme.spacing.xs}; */
-`;
-
-const MainPannelContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: blue;
 `;
 
 const StyledList = styled.ul`
@@ -117,12 +109,13 @@ const StyledInputRadio = styled.input`
   }
 `;
 
-interface IPreferencesPannelProps {
+interface IPreferencesSidePannelProps {
   preferences?: IPreferences;
+  defaultSelected?: string;
   onChange?: (id: string) => void;
 }
-const PreferencesPannel = (props: IPreferencesPannelProps): JSX.Element => {
-  const [checkedRadio, setCheckedRadio] = useState<string | undefined>();
+const PreferencesSidePannel = (props: IPreferencesSidePannelProps): JSX.Element => {
+  const [checkedRadio, setCheckedRadio] = useState<string | undefined>(props.defaultSelected);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { id } = event.target;
@@ -152,21 +145,178 @@ const PreferencesPannel = (props: IPreferencesPannelProps): JSX.Element => {
   );
 };
 
-const Preferences = (): JSX.Element => {
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
+const MainPannelContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+`;
 
+// Styled components for the input pair
+const InputPairContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  & label {
+    flex-basis: 30%;
+  }
+`;
+
+const StyledForm = styled.form`
+  /* display: flex;
+  flex-direction: column; */
+  width: 100%;
+  height: 100%;
+`;
+
+const StyledInput = styled.input`
+  width: 100%;
+  width: 100%;
+  color: ${({ theme }) => theme.colors.white};
+  border: 0px solid transparent;
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.white};
+  }
+`;
+
+const StyledSelect = styled.select`
+  width: 100%;
+`;
+
+const BehaviourPreferences = (): JSX.Element => {
+  const {
+    t,
+    i18n: { options },
+  } = useTranslation();
+  console.log('resources', options.resources);
+  return (
+    <>
+      <StyledForm>
+        <fieldset>
+          <legend>Interface {t('caca')}</legend>
+          <span>Changing Interface settings requires application restart</span>
+          <div>
+            <InputPairContainer>
+              <label htmlFor="fname">First Name:</label>
+              <StyledInput type="text" id="fname" name="fname" />
+            </InputPairContainer>
+            <InputPairContainer>
+              <label htmlFor="email">Email:</label>
+              <StyledInput type="email" id="email" name="lname" />
+            </InputPairContainer>
+            <InputPairContainer>
+              <label htmlFor="email">Gender:</label>
+              <StyledSelect>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </StyledSelect>
+            </InputPairContainer>
+            <InputPairContainer>
+              <StyledInput type="checkbox" id="caca2" style={{ width: 'auto' }} />
+              <label htmlFor="caca2">Other1:</label>
+            </InputPairContainer>
+            <InputPairContainer>
+              <StyledInput type="radio" id="caca2" style={{ width: 'auto' }} />
+              <label htmlFor="caca2">Other:</label>
+            </InputPairContainer>
+          </div>
+        </fieldset>
+      </StyledForm>
+    </>
+  );
+};
+
+const DownloadPreferences = (): JSX.Element => {
+  const {
+    t,
+    i18n: { options },
+  } = useTranslation();
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const openFolderDialog = async (): Promise<void> => {
+    const result = (await window.commands.dialogs({
+      defaultPath: preferences?.downloads?.savePath,
+      properties: ['openDirectory', 'promptToCreate'],
+      createDirectory: true,
+    })) as { canceled: boolean; filePaths: string[] };
+    const savePath = result.filePaths[0];
+    !result.canceled && setPreferences({ ...preferences, downloads: { savePath } });
+  };
+
+  return (
+    <>
+      <StyledForm
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
+        <fieldset>
+          <legend>Interface {t('caca')}</legend>
+          <span>When downloading content</span>
+          <div>
+            <InputPairContainer>
+              <label htmlFor="savePath">save path:</label>
+              <StyledInput
+                type="text"
+                id="savePath"
+                name="savePath"
+                placeholder={preferences?.downloads?.savePath}
+              />
+              <button onClick={openFolderDialog}>openDirectory</button>
+            </InputPairContainer>
+            <InputPairContainer>
+              <label htmlFor="email">Email:</label>
+              <StyledInput type="email" id="email" name="lname" />
+            </InputPairContainer>
+          </div>
+        </fieldset>
+      </StyledForm>
+    </>
+  );
+};
+
+const Preferences = (): JSX.Element => {
+  const pannels = {
+    downloads: (
+      <>
+        <DownloadPreferences />
+      </>
+    ),
+    behaviour: (
+      <>
+        <BehaviourPreferences />
+      </>
+    ),
+    // advanced: <AdvancedContainer />,
+  };
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const firstPreference = preferences && Object.keys(preferences).slice(0, 1).pop();
+  const [selectedPreferenceGroup, setSelectedPreferenceGroup] = useState<string>(
+    firstPreference ?? 'downloads',
+  );
   const onSelectPreference = (id: string): void => {
     console.log('id', id);
+    setSelectedPreferenceGroup(id);
   };
 
   return (
     <PreferencesContainer>
       <SidePannelContainer>
         <Suspense fallback={<div>Loading...</div>}>
-          <PreferencesPannel preferences={preferences} onChange={onSelectPreference} />
+          <PreferencesSidePannel
+            preferences={preferences}
+            onChange={onSelectPreference}
+            defaultSelected={selectedPreferenceGroup}
+          />
         </Suspense>
       </SidePannelContainer>
-      <MainPannelContainer />
+      <MainPannelContainer>
+        <Suspense fallback={<div>Loading...</div>}>{pannels[selectedPreferenceGroup]}</Suspense>
+      </MainPannelContainer>
     </PreferencesContainer>
   );
 };

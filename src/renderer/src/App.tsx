@@ -99,8 +99,8 @@ const App = (): JSX.Element => {
         <I18nextProvider i18n={i18n}>
           <Container>
             <Suspense fallback={<div>Loading...</div>}>
-              {/* <Preferences /> */}
-              <Download />
+              <Preferences />
+              {/* <Download /> */}
             </Suspense>
             {/* <Download /> */}
             {/* <Playlist /> */}

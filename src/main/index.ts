@@ -1,9 +1,18 @@
-import { app, shell, ipcMain, IpcMainInvokeEvent, BrowserWindow } from 'electron';
+import {
+  app,
+  shell,
+  ipcMain,
+  IpcMainInvokeEvent,
+  BrowserWindow,
+  dialog,
+  OpenDialogOptions,
+} from 'electron';
 import * as path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
 import type { IPreferences } from 'types/types';
+import dialogs from './lib/dialogs';
 import { savePreferences, loadPreferences } from './lib/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
 // import callFork from './fork'
@@ -34,6 +43,10 @@ function createWindow(): void {
     shell.openExternal(details.url);
     return { action: 'deny' };
   });
+
+  ipcMain.handle('dialogs', async (event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
+    dialogs(options, mainWindow),
+  );
 
   ipcMain.handle('getVideoInfo', async (event: IpcMainInvokeEvent, url: string) => {
     const result = await getVideoInfo(url);
