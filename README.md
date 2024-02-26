@@ -1,7 +1,7 @@
-# electron-vite-worker-example
+# Musika
 
-![electron version](https://img.shields.io/github/package-json/dependency-version/alex8088/electron-vite-worker-example/dev/electron)
-![electron vite version](https://img.shields.io/github/package-json/dependency-version/alex8088/electron-vite-worker-example/dev/electron-vite)
+![electron version](https://img.shields.io/github/package-json/dependency-version/maggiben/musika/dev/electron)
+![electron vite version](https://img.shields.io/github/package-json/dependency-version/maggiben/musika/dev/electron-vite)
 
 > electron-vite worker and fork example
 
@@ -14,7 +14,7 @@
 Clone this repo to your local machine and install the dependencies.
 
 ```bash
-pnpm i
+npm i
 ```
 
 ## Worker Example
