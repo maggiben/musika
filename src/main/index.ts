@@ -3,6 +3,8 @@ import * as path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
+import type { IPreferences } from 'types/types';
+import { savePreferences, loadPreferences } from './lib/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
 // import callFork from './fork'
 
@@ -42,6 +44,19 @@ function createWindow(): void {
     const result = await download(url, mainWindow);
     return result;
   });
+
+  ipcMain.handle('loadPreferences', async (event: IpcMainInvokeEvent, url: string) => {
+    const result = await loadPreferences(mainWindow);
+    return result;
+  });
+
+  ipcMain.handle(
+    'savePreferences',
+    async (event: IpcMainInvokeEvent, preferences: IPreferences) => {
+      const result = await savePreferences(preferences, mainWindow);
+      return result;
+    },
+  );
 
   // Test active push message to Renderer-process.
   mainWindow.webContents.on('did-finish-load', () => {
