@@ -54,42 +54,15 @@ const StyledListItem = styled.li`
 `;
 
 const StyledLabel = styled.label`
-  display: inline-flex;
+  flex-basis: auto;
   width: 100%;
   align-items: center;
   padding: ${({ theme }) => theme.spacing.xs};
-
   display: block;
+  white-space: nowrap;
   cursor: pointer;
   white-space: nowrap;
   position: relative;
-  /* transition: 0.4s ease-in-out 0s; */
-
-  /* &:after,
-  &:before {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-  }
-
-  &:after {
-    height: 19px;
-    width: 19px;
-    border: 2px solid #524eee;
-    left: 19px;
-    top: calc(50% - 12px);
-  }
-  &:before {
-    background: #524eee;
-    height: 20px;
-    width: 20px;
-    left: 21px;
-    top: calc(50%-5px);
-    transform: scale(5);
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.4s ease-in-out 0s;
-  } */
 `;
 
 const StyledInputRadio = styled.input`
@@ -161,9 +134,6 @@ const InputPairContainer = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  & label {
-    flex-basis: 30%;
-  }
 `;
 
 const StyledForm = styled.form`
@@ -185,6 +155,60 @@ const StyledInput = styled.input`
 
 const StyledSelect = styled.select`
   width: 100%;
+`;
+
+const InputGroup = styled.div`
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+  & .form-control,
+  .form-select {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+  }
+`;
+
+const FormControl = styled.input`
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: white;
+  border: 0;
+  background-clip: padding-box;
+  appearance: none;
+  border-radius: 0;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+`;
+
+const Btn = styled.button`
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  color: white;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 0;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 `;
 
 const BehaviourPreferences = (): JSX.Element => {
@@ -255,22 +279,35 @@ const DownloadPreferences = (): JSX.Element => {
         }}
       >
         <fieldset>
-          <legend>Interface {t('caca')}</legend>
+          <legend>Downloads</legend>
           <span>When downloading content</span>
           <div>
             <InputPairContainer>
-              <label htmlFor="savePath">save path:</label>
-              <StyledInput
-                type="text"
-                id="savePath"
-                name="savePath"
-                placeholder={preferences?.downloads?.savePath}
-              />
-              <button onClick={openFolderDialog}>openDirectory</button>
+              <StyledLabel htmlFor="email">Save Path:</StyledLabel>
+              <InputGroup>
+                <FormControl
+                  type="text"
+                  id="savePath"
+                  name="savePath"
+                  className="form-control"
+                  placeholder={preferences?.downloads?.savePath}
+                />
+                <Btn type="button" id="button" onClick={openFolderDialog}>
+                  Open 📁
+                </Btn>
+              </InputGroup>
             </InputPairContainer>
             <InputPairContainer>
-              <label htmlFor="email">Email:</label>
-              <StyledInput type="email" id="email" name="lname" />
+              <StyledLabel htmlFor="maxconnections">Max connections:</StyledLabel>
+              <InputGroup>
+                <FormControl
+                  type="number"
+                  id="maxconnections"
+                  name="maxconnections"
+                  className="form-control"
+                  placeholder={preferences?.downloads?.savePath}
+                />
+              </InputGroup>
             </InputPairContainer>
           </div>
         </fieldset>
