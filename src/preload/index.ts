@@ -1,4 +1,4 @@
-import { ipcRenderer, contextBridge, dialog } from 'electron';
+import { ipcRenderer, contextBridge } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 import type { IPreferences } from 'types/types';
 

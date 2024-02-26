@@ -55,18 +55,6 @@ enum Options {
 }
 
 export type EncodeOptions = { [key in keyof typeof Options]: string | number };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getEncoderOptions(flags: Record<string, unknown>): EncodeOptions | undefined {
-  const entries = Object.entries({
-    format: 'ogg',
-    // audioCodec: get(flags, 'audioCodec') as string,
-    // videoCodec: get(flags, 'videoCodec') as string,
-    // videoBitrate: get(flags, 'videoBitrate') as number,
-    // audioBitrate: get(flags, 'audioBitrate') as number,
-  }).filter((option) => Boolean(option[1]));
-
-  return entries.length ? (Object.fromEntries(entries) as EncodeOptions) : undefined;
-}
 
 export default async function download(
   url: string,

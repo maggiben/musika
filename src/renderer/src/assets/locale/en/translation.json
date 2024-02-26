@@ -5,5 +5,11 @@
   "welcome home": "Welcome to Musika",
   "thumbnail": "thumbnail",
   "title": "title",
+  "downloads": "Downloads",
+  "save files to": "Save files to",
+  "open folder": "Open 📁",
+  "max connections": "Max connections",
+  "retries": "Retries",
+  "timeout": "Timeout in milliseconds",
   "restart required message": "Changing Interface settings requires application restart"
 }

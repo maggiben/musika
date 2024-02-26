@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ytpl from '@distube/ytpl';
 import ytdl from 'ytdl-core';

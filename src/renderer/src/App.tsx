@@ -48,9 +48,9 @@ const theme: DefaultTheme = {
     xxl: '40px',
   },
   colors: {
-    white: 'white',
+    white: 'var(--color-white)',
     red: '#d21d30',
-    darkGray: '#212121',
+    darkGray: 'var(--color-darkdray)',
     midGray: '#484848',
     lightGray: '#858585',
     violet: '#6400ff',

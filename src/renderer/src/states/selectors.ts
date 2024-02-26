@@ -1,5 +1,4 @@
 import { selector } from 'recoil';
-import * as atoms from './atoms';
 import type { IPreferences } from 'types/types';
 
 // export interface RecoilState {
@@ -16,22 +15,7 @@ import type { IPreferences } from 'types/types';
 //   },
 // });
 
-const defaultPreferences: IPreferences = {
-  behaviour: {},
-  downloads: {
-    savePath: '',
-  },
-  advanced: {},
-};
-
 export const preferencesSelector = selector({
   key: 'preferencesSelector',
-  get: async (): Promise<IPreferences> => {
-    try {
-      return await window.preferences.loadPreferences();
-    } catch (error) {
-      console.error(error);
-      return defaultPreferences;
-    }
-  },
+  get: async (): Promise<IPreferences> => window.preferences.loadPreferences(),
 });

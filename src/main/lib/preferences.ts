@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'path';
-import { app, nativeTheme } from 'electron';
+import { app, nativeTheme, BrowserWindow } from 'electron';
 import type { IPreferences } from 'types/types';
 
 const defaultPreferences: IPreferences = {
@@ -9,10 +9,14 @@ const defaultPreferences: IPreferences = {
   },
   downloads: {
     savePath: app.getPath('downloads'),
+    maxconnections: 5,
+    retries: 3,
+    timeout: 120 * 1000, // 120 seconds
   },
   advanced: {},
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPreferences> {
   const userDataPath = app.getPath('userData');
   const preferencesPath = path.join(userDataPath, 'preferences.json');
@@ -42,6 +46,7 @@ export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPref
 
 export async function savePreferences(
   preferences: IPreferences,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   mainWindow?: BrowserWindow,
 ): Promise<boolean> {
   const userDataPath = app.getPath('userData');
