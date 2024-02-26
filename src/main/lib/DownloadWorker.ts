@@ -320,9 +320,12 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       videoFormat = this.videoFormat,
       format,
     } = options;
-    // fs.appendFileSync('output.txt', `output: ${output}\nformat: ${options.format}`);
+    const name = utils.tmpl(output, { ...videoInfo, ...videoFormat });
+    console.log('output', output);
+    console.log('name', name);
+    console.log('name', JSON.stringify({ ...videoInfo, ...videoFormat }, null, 2));
     return path.format({
-      name: utils.tmpl(output, [videoInfo, videoFormat]),
+      name: utils.tmpl(output, { ...videoInfo, ...videoFormat }),
       ext: `.${format}`,
     });
   }

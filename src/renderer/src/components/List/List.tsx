@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
@@ -178,8 +177,8 @@ const List = (props: IListProps): JSX.Element | null => {
     //   return { ...prevProgress, [source?.id]: Math.floor(percentage) };
     // });
     setProgress((prevProgress) => {
-      return { 
-        ...prevProgress, 
+      return {
+        ...prevProgress,
         [source?.id]: [prevProgress?.[source?.id]?.[1] ?? 0, Math.floor(percentage)],
       };
     });
@@ -255,10 +254,7 @@ const List = (props: IListProps): JSX.Element | null => {
     return items.map((item, index) => {
       const songIndex = padZeroes(index + 1, items.length.toString().split('').length);
       return (
-        <ListItemWrapper
-          key={`${item.id}-${index}`}
-          $progress={progress?.[item.id]}
-        >
+        <ListItemWrapper key={`${item.id}-${index}`} $progress={progress?.[item.id]}>
           <ListBack data-testid="list-item-back">
             <SongIndex>{songIndex}</SongIndex>
             <span>·</span>

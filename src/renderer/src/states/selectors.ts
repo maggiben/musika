@@ -1,5 +1,6 @@
-// import { selector } from 'recoil';
-// import * as atoms from './atoms';
+import { selector } from 'recoil';
+import * as atoms from './atoms';
+import type { IPreferences } from 'types/types';
 
 // export interface RecoilState {
 //   hasSelectedPerson: boolean;
@@ -15,23 +16,22 @@
 //   },
 // });
 
-// export const hasMultiplePerson = selector<RecoilState['hasMultiplePerson']>({
-//   key: 'hasMultiplePerson',
-//   get: ({ get }) => {
-//     const persons = get(atoms.personsState);
-//     return persons ? Array.isArray(persons) && persons.length > 1 : false;
-//   },
-// });
+const defaultPreferences: IPreferences = {
+  behaviour: {},
+  downloads: {
+    savePath: '',
+  },
+  advanced: {},
+};
 
-// // export const selectedPerson = selector<RecoilState['selectedPerson']>({
-// //   key: 'selectedPerson',
-// //   get: ({ get }) => {
-// //     const persons = get(atoms.personsState);
-// //     const person = persons && persons.find(({ selected }) => selected);
-// //     return person ? [ person ] : undefined;
-// //   },
-// //   set: ({ get, set }, newValue) => {
-// //     const persons = get(atoms.personsState);
-// //     return set(atoms.personsState, newValue);
-// //   }
-// // });
+export const preferencesSelector = selector({
+  key: 'preferencesSelector',
+  get: async (): Promise<IPreferences> => {
+    try {
+      return await window.preferences.loadPreferences();
+    } catch (error) {
+      console.error(error);
+      return defaultPreferences;
+    }
+  },
+});

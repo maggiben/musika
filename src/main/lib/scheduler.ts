@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * @file         : Scheduler.ts
  * @summary      : Playlist thread scheduler
@@ -252,7 +251,9 @@ export class Scheduler extends EventEmitter {
    * @param {Worker} worker the worker currently executing
    * @returns {boolean} returns false if exceeded the maximum allowed retries otherwise returns true
    */
-  private async retryDownloadWorker<T extends ISchedulerResult>(item: ytpl.result['items'][0]): Promise<T> {
+  private async retryDownloadWorker<T extends ISchedulerResult>(
+    item: ytpl.result['items'][0],
+  ): Promise<T> {
     if (!this.retryItems.has(item.id)) {
       this.retryItems.set(item.id, {
         item,
@@ -290,7 +291,9 @@ export class Scheduler extends EventEmitter {
     });
   }
 
-  private async downloadWorkers<T extends ISchedulerResult>(item: ytpl.result['items'][0]): Promise<T> {
+  private async downloadWorkers<T extends ISchedulerResult>(
+    item: ytpl.result['items'][0],
+  ): Promise<T> {
     const workerData: ISchedulerWorkerOptions = {
       item,
       output: this.output,

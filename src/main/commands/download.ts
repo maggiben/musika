@@ -37,10 +37,7 @@ import * as ytpl from '@distube/ytpl';
 import * as ytdl from 'ytdl-core';
 import { BrowserWindow } from 'electron';
 import { Scheduler } from '../lib/Scheduler';
-import * as utils from '@shared/utils';
 import type { IDownloadWorkerMessage } from '../lib/DownloadWorker';
-import progressStream from 'progress-stream';
-import type { Progress } from 'progress-stream';
 
 interface IDownloadOptions {
   output: string;
@@ -74,12 +71,10 @@ function getEncoderOptions(flags: Record<string, unknown>): EncodeOptions | unde
 export default async function download(
   url: string,
   mainWindow: BrowserWindow | null,
-  options: IDownloadOptions = { maxconnections: 5, output: 'a.mp4', flags: { format: 'ogg' } },
+  options: IDownloadOptions,
 ): Promise<Record<string, unknown>> {
   const playlistId = ytpl.validateID(url) && (await ytpl.getPlaylistID(url));
   const videoId = ytdl.validateURL(url) && ytdl.getVideoID(url);
-  const { output, maxconnections, retries, flags } = options;
-  console.log('getEncoderOptions(flags)', getEncoderOptions(flags));
   if (playlistId) {
     const scheduler = new Scheduler({
       playlistId,
@@ -88,10 +83,7 @@ export default async function download(
         hl: 'en',
         limit: Infinity,
       },
-      output,
-      maxconnections,
-      retries: retries,
-      flags,
+      ...options,
     });
     scheduler
       .once('playlistItems', (message: IDownloadWorkerMessage) => {

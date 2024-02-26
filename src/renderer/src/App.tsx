@@ -9,13 +9,14 @@
 // export default App;
 
 import '@assets/styles/App.css';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
 import { RecoilRoot } from 'recoil';
 import Playlist from '@containers/playlist/Playlist';
 import Download from '@containers/download/Download';
+import Preferences from '@renderer/containers/preferences/Preferences';
 
 const Container = styled.div`
   width: 100%;
@@ -97,7 +98,11 @@ const App = (): JSX.Element => {
       <RecoilRoot>
         <I18nextProvider i18n={i18n}>
           <Container>
-            <Download />
+            <Suspense fallback={<div>Loading...</div>}>
+              {/* <Preferences /> */}
+              <Download />
+            </Suspense>
+            {/* <Download /> */}
             {/* <Playlist /> */}
           </Container>
         </I18nextProvider>

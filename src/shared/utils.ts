@@ -105,17 +105,19 @@ export function fromHumanSize(size: string): number {
  * @return {string}
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const tmpl = (str: string, objs: any[]): string => {
-  return str.replace(/\{([\w.-]+)\}/g, (match: string, prop: string) => {
-    const name = objs
-      .map((result: Record<string, unknown>) => {
-        const value = result[prop] as string;
-        return value ? sanitizeName(value, { replacement: '-' }) : undefined;
-      })
-      .filter(Boolean)
-      .pop();
-    return name ?? match;
+export const tmpl = (
+  str: string,
+  obj: Record<string, unknown>,
+  sep: string = '.',
+  replacement: string = '-',
+): string => {
+  const result = str.replace(/{([^{}]+)}/g, (match, key) => {
+    const value = key.split(sep).reduce((acc, curr) => {
+      return acc && typeof acc === 'object' ? acc[curr] : undefined;
+    }, obj);
+    return value !== undefined ? String(value) : '';
   });
+  return sanitizeName(result, { replacement });
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
