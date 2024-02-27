@@ -15,7 +15,6 @@ import type { IPreferences } from 'types/types';
 import dialogs from './lib/dialogs';
 import { savePreferences, loadPreferences } from './lib/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
-// import callFork from './fork'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const template: any = [
