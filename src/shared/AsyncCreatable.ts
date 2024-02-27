@@ -44,7 +44,7 @@ export abstract class AsyncCreatable<O = object> {
    * @param options An options object providing initialization params.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public constructor(options: O) {
+  public constructor(_options: O) {
     /* leave up to implementer */
   }
 

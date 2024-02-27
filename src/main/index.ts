@@ -17,7 +17,8 @@ import { savePreferences, loadPreferences } from './lib/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
 // import callFork from './fork'
 
-const template = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const template: any = [
   {
     label: 'File',
     submenu: [
@@ -98,6 +99,13 @@ if (process.platform === 'darwin') {
     },
   );
 
+  // View menu
+  template[3].submenu[2] = {
+    label: 'Toggle Developer Tools',
+    accelerator: 'Cmd+Option+I',
+    role: 'toggledevtools',
+  };
+
   // Window menu
   template[4].submenu = [
     { role: 'minimize' },
@@ -137,36 +145,22 @@ function createWindow(): void {
     return { action: 'deny' };
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ipcMain.handle('dialogs', async (event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
+  ipcMain.handle('dialogs', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
     dialogs(options, mainWindow),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ipcMain.handle('getVideoInfo', async (event: IpcMainInvokeEvent, url: string) => {
-    const result = await getVideoInfo(url);
-    return result;
-  });
+  ipcMain.handle('getVideoInfo', async (_event: IpcMainInvokeEvent, url: string) =>
+    getVideoInfo(url),
+  );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ipcMain.handle('download', async (event: IpcMainInvokeEvent, url: string) => {
-    const result = await download(url, mainWindow);
-    return result;
-  });
+  ipcMain.handle('download', async (_event: IpcMainInvokeEvent, url: string) =>
+    download(url, mainWindow),
+  );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ipcMain.handle('loadPreferences', async (event: IpcMainInvokeEvent) => {
-    const result = await loadPreferences(mainWindow);
-    return result;
-  });
+  ipcMain.handle('loadPreferences', async () => loadPreferences(mainWindow));
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ipcMain.handle(
-    'savePreferences',
-    async (event: IpcMainInvokeEvent, preferences: IPreferences) => {
-      const result = await savePreferences(preferences, mainWindow);
-      return result;
-    },
+  ipcMain.handle('savePreferences', async (_event: IpcMainInvokeEvent, preferences: IPreferences) =>
+    savePreferences(preferences, mainWindow),
   );
 
   // Test active push message to Renderer-process.

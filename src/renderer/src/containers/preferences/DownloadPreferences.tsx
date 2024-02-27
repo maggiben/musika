@@ -1,9 +1,6 @@
-import React, { useEffect, Suspense, useState } from 'react';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
-import { IPreferences } from 'types/types';
 // import { useTranslation } from 'react-i18next';
 import {
   StyledForm,

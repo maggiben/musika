@@ -12,7 +12,8 @@ export interface IPlaylist extends Omit<ytpl.result, 'views'> {
   views: string | number;
 }
 
-const mockPlaylist: IPlaylist = {
+/*
+const mockPlaylist: any = {
   id: 'PLF48AC0919899FFED',
   thumbnail: {
     url: 'https://i.ytimg.com/vi/q2ZHjSA8mkY/hqdefault.jpg?sqp=-oaymwEXCNACELwBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDuA7yfheNh6mN5YqqcN5fyRe3oew',
@@ -401,6 +402,7 @@ const mockPlaylist: IPlaylist = {
     },
   ],
 };
+*/
 
 export const playlistState = atom<{ playlist: IPlaylist | undefined }>({
   key: 'playlistState',

@@ -98,7 +98,7 @@ export default function getDownloadOptions(flags: Record<string, unknown>): ytdl
       createFilter(name, fieldKey, value, false);
     }
     optsKey = 'un' + optsKey;
-    if (get(flags, optsKey)) {
+    if (flags[optsKey]) {
       const optsValue = flags[optsKey] as string;
       createFilter(name, fieldKey, optsValue, true);
     }

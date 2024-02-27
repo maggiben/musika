@@ -3,7 +3,7 @@ import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
 import { padZeroes } from '@utils/string';
 import type ytpl from '@distube/ytpl';
-import type { IpcMainInvokeEvent } from 'electron';
+import type { IpcRendererEvent } from 'electron';
 import type { IDownloadWorkerMessage } from 'types/types';
 import type { Progress } from 'progress-stream';
 import type { IPlaylist } from '@renderer/states/atoms';
@@ -131,7 +131,7 @@ interface IListProps {
 const List = (props: IListProps): JSX.Element | null => {
   const [progress, setProgress] = useState<Record<string, number[]>>();
   const playlistItemsListener = (
-    event: IpcMainInvokeEvent,
+    _event: IpcRendererEvent,
     message: IDownloadWorkerMessage,
   ): void => {
     const { length } = message?.details?.playlistItems as ytpl.result['items'];
@@ -139,14 +139,14 @@ const List = (props: IListProps): JSX.Element | null => {
   };
 
   const contentLengthListener = (
-    event: IpcMainInvokeEvent,
+    _event: IpcRendererEvent,
     message: IDownloadWorkerMessage,
   ): void => {
     const contentLength = message?.details?.contentLength as number;
     console.log(`contentLength: ${contentLength}`);
   };
 
-  const endListener = (event: IpcMainInvokeEvent, message: IDownloadWorkerMessage): void => {
+  const endListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
     setProgress((prevState) => {
       const newState = { ...prevState };
       delete newState[message?.source?.id];
@@ -154,7 +154,7 @@ const List = (props: IListProps): JSX.Element | null => {
     });
   };
 
-  const timeoutListener = (event: IpcMainInvokeEvent, message: IDownloadWorkerMessage): void => {
+  const timeoutListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
     setProgress((prevState) => {
       const newState = { ...prevState };
       delete newState[message?.source?.id];
@@ -162,7 +162,7 @@ const List = (props: IListProps): JSX.Element | null => {
     });
   };
 
-  const exitListener = (event: IpcMainInvokeEvent, message: IDownloadWorkerMessage): void => {
+  const exitListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
     setProgress((prevState) => {
       const newState = { ...prevState };
       delete newState[message?.source?.id];
@@ -170,7 +170,7 @@ const List = (props: IListProps): JSX.Element | null => {
     });
   };
 
-  const progressListener = (event: IpcMainInvokeEvent, message: IDownloadWorkerMessage): void => {
+  const progressListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
     const { source } = message;
     const { percentage } = message?.details?.progress as Progress;
     // setProgress((prevProgress) => {
@@ -189,7 +189,7 @@ const List = (props: IListProps): JSX.Element | null => {
       'on' in window.electron.ipcRenderer &&
       typeof window.electron.ipcRenderer.on === 'function'
     ) {
-      window.electron.ipcRenderer.once('playlistItems', playlistItemsListener);
+      window.electron.ipcRenderer.on('playlistItems', playlistItemsListener);
       window.electron.ipcRenderer.on('contentLength', contentLengthListener);
       window.electron.ipcRenderer.on('end', endListener);
       window.electron.ipcRenderer.on('timeout', timeoutListener);

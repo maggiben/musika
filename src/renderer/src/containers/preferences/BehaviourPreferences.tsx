@@ -1,7 +1,5 @@
-import React, { useEffect, Suspense, useState } from 'react';
-import styled, { css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 // import { useTranslation } from 'react-i18ne
 
@@ -16,12 +14,8 @@ import {
 } from '@renderer/components/Form/Form';
 
 const BehaviourPreferences = (): JSX.Element => {
-  const {
-    t,
-    i18n: { options },
-  } = useTranslation();
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
-  console.log('resources', options.resources);
+  const { t } = useTranslation();
+  const [preferences] = useRecoilState(preferencesState);
   return (
     <>
       <StyledForm

@@ -111,7 +111,7 @@ export const tmpl = (
   sep: string = '.',
   replacement: string = '-',
 ): string => {
-  const result = str.replace(/{([^{}]+)}/g, (match, key) => {
+  const result = str.replace(/{([^{}]+)}/g, (_match, key) => {
     const value = key.split(sep).reduce((acc, curr) => {
       return acc && typeof acc === 'object' ? acc[curr] : undefined;
     }, obj);
@@ -171,6 +171,7 @@ export function getYoutubeVideoId(url: string): string | undefined {
   if (match && match[1]) {
     return match[1];
   }
+  return undefined;
 }
 /**
  * Get playlist id from url

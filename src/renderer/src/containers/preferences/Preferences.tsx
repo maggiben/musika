@@ -52,10 +52,10 @@ const Preferences = (): JSX.Element => {
     ),
     // advanced: <AdvancedContainer />,
   };
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const firstPreference = preferences && Object.keys(preferences).slice(0, 1).pop();
+  const [preferences] = useRecoilState(preferencesState);
+  // const firstPreference = preferences && Object.keys(preferences).slice(0, 1).pop();
   const [selectedPreferenceGroup, setSelectedPreferenceGroup] = useState<string>(
-    firstPreference ?? 'downloads',
+    /* firstPreference ?? */ 'downloads',
   );
   const onSelectPreference = (id: string): void => {
     console.log('id', id);

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 // import { useTranslation } from 'react-i18next';
 
 const PreferencesContainer = styled.div`

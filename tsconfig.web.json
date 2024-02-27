@@ -6,8 +6,8 @@
     "src/renderer/src/**/*.tsx",
     "src/preload/*.d.ts",
     "src/shared/*",
-    "src/types/*"
-, "src/shared/getDownloadOptions.ts", "src/shared/AsyncCreatable.ts", "src/shared/getEncoderOptions.ts"  ],
+    "src/types/*", 
+  ],
   "compilerOptions": {
     "composite": true,
     /* Bundler mode */
