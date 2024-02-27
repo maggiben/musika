@@ -8,7 +8,7 @@ export declare global {
     commands: Record<string, (...args: unknown) => Promise<unknown>>;
     preferences: {
       loadPreferences: () => Promise<IPreferences>;
-      savePreferences: () => Promise<IPreferences>;
+      savePreferences: (preferences: IPreferences) => Promise<boolean>;
     };
   }
 }

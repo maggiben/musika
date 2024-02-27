@@ -5,6 +5,7 @@ export const StyledLabel = styled.label`
   width: 100%;
   align-items: center;
   padding: ${({ theme }) => theme.spacing.xs};
+  font-size: ${({ theme }) => theme.fontSizes.s};
   display: block;
   white-space: nowrap;
   cursor: pointer;
@@ -17,6 +18,9 @@ export const InputPairContainer = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  &:not(:last-child) {
+    margin-bottom: ${({ theme }) => theme.spacing.xxs};
+  }
 `;
 
 export const StyledForm = styled.form`
@@ -46,11 +50,10 @@ export const InputGroup = styled.div`
 export const FormControl = styled.input`
   display: block;
   width: 100%;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  color: white;
+  padding: ${({ theme }) => theme.spacing.xs};
+  font-size: ${({ theme }) => theme.fontSizes.s};
+  line-height: ${({ theme }) => theme.lineHeights.l};
+  color: ${({ theme }) => theme.colors.white};
   border: 0;
   background-clip: padding-box;
   appearance: none;
@@ -82,5 +85,27 @@ export const StyledButton = styled.button`
   &:hover {
     color: ${({ theme }) => theme.colors.white};
     background-color: ${({ theme }) => theme.colors.lightGray};
+  }
+`;
+
+export const StyledSelect = styled.select`
+  display: block;
+  width: 100%;
+  margin-left: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.xs};
+  font-size: ${({ theme }) => theme.fontSizes.s};
+  line-height: ${({ theme }) => theme.lineHeights.l};
+  color: ${({ theme }) => theme.colors.white};
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  /* background-blend-mode: difference; */
+  border: 0px;
+  border-radius: 0px;
+  appearance: none;
+  background-clip: padding-box;
+  &:focus {
+    outline: 0;
   }
 `;

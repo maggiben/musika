@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
-// import { useTranslation } from 'react-i18ne
+import languages from '@translation/languages.json';
 
 import {
   StyledForm,
@@ -11,11 +11,25 @@ import {
   FormControl,
   InputGroup,
   InputPairContainer,
+  StyledSelect,
 } from '@renderer/components/Form/Form';
 
 const BehaviourPreferences = (): JSX.Element => {
-  const { t } = useTranslation();
-  const [preferences] = useRecoilState(preferencesState);
+  const { t, i18n } = useTranslation();
+  console.log('i18n', i18n);
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const handleChangeLanguage = async (event: React.ChangeEvent<HTMLSelectElement>): void => {
+    const { value } = event.target;
+    try {
+      const newPreferences = { ...preferences, behaviour: { language: value } };
+      window.preferences.savePreferences(newPreferences);
+      setPreferences(newPreferences);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  // console.log('preferences', preferences);
+  // console.log('languages', languages);
   return (
     <>
       <StyledForm
@@ -24,68 +38,31 @@ const BehaviourPreferences = (): JSX.Element => {
         }}
       >
         <StyledDFieldset>
-          <legend>{t('downloads')}</legend>
+          <legend>{t('interface')}</legend>
+          <i>{t('restart required message')}</i>
           <div>
             <InputPairContainer>
-              <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
-              <InputGroup>
-                <FormControl
-                  type="text"
-                  id="savePath"
-                  name="savePath"
-                  className="form-control"
-                  defaultValue={preferences?.downloads?.savePath}
-                  placeholder={t('save files to')}
-                />
-                <StyledButton type="button" id="button" onClick={() => {}}>
-                  {t('open folder')}
-                </StyledButton>
-              </InputGroup>
+              <StyledLabel htmlFor="language">{t('language')}</StyledLabel>
+              <StyledSelect
+                className="form-select"
+                defaultValue={preferences?.behaviour?.language}
+                onChange={handleChangeLanguage}
+              >
+                {languages.map((language) => (
+                  <option key={language.code} value={language.code}>
+                    {language.english}
+                  </option>
+                ))}
+              </StyledSelect>
             </InputPairContainer>
+          </div>
+        </StyledDFieldset>
+        <StyledDFieldset>
+          <legend>{t('desktop')}</legend>
+          <div>
             <InputPairContainer>
-              <StyledLabel htmlFor="maxconnections">{t('max connections')}</StyledLabel>
-              <InputGroup>
-                <FormControl
-                  type="number"
-                  id="maxconnections"
-                  name="maxconnections"
-                  min="1"
-                  max="100"
-                  className="form-control"
-                  defaultValue={preferences?.downloads?.maxconnections}
-                  placeholder={t('max connections')}
-                />
-              </InputGroup>
-            </InputPairContainer>
-            <InputPairContainer>
-              <StyledLabel htmlFor="retries">{t('retries')}</StyledLabel>
-              <InputGroup>
-                <FormControl
-                  type="number"
-                  id="retries"
-                  name="retries"
-                  min="1"
-                  max="100"
-                  className="form-control"
-                  defaultValue={preferences?.downloads?.retries}
-                  placeholder={t('retries')}
-                />
-              </InputGroup>
-            </InputPairContainer>
-            <InputPairContainer>
-              <StyledLabel htmlFor="timeout">{t('timeout')}</StyledLabel>
-              <InputGroup>
-                <FormControl
-                  type="number"
-                  id="timeout"
-                  name="timeout"
-                  min="10000"
-                  max="600000"
-                  className="form-control"
-                  defaultValue={preferences?.downloads?.timeout}
-                  placeholder={t('timeout')}
-                />
-              </InputGroup>
+              <input type="checkbox" id="auto-update"></input>
+              <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
             </InputPairContainer>
           </div>
         </StyledDFieldset>

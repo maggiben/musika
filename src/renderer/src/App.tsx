@@ -47,10 +47,16 @@ const theme: DefaultTheme = {
     xl: '32px',
     xxl: '40px',
   },
+  lineHeights: {
+    xs: '0.5',
+    m: '1',
+    l: '1.5',
+  },
   colors: {
     white: 'var(--color-white)',
     red: '#d21d30',
     darkGray: 'var(--color-darkdray)',
+    softGray: '#3b3b3b',
     midGray: '#484848',
     lightGray: '#858585',
     violet: '#6400ff',

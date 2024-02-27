@@ -5,23 +5,31 @@ import type { IPreferences } from 'types/types';
 
 const preferencesPath = path.join(app.getPath('userData'), 'config', 'preferences.json');
 
-const defaultPreferences: IPreferences = {
-  behaviour: {
-    shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
-  },
-  downloads: {
-    savePath: app.getPath('downloads'),
-    maxconnections: 5,
-    retries: 3,
-    timeout: 120 * 1000, // 120 seconds
-  },
-  advanced: {
-    preferencesPath,
-  },
+const getDefaultPreferences = (): IPreferences => {
+  const preferredSystemLanguages = app.getPreferredSystemLanguages();
+  return {
+    behaviour: {
+      shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
+      language: preferredSystemLanguages?.[0]?.split('-')?.[0] ?? 'en',
+      preferredSystemLanguages,
+    },
+    downloads: {
+      savePath: app.getPath('downloads'),
+      maxconnections: 5,
+      retries: 3,
+      timeout: 120 * 1000, // 120 seconds,
+      quality: 'lowest',
+      fileNameTmpl: '{videoDetails.title}',
+    },
+    advanced: {
+      preferencesPath,
+    },
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPreferences> {
+  const defaultPreferences = getDefaultPreferences();
   try {
     await fs.access(preferencesPath, fs.constants.R_OK);
     const savedPreferences = JSON.parse(await fs.readFile(preferencesPath, 'utf8'));
@@ -33,7 +41,6 @@ export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPref
   } catch (error) {
     try {
       const save = await savePreferences(defaultPreferences, mainWindow);
-      console.log('save', save, error);
       if (save) {
         mainWindow &&
           dialog.showMessageBox(mainWindow, {

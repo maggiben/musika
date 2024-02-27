@@ -67,12 +67,19 @@ declare module 'styled-components' {
 }
 
 export interface IPreferences {
-  behaviour?: Record<string, unknown>;
+  behaviour?: {
+    shouldUseDarkColors?: boolean;
+    language?: string;
+    preferredSystemLanguages?: string[];
+  };
   advanced?: Record<string, unknown>;
   downloads?: {
     savePath?: string;
     maxconnections?: number;
     retries?: number;
     timeout?: number;
+    quality?: string;
+    filter?: string;
+    fileNameTmpl?: string;
   };
 }

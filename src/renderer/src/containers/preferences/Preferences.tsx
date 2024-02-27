@@ -5,6 +5,7 @@ import { preferencesState } from '@states/atoms';
 import DownloadPreferences from './DownloadPreferences';
 import BehaviourPreferences from './BehaviourPreferences';
 import PreferencesSidePannel from './PreferencesSidePannel';
+import { StyledButton } from '@renderer/components/Form/Form';
 
 const PreferencesContainer = styled.div`
   width: 100%;
@@ -75,8 +76,37 @@ const Preferences = (): JSX.Element => {
       </SidePannelContainer>
       <MainPannelContainer>
         <Suspense fallback={<div>Loading...</div>}>{pannels[selectedPreferenceGroup]}</Suspense>
+        <ActionButtons />
       </MainPannelContainer>
     </PreferencesContainer>
+  );
+};
+
+const ActionButtonsContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 1px solid ${({ theme }) => theme.colors.lightGray};
+`;
+
+const ActionButtonsGroup = styled.div`
+  /* width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 1px solid ${({ theme }) => theme.colors.lightGray}; */
+`;
+
+const ActionButtons = (): JSX.Element => {
+  return (
+    <ActionButtonsContainer>
+      <ActionButtonsGroup>
+        <StyledButton>Ok</StyledButton>
+        <StyledButton>Cancel</StyledButton>
+        <StyledButton>Apply</StyledButton>
+      </ActionButtonsGroup>
+    </ActionButtonsContainer>
   );
 };
 
