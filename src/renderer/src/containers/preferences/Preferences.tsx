@@ -5,11 +5,12 @@ import { preferencesState } from '@states/atoms';
 import DownloadPreferences from './DownloadPreferences';
 import BehaviourPreferences from './BehaviourPreferences';
 import PreferencesSidePannel from './PreferencesSidePannel';
-import { StyledButton } from '@renderer/components/Form/Form';
+import ActionButtons from './ActionButtons';
 
 const PreferencesContainer = styled.div`
   width: 100%;
   height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -22,16 +23,17 @@ const SidePannelContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.darkGray};
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.colors.dark};
   color: ${({ theme }) => theme.colors.midGray};
-  /* padding: ${({ theme }) => theme.spacing.xs}; */
-  border-right: 1px solid ${({ theme }) => theme.colors.lightGray};
+  /* border-right: 1px solid ${({ theme }) => theme.colors.lightGray}; */
 `;
 
 const MainPannelContainer = styled.div`
-  width: 100%;
+  flex: 1;
   height: 100%;
   display: flex;
+  overflow: hidden;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -54,18 +56,15 @@ const Preferences = (): JSX.Element => {
     // advanced: <AdvancedContainer />,
   };
   const [preferences] = useRecoilState(preferencesState);
-  // const firstPreference = preferences && Object.keys(preferences).slice(0, 1).pop();
-  const [selectedPreferenceGroup, setSelectedPreferenceGroup] = useState<string>(
-    /* firstPreference ?? */ 'downloads',
+  const firstPreference = preferences && Object.keys(preferences).slice(0, 1).pop();
+  const [selectedPreferenceGroup, setSelectedPreferenceGroup] = useState<string | undefined>(
+    firstPreference,
   );
-  const onSelectPreference = (id: string): void => {
-    console.log('id', id);
-    setSelectedPreferenceGroup(id);
-  };
+  const onSelectPreference = (id: string): void => setSelectedPreferenceGroup(id);
 
   return (
     <PreferencesContainer>
-      <SidePannelContainer>
+      <SidePannelContainer data-testid="side-pannel-container">
         <Suspense fallback={<div>Loading...</div>}>
           <PreferencesSidePannel
             preferences={preferences}
@@ -74,39 +73,13 @@ const Preferences = (): JSX.Element => {
           />
         </Suspense>
       </SidePannelContainer>
-      <MainPannelContainer>
-        <Suspense fallback={<div>Loading...</div>}>{pannels[selectedPreferenceGroup]}</Suspense>
+      <MainPannelContainer data-testid="main-pannel-container">
+        <Suspense fallback={<div>Loading...</div>}>
+          <>{selectedPreferenceGroup && pannels[selectedPreferenceGroup]}</>
+        </Suspense>
         <ActionButtons />
       </MainPannelContainer>
     </PreferencesContainer>
-  );
-};
-
-const ActionButtonsContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  border-top: 1px solid ${({ theme }) => theme.colors.lightGray};
-`;
-
-const ActionButtonsGroup = styled.div`
-  /* width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  border-top: 1px solid ${({ theme }) => theme.colors.lightGray}; */
-`;
-
-const ActionButtons = (): JSX.Element => {
-  return (
-    <ActionButtonsContainer>
-      <ActionButtonsGroup>
-        <StyledButton>Ok</StyledButton>
-        <StyledButton>Cancel</StyledButton>
-        <StyledButton>Apply</StyledButton>
-      </ActionButtonsGroup>
-    </ActionButtonsContainer>
   );
 };
 

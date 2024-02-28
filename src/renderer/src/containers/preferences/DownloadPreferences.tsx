@@ -17,13 +17,14 @@ const DownloadOptions = (): JSX.Element => {
   const { t } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
   const openFolderDialog = async (): Promise<void> => {
-    const result = (await window.commands.dialogs({
+    const result = await window.commands.dialogs({
       defaultPath: preferences?.downloads?.savePath,
       properties: ['openDirectory', 'promptToCreate'],
-      createDirectory: true,
-    })) as { canceled: boolean; filePaths: string[] };
-    const savePath = result.filePaths[0];
-    !result.canceled && setPreferences({ ...preferences, downloads: { savePath } });
+    });
+    if (!result.canceled) {
+      const savePath = result.filePaths[0];
+      !result.canceled && setPreferences({ ...preferences, downloads: { savePath } });
+    }
   };
   return (
     <StyledDFieldset>
@@ -160,18 +161,6 @@ const QualityOptions = (): JSX.Element => {
 };
 
 const DownloadPreferences = (): JSX.Element => {
-  const { t } = useTranslation();
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const openFolderDialog = async (): Promise<void> => {
-    const result = (await window.commands.dialogs({
-      defaultPath: preferences?.downloads?.savePath,
-      properties: ['openDirectory', 'promptToCreate'],
-      createDirectory: true,
-    })) as { canceled: boolean; filePaths: string[] };
-    const savePath = result.filePaths[0];
-    !result.canceled && setPreferences({ ...preferences, downloads: { savePath } });
-  };
-
   return (
     <>
       <StyledForm

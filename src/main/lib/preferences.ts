@@ -6,6 +6,7 @@ import type { IPreferences } from 'types/types';
 const preferencesPath = path.join(app.getPath('userData'), 'config', 'preferences.json');
 
 const getDefaultPreferences = (): IPreferences => {
+  const nodeEnv = process.env.NODE_ENV;
   const preferredSystemLanguages = app.getPreferredSystemLanguages();
   return {
     behaviour: {
@@ -22,7 +23,23 @@ const getDefaultPreferences = (): IPreferences => {
       fileNameTmpl: '{videoDetails.title}',
     },
     advanced: {
+      nodeEnv,
       preferencesPath,
+      update: {
+        automatic: true,
+      },
+      logs: {
+        enabled: true,
+        savePath: path.join(app.getPath('userData'), 'logs'),
+        backup: {
+          enabled: true,
+          maxSize: 1440,
+        },
+        purge: {
+          enabled: true,
+          maxSize: 2678400000,
+        },
+      },
     },
   };
 };

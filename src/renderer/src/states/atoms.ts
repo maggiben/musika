@@ -411,7 +411,7 @@ export const playlistState = atom<{ playlist: IPlaylist | undefined }>({
   },
 });
 
-export const preferencesState = atom<IPreferences | undefined>({
+export const preferencesState = atom<IPreferences>({
   key: 'preferencesState',
   default: preferencesSelector,
 });

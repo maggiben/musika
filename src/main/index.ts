@@ -9,6 +9,7 @@ import {
 } from 'electron';
 import * as path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import { getMenu } from './menu';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
 import type { IPreferences } from 'types/types';
@@ -17,104 +18,6 @@ import { savePreferences, loadPreferences } from './lib/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
 import pjson from '@pjson';
 // import callFork from './fork'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const template: any = [
-  {
-    label: 'File',
-    submenu: [
-      { label: 'New File', accelerator: 'CmdOrCtrl+N' },
-      { label: 'Open File', accelerator: 'CmdOrCtrl+O' },
-      { type: 'separator' },
-      { label: 'Save', accelerator: 'CmdOrCtrl+S' },
-      { label: 'Save As', accelerator: 'CmdOrCtrl+Shift+S' },
-      { type: 'separator' },
-      { label: 'Exit', role: 'quit' },
-    ],
-  },
-  {
-    label: 'Edit',
-    submenu: [
-      { label: 'Undo', accelerator: 'CmdOrCtrl+Z', role: 'undo' },
-      { label: 'Redo', accelerator: 'CmdOrCtrl+Shift+Z', role: 'redo' },
-      { type: 'separator' },
-      { label: 'Cut', accelerator: 'CmdOrCtrl+X', role: 'cut' },
-      { label: 'Copy', accelerator: 'CmdOrCtrl+C', role: 'copy' },
-      { label: 'Paste', accelerator: 'CmdOrCtrl+V', role: 'paste' },
-      { label: 'Select All', accelerator: 'CmdOrCtrl+A', role: 'selectall' },
-    ],
-  },
-  {
-    label: 'View',
-    submenu: [
-      { label: 'Reload', accelerator: 'CmdOrCtrl+R', role: 'reload' },
-      { label: 'Toggle Full Screen', accelerator: 'CmdOrCtrl+F', role: 'togglefullscreen' },
-      { label: 'Toggle Developer Tools', accelerator: 'CmdOrCtrl+Shift+I', role: 'toggledevtools' },
-    ],
-  },
-  {
-    label: 'Window',
-    role: 'window',
-    submenu: [
-      { label: 'Minimize', accelerator: 'CmdOrCtrl+M', role: 'minimize' },
-      { label: 'Close', accelerator: 'CmdOrCtrl+W', role: 'close' },
-    ],
-  },
-  {
-    label: 'Help',
-    role: 'help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click: async () => {
-          const { shell } = require('electron');
-          await shell.openExternal('https://electronjs.org');
-        },
-      },
-    ],
-  },
-];
-
-if (process.platform === 'darwin') {
-  template.unshift({
-    label: app.getName(),
-    submenu: [
-      { role: 'about' },
-      { type: 'separator' },
-      { role: 'services', submenu: [] },
-      { type: 'separator' },
-      { role: 'hide' },
-      { role: 'hideothers' },
-      { role: 'unhide' },
-      { type: 'separator' },
-      { role: 'quit' },
-    ],
-  });
-
-  // Edit menu
-  template[2].submenu.push(
-    { type: 'separator' },
-    {
-      label: 'Speech',
-      submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
-    },
-  );
-
-  // View menu
-  template[3].submenu[2] = {
-    label: 'Toggle Developer Tools',
-    accelerator: 'Cmd+Option+I',
-    role: 'toggledevtools',
-  };
-
-  // Window menu
-  template[4].submenu = [
-    { role: 'minimize' },
-    { role: 'zoom' },
-    { type: 'separator' },
-    { role: 'front' },
-  ];
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function createWindow(_preferences: IPreferences): void {
@@ -135,7 +38,7 @@ function createWindow(_preferences: IPreferences): void {
     },
   });
 
-  const menu = Menu.buildFromTemplate(template);
+  const menu = Menu.buildFromTemplate(getMenu(mainWindow));
   Menu.setApplicationMenu(menu);
 
   mainWindow.on('ready-to-show', () => {
@@ -214,7 +117,7 @@ app.whenReady().then(async () => {
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) createWindow(preferences);
   });
 });
 

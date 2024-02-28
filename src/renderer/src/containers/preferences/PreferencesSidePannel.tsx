@@ -8,16 +8,26 @@ const StyledList = styled.ul`
   margin: 0px;
   width: 100%;
   overflow-y: scroll;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const StyledListItem = styled.li`
   width: 100%;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   & [type='radio']:checked ~ label {
     color: ${({ theme }) => theme.colors.red};
+    background-color: ${({ theme }) => theme.colors.softGray};
+  }
+  & label {
+    display: flex;
+    flex-direction: column;
   }
   /* & [type='radio']:checked ~ label::before {
     opacity: 1;
@@ -28,7 +38,6 @@ const StyledListItem = styled.li`
 
 const StyledLabel = styled.label`
   flex-basis: auto;
-  width: 100%;
   align-items: center;
   padding: ${({ theme }) => theme.spacing.xs};
   display: block;
@@ -36,6 +45,7 @@ const StyledLabel = styled.label`
   cursor: pointer;
   white-space: nowrap;
   position: relative;
+  width: 100%;
 `;
 
 const StyledInputRadio = styled.input`
@@ -70,13 +80,24 @@ const PreferencesSidePannel = (props: IPreferencesSidePannelProps): JSX.Element 
     props.onChange && props.onChange(id);
   };
 
+  const preferencesIcons = {
+    behaviour: {
+      icon: '🖥️',
+    },
+    downloads: {
+      icon: '⬇️',
+    },
+    advanced: {
+      icon: '⚙️',
+    },
+  };
+
   return (
     <StyledList>
       {props.preferences &&
         Object.entries(props.preferences).map(([key], index) => {
           return (
             <StyledListItem key={index}>
-              {/* <StyledSideBarButton>{key}</StyledSideBarButton> */}
               <StyledInputRadio
                 type="radio"
                 name="preferences"
@@ -84,7 +105,10 @@ const PreferencesSidePannel = (props: IPreferencesSidePannelProps): JSX.Element 
                 onChange={onChangeHandler}
                 checked={checkedRadio === key}
               />
-              <StyledLabel htmlFor={key}>{key}</StyledLabel>
+              <StyledLabel htmlFor={key}>
+                <i>{preferencesIcons[key]?.icon}</i>
+                <span>{key}</span>
+              </StyledLabel>
             </StyledListItem>
           );
         })}

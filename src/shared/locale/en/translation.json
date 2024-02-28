@@ -21,6 +21,12 @@
   "apply": "Apply",
   "check for updates": "Check for program updates",
   "desktop": "Desktop",
+  "log file": "Log file",
   "timeout": "Timeout in milliseconds",
-  "restart required message": "Changing Interface settings requires application restart"
+  "backup log after": "Backup the log file after",
+  "delete backup after": "Delete the backup logs older than",
+  "restart required message": "Changing Interface settings requires application restart",
+  "preferences.label.downloads": "",
+  "menu.app.quit": "Quit",
+  "menu.app.preferences": "Preferences..."
 }

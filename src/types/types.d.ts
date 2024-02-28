@@ -72,7 +72,25 @@ export interface IPreferences {
     language?: string;
     preferredSystemLanguages?: string[];
   };
-  advanced?: Record<string, unknown>;
+  advanced?: {
+    nodeEnv?: string;
+    preferencesPath?: string;
+    update?: {
+      automatic?: boolean;
+    };
+    logs?: {
+      enabled?: boolean;
+      savePath?: string;
+      backup?: {
+        enabled: boolean;
+        maxSize: number;
+      };
+      purge?: {
+        enabled: boolean;
+        maxSize: number;
+      };
+    };
+  };
   downloads?: {
     savePath?: string;
     maxconnections?: number;

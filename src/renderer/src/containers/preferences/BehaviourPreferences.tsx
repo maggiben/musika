@@ -7,37 +7,99 @@ import {
   StyledForm,
   StyledLabel,
   StyledDFieldset,
-  StyledButton,
-  FormControl,
-  InputGroup,
   InputPairContainer,
   StyledSelect,
+  InputGroup,
+  StyledButton,
+  FormControl,
 } from '@renderer/components/Form/Form';
 
 const BehaviourPreferences = (): JSX.Element => {
   const { t, i18n } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const handleChangeLanguage = async (event: React.ChangeEvent<HTMLSelectElement>): void => {
+  const handleChangeLanguage = async (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ): Promise<void> => {
     const { value } = event.target;
     try {
       const newPreferences = { ...preferences, behaviour: { language: value } };
       i18n.changeLanguage(value);
-      window.preferences.savePreferences(newPreferences);
       setPreferences(newPreferences);
     } catch (error) {
       console.error(error);
     }
   };
-  console.log('i18n', i18n);
-  console.log('preferences', preferences);
-  console.log('languages', languages);
+
+  const openFolderDialog = async (): Promise<void> => {
+    const result = await window.commands.dialogs({
+      defaultPath: preferences?.advanced?.logs?.savePath,
+      properties: ['openDirectory', 'promptToCreate'],
+    });
+    if (!result.canceled) {
+      const savePath = result.filePaths[0];
+      !result.canceled &&
+        setPreferences({
+          ...preferences,
+          advanced: {
+            ...preferences?.advanced,
+            logs: {
+              ...preferences?.advanced?.logs,
+              savePath,
+            },
+          },
+        });
+    }
+  };
+
   const supportedLangs = languages.filter((language) => {
     const { supportedLngs } = i18n.options;
     return supportedLngs && Array.isArray(supportedLngs) && supportedLngs.includes(language.code);
   });
+
+  const handleEnableLogs = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const { checked } = event.target;
+    try {
+      const newPreferences = {
+        ...preferences,
+        advanced: {
+          ...preferences?.advanced,
+          logs: {
+            ...preferences?.advanced?.logs,
+            enabled: checked,
+          },
+        },
+      };
+      setPreferences(newPreferences);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAutomatedUpdate = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): Promise<void> => {
+    const { checked } = event.target;
+    try {
+      const newPreferences = {
+        ...preferences,
+        advanced: {
+          ...preferences?.advanced,
+          update: {
+            ...preferences?.advanced?.update,
+            automatic: checked,
+          },
+        },
+      };
+      setPreferences(newPreferences);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <StyledForm
+        data-testid="behaviour-preferences"
         onSubmit={(e) => {
           e.preventDefault();
         }}
@@ -50,6 +112,7 @@ const BehaviourPreferences = (): JSX.Element => {
               <StyledLabel htmlFor="language">{t('language')}</StyledLabel>
               <StyledSelect
                 className="form-select"
+                id="language"
                 defaultValue={preferences?.behaviour?.language}
                 onChange={handleChangeLanguage}
               >
@@ -66,8 +129,37 @@ const BehaviourPreferences = (): JSX.Element => {
           <legend>{t('desktop')}</legend>
           <div>
             <InputPairContainer>
-              <input type="checkbox" id="auto-update"></input>
+              <input type="checkbox" id="auto-update" onChange={handleAutomatedUpdate}></input>
               <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
+            </InputPairContainer>
+          </div>
+        </StyledDFieldset>
+        <StyledDFieldset disabled={!preferences?.advanced?.logs?.enabled}>
+          <legend>
+            <input
+              type="checkbox"
+              id="enable-logs"
+              defaultChecked={Boolean(preferences?.advanced?.logs?.savePath)}
+              onChange={handleEnableLogs}
+            ></input>
+            <label htmlFor="enable-logs">{t('log file')}</label>
+          </legend>
+          <div>
+            <InputPairContainer>
+              <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
+              <InputGroup>
+                <FormControl
+                  type="text"
+                  id="savePath"
+                  name="savePath"
+                  className="form-control"
+                  defaultValue={preferences?.advanced?.logs?.savePath}
+                  placeholder={t('save files to')}
+                />
+                <StyledButton type="button" id="button" onClick={openFolderDialog}>
+                  {t('open folder')}
+                </StyledButton>
+              </InputGroup>
             </InputPairContainer>
           </div>
         </StyledDFieldset>
