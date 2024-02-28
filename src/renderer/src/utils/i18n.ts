@@ -1,20 +1,17 @@
 import i18n, { Module } from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import translationES from '@translation/es/translation.json';
-import translationEN from '@translation/en/translation.json';
-import translationFR from '@translation/fr/translation.json';
-import { IPreferences } from 'types/types';
+import translationES from '@locale/es/translation.json';
+import translationEN from '@locale/en/translation.json';
+import translationFR from '@locale/fr/translation.json';
 
+const fallbackLng = 'en';
 const languageDetector = {
   type: 'languageDetector',
   async: true, // If this is set to true, your detect function receives a callback function that you should call with your language, useful to retrieve your language stored in AsyncStorage for example
-  detect: async function () {
-    // You'll receive a callback if you passed async true
-    /* return detected language */
-    const preferences = await window.preferences.loadPreferences();
-    return preferences?.behaviour?.language ?? 'en';
-  },
+  detect: async () =>
+    (await window.preferences.loadPreferences()).behaviour?.language ?? fallbackLng,
 };
+
 // (We only need to initialize i18next once).
 i18n
   .use(languageDetector as Module)
@@ -29,7 +26,7 @@ i18n
     },
     supportedLngs: ['en', 'es', 'fr'],
     // Set the default language to English.
-    fallbackLng: 'en',
+    fallbackLng,
     // Disable i18next's default escaping, which prevents XSS
     // attacks. React already takes care of this.
     interpolation: {

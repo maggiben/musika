@@ -15,6 +15,7 @@ import type { IPreferences } from 'types/types';
 import dialogs from './lib/dialogs';
 import { savePreferences, loadPreferences } from './lib/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
+import pjson from '@pjson';
 // import callFork from './fork'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,7 +116,8 @@ if (process.platform === 'darwin') {
   ];
 }
 
-function createWindow(preferences: IPreferences): void {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function createWindow(_preferences: IPreferences): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -185,10 +187,9 @@ app.whenReady().then(async () => {
   electronApp.setAppUserModelId('com.electron');
 
   app.setAboutPanelOptions({
-    applicationName: 'pepe',
-    applicationVersion: '1.1',
-    copyright: 'Benjamin Maggi 2024',
-    // iconPath:
+    applicationName: pjson.name,
+    applicationVersion: pjson.version,
+    copyright: `${pjson.author} ${new Date().getFullYear()}`,
   });
 
   // Default open or close DevTools by F12 in development

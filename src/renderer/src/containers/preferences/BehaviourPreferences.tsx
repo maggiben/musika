@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
-import languages from '@translation/languages.json';
+import languages from '@locale/languages.json';
 
 import {
   StyledForm,

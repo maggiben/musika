@@ -1,6 +1,7 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
   "include": [
+    "package.json",
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.tsx",
@@ -32,7 +33,7 @@
       "@states/*": ["src/renderer/src/states/*"],
       "@shared/*": ["src/shared/*"],
       "types/*": ["src/types/*"],
-      "@translation/*": [ "src/renderer/src/assets/locale/*" ],
+      "@locale/*": ["src/shared/locale/*"],
       "@pjson": ["package.json"],
     }
   }

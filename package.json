@@ -1,10 +1,23 @@
 {
   "name": "musika",
-  "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "version": "0.0.1",
+  "description": "A yutube media manager",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://www.electronjs.org",
+  "author": "Benjamin Maggi @maggiben",
+  "homepage": "https://github.com/maggiben/musika",
+  "bugs": "https://github.com/maggiben/musika/issues",
+  "keywords": [
+    "youtube",
+    "download",
+    "video",
+    "audio",
+    "multimedia"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/maggiben/musika.git"
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
