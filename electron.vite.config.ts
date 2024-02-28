@@ -19,13 +19,6 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin(), tsconfigPaths()],
   },
   renderer: {
-    // resolve: {
-    //   alias: {
-    //     '@renderer': resolve('src/renderer/src'),
-    //     "@assets": resolve('src/renderer/src/assets'),
-    //     "@utils": resolve('src/renderer/src/utils'),
-    //   }
-    // },
     plugins: [react(), tsconfigPaths()],
   },
 });

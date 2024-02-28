@@ -16,20 +16,25 @@ import {
 
 const BehaviourPreferences = (): JSX.Element => {
   const { t, i18n } = useTranslation();
-  console.log('i18n', i18n);
   const [preferences, setPreferences] = useRecoilState(preferencesState);
   const handleChangeLanguage = async (event: React.ChangeEvent<HTMLSelectElement>): void => {
     const { value } = event.target;
     try {
       const newPreferences = { ...preferences, behaviour: { language: value } };
+      i18n.changeLanguage(value);
       window.preferences.savePreferences(newPreferences);
       setPreferences(newPreferences);
     } catch (error) {
       console.error(error);
     }
   };
-  // console.log('preferences', preferences);
-  // console.log('languages', languages);
+  console.log('i18n', i18n);
+  console.log('preferences', preferences);
+  console.log('languages', languages);
+  const supportedLangs = languages.filter((language) => {
+    const { supportedLngs } = i18n.options;
+    return supportedLngs && Array.isArray(supportedLngs) && supportedLngs.includes(language.code);
+  });
   return (
     <>
       <StyledForm
@@ -48,7 +53,7 @@ const BehaviourPreferences = (): JSX.Element => {
                 defaultValue={preferences?.behaviour?.language}
                 onChange={handleChangeLanguage}
               >
-                {languages.map((language) => (
+                {supportedLangs.map((language) => (
                   <option key={language.code} value={language.code}>
                     {language.english}
                   </option>

@@ -9,9 +9,9 @@
   color-scheme: light dark;
   /* Default colors */
   --color-white: white;
-  --color-darkdray: #212121;
+  --color-black: black;
   --text-color: var(--color-white);
-  --background-color: var(--color-darkdray);
+  --background-color: var(--color-black);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,14 +24,14 @@
   /* Dark color scheme */
   :root {
     --text-color: var(--color-white);
-    --background-color: var(--color-darkdray);
+    --background-color: var(--color-black);
   }
 }
 
 @media (prefers-color-scheme: light) {
   /* Dark color scheme */
   :root {
-    --text-color: var(--color-darkdray);
+    --text-color: var(--color-black);
     --background-color: var(--color-white);
   }
 }
