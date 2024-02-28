@@ -13,8 +13,8 @@ import { getMenu } from './menu';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
 import type { IPreferences } from 'types/types';
-import dialogs from './lib/dialogs';
-import { savePreferences, loadPreferences } from './lib/preferences';
+import dialogs from './utils/dialogs';
+import { savePreferences, loadPreferences } from './utils/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
 import pjson from '@pjson';
 // import callFork from './fork'
@@ -94,6 +94,8 @@ app.whenReady().then(async () => {
     applicationVersion: pjson.version,
     copyright: `${pjson.author} ${new Date().getFullYear()}`,
   });
+
+  app.setName(pjson?.name?.charAt(0).toUpperCase() + pjson?.name?.slice(1));
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

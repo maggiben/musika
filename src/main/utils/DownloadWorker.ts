@@ -40,9 +40,9 @@ import fs from 'fs';
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import ProgressStream from 'progress-stream';
-import * as utils from '@shared/utils';
-import getDownloadOptions from '@shared/getDownloadOptions';
-import { AsyncCreatable } from '@shared/AsyncCreatable';
+import * as utils from '@shared/lib/utils';
+import getDownloadOptions from '@shared/lib/getDownloadOptions';
+import { AsyncCreatable } from '@shared/lib/AsyncCreatable';
 import TimeoutStream from './TimeoutStream';
 
 export interface IDownloadWorkerOptions {

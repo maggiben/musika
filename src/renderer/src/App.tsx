@@ -55,6 +55,14 @@ const theme: DefaultTheme = {
   colors: {
     white: 'var(--color-white)',
     black: 'var(--color-black)',
+    // blue
+    // brown
+    // gray
+    // green
+    // orange
+    // pink
+    // purple
+    // yellow
     red: '#d21d30',
     darkGray: 'var(--color-darkdray)',
     softGray: '#3b3b3b',

@@ -1,4 +1,5 @@
 import i18n, { Module } from 'i18next';
+import { loadPreferences } from '../utils/preferences';
 import { initReactI18next } from 'react-i18next';
 import translationES from '@locale/es/translation.json';
 import translationEN from '@locale/en/translation.json';
@@ -8,8 +9,7 @@ const fallbackLng = 'en';
 const languageDetector = {
   type: 'languageDetector',
   async: true, // If this is set to true, your detect function receives a callback function that you should call with your language, useful to retrieve your language stored in AsyncStorage for example
-  detect: async () =>
-    (await window.preferences.loadPreferences()).behaviour?.language ?? fallbackLng,
+  detect: async () => (await loadPreferences()).behaviour?.language ?? fallbackLng,
 };
 
 // (We only need to initialize i18next once).

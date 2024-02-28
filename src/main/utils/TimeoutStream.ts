@@ -35,7 +35,7 @@
 
 import { performance } from 'perf_hooks';
 import { Writable, WritableOptions, Readable } from 'stream';
-import * as utils from '@shared/utils';
+import * as utils from '@shared/lib/utils';
 
 export interface TimeoutStreamOptions extends WritableOptions {
   timeout: number;

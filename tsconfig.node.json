@@ -8,9 +8,10 @@
     "src/preload/*",
     "src/main/workers/worker-simple.ts",
     "src/shared/*",
-    "src/main/lib/*",
+    "src/shared/lib/*",
+    "src/main/utils/*",
     "src/main/workers/*"
-  ],
+, "src/main/utils/dialogs.ts", "src/main/utils/DownloadWorker.ts", "src/main/utils/preferences.ts", "src/main/utils/Scheduler.ts", "src/main/utils/TimeoutStream.ts"  ],
   "compilerOptions": {
     "composite": true,
     "isolatedModules": false,

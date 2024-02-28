@@ -1,6 +1,6 @@
 import { app, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import pjson from '@pjson';
-import i18n from '@shared/i18n';
+import i18n from './utils/i18n';
 
 interface MenuItem extends MenuItemConstructorOptions {
   label?: string;
@@ -73,6 +73,12 @@ export const getMenu = (mainWindow?: BrowserWindow): (MenuItemConstructorOptions
       label: app.getName(),
       submenu: [
         { role: 'about' },
+        {
+          label: i18n.t('menu.app.checkForUpdates'),
+          click: async () => {
+            console.log('check for updates');
+          },
+        },
         { type: 'separator' },
         {
           label: i18n.t('menu.app.preferences'),

@@ -1,5 +1,5 @@
 import 'styled-components';
-export { IDownloadWorkerMessage } from '../main/lib/DownloadWorker';
+export { IDownloadWorkerMessage } from '../main/utils/DownloadWorker';
 
 interface IAnimation {
   duration: string;

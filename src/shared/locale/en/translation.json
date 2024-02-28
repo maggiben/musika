@@ -28,5 +28,6 @@
   "restart required message": "Changing Interface settings requires application restart",
   "preferences.label.downloads": "",
   "menu.app.quit": "Quit",
-  "menu.app.preferences": "Preferences..."
+  "menu.app.preferences": "Preferences...",
+  "menu.app.checkForUpdates": "Check for Updates..."
 }

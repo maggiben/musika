@@ -36,8 +36,8 @@
 import * as ytpl from '@distube/ytpl';
 import * as ytdl from 'ytdl-core';
 import { BrowserWindow } from 'electron';
-import { Scheduler } from '../lib/Scheduler';
-import type { IDownloadWorkerMessage } from '../lib/DownloadWorker';
+import { Scheduler } from '../utils/Scheduler';
+import type { IDownloadWorkerMessage } from '../utils/DownloadWorker';
 
 interface IDownloadOptions {
   output: string;

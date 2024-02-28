@@ -191,3 +191,5 @@ export function getYoutubePlaylistId(url: string): string | undefined {
   }
   return;
 }
+
+export const isRenderer = typeof process === 'undefined' || !process || process.type === 'renderer';
