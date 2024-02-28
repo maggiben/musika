@@ -14,7 +14,7 @@ import i18n from '@utils/i18n';
 import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
 import { RecoilRoot } from 'recoil';
-// import Playlist from '@containers/playlist/Playlist';
+import Playlist from '@containers/playlist/Playlist';
 // import Download from '@containers/download/Download';
 import Preferences from '@renderer/containers/preferences/Preferences';
 
@@ -93,6 +93,9 @@ const theme: DefaultTheme = {
 };
 
 const App = (): JSX.Element => {
+  const handleMenuClick = (_event, message): void => {
+    console.log('handleMenuClick', message);
+  };
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent): void => {
       // Get the clipboard content
@@ -102,10 +105,18 @@ const App = (): JSX.Element => {
 
     // Add event listener for paste
     document.addEventListener('paste', handlePaste);
+    // Use contextBridge
+    window.electron.ipcRenderer.on('menu-click', handleMenuClick);
 
     // Remove event listener on cleanup
     return () => {
       document.removeEventListener('paste', handlePaste);
+      if (
+        'off' in window.electron.ipcRenderer &&
+        typeof window.electron.ipcRenderer.off === 'function'
+      ) {
+        window.electron.ipcRenderer.off('menu-click', handleMenuClick);
+      }
     };
   }, []);
   return (

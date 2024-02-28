@@ -83,7 +83,8 @@ export const getMenu = (mainWindow?: BrowserWindow): (MenuItemConstructorOptions
         {
           label: i18n.t('menu.app.preferences'),
           accelerator: 'CmdOrCtrl+,',
-          click: async () => mainWindow?.webContents.send('show-preferences'),
+          click: async () =>
+            mainWindow?.webContents.send('menu-click', { id: 'menu.app.preferences' }),
         },
         { type: 'separator' },
         { role: 'services', submenu: [] },

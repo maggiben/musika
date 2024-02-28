@@ -62,12 +62,12 @@ export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPref
         mainWindow &&
           dialog.showMessageBox(mainWindow, {
             type: 'question',
-            buttons: ['Cancel', 'Yes, please', 'No, thanks'],
-            title: 'Hello',
+            buttons: ['Ok'],
+            title: 'Default Preferences Created !',
             defaultId: 1,
             message: `We created a new preferences file for you here: ${preferencesPath}`,
-            checkboxLabel: 'Remember my answer',
-            checkboxChecked: true,
+            // checkboxLabel: 'Remember my answer',
+            // checkboxChecked: true,
           });
         return defaultPreferences;
       }

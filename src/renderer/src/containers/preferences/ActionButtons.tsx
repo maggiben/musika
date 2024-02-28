@@ -9,15 +9,19 @@ const ActionButtonsContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  border-top: 1px solid ${({ theme }) => theme.colors.lightGray};
+  /* border-top: 1px solid ${({ theme }) => theme.colors.lightGray}; */
 `;
 
 const ActionButtonsGroup = styled.div`
-  /* width: 100%;
+  width: 100%;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  border-top: 1px solid ${({ theme }) => theme.colors.lightGray}; */
+  & button {
+    &:not(:last-child) {
+      margin-right: ${({ theme }) => theme.spacing.xs};
+    }
+  }
 `;
 
 const ActionButtons = (): JSX.Element => {
