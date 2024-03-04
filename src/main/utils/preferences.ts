@@ -1,4 +1,5 @@
 import * as fs from 'node:fs/promises';
+// import { is } from '@electron-toolkit/utils';
 import * as path from 'path';
 import { app, nativeTheme, BrowserWindow, dialog } from 'electron';
 import type { IPreferences } from 'types/types';
@@ -23,6 +24,7 @@ const getDefaultPreferences = (): IPreferences => {
       fileNameTmpl: '{videoDetails.title}',
     },
     advanced: {
+      // isDev: is.dev,
       nodeEnv,
       preferencesPath,
       update: {

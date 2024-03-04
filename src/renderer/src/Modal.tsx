@@ -1,22 +1,10 @@
-// import * as utils from '@utils/utils';
-// const App = (): JSX.Element => {
-//   const bytes = utils.toHumanSize(1099511627776);
-//   return (
-//     <h1>A Hexabyte is {bytes} size</h1>
-//   );
-// };
-
-// export default App;
-
-import '@assets/styles/App.css';
+import '@assets/styles/Modal.css';
 import { useEffect, Suspense, useState } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
 import { RecoilRoot } from 'recoil';
-import Playlist from '@containers/playlist/Playlist';
-import Download from '@containers/download/Download';
-// import Preferences from '@renderer/containers/preferences/Preferences';
+import Preferences from '@renderer/containers/preferences/Preferences';
 
 const Container = styled.div`
   width: 100%;
@@ -92,7 +80,7 @@ const theme: DefaultTheme = {
   },
 };
 
-const App = (): JSX.Element => {
+const Modal = (): JSX.Element => {
   const [showModal, setShowModa] = useState<boolean>(false);
 
   const handleMenuClick = (_event, message): void => {
@@ -125,18 +113,15 @@ const App = (): JSX.Element => {
         window.electron.ipcRenderer.off('menu-click', handleMenuClick);
       }
     };
-  }, [window.electron.ipcRenderer]);
+  }, []);
   return (
     <ThemeProvider theme={theme}>
       <RecoilRoot>
         <I18nextProvider i18n={i18n}>
           <Container>
             <Suspense fallback={<div>Loading...</div>}>
-              {/* <Preferences /> */}
-              <Download />
+              <Preferences />
             </Suspense>
-            {/* <Download /> */}
-            {/* <Playlist /> */}
           </Container>
         </I18nextProvider>
       </RecoilRoot>
@@ -144,4 +129,4 @@ const App = (): JSX.Element => {
   );
 };
 
-export default App;
+export default Modal;

@@ -29,5 +29,8 @@
   "preferences.label.downloads": "",
   "menu.app.quit": "Quit",
   "menu.app.preferences": "Preferences...",
-  "menu.app.checkForUpdates": "Check for Updates..."
+  "menu.app.checkForUpdates": "Check for Updates...",
+  "move to applications forlder?": "Move to Applications folder?",
+  "must live in the applications folder to be able to run correctly": "must live in the Applications folder to be able to run correctly"
+
 }

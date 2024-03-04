@@ -38,6 +38,16 @@ function createWindow(_preferences: IPreferences): void {
     },
   });
 
+  const modal = new BrowserWindow({
+    parent: mainWindow,
+    modal: true,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js'),
+      sandbox: false,
+    },
+  });
+
   const menu = Menu.buildFromTemplate(getMenu(mainWindow));
   Menu.setApplicationMenu(menu);
 
@@ -51,7 +61,7 @@ function createWindow(_preferences: IPreferences): void {
   });
 
   ipcMain.handle('dialogs', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
-    dialogs(options, mainWindow),
+    dialogs(options, modal),
   );
 
   ipcMain.handle('getVideoInfo', async (_event: IpcMainInvokeEvent, url: string) =>
@@ -77,8 +87,38 @@ function createWindow(_preferences: IPreferences): void {
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
+
+    modal.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/modal.html`);
+    modal.once('ready-to-show', () => {
+      console.log('ready-to-show-modal: ', `${process.env['ELECTRON_RENDERER_URL']}/modal.html`);
+      ipcMain.on('show-modal', async () => {
+        console.log('show-modal');
+        modal.show();
+      });
+      ipcMain.on('hide-modal', async () => {
+        console.log('hide-modal');
+        modal.hide();
+      });
+    });
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    const modal = new BrowserWindow({
+      parent: mainWindow,
+      modal: true,
+      show: false,
+      webPreferences: {
+        preload: path.join(__dirname, '../preload/index.js'),
+        sandbox: false,
+      },
+    });
+    modal.loadFile(path.join(__dirname, '../renderer/modal.html'));
+    modal.once('ready-to-show', () => {
+      console.log('ready-to-show-modal');
+      ipcMain.handle('show-modal', async () => {
+        console.log('show-modal');
+        modal.show();
+      });
+    });
   }
 }
 

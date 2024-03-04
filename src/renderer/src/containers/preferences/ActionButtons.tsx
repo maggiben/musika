@@ -31,10 +31,16 @@ const ActionButtons = (): JSX.Element => {
     window.preferences.savePreferences(preferences);
     alert('preferences saved');
   };
+
+  const handleCancelClick = async (): Promise<void> => {
+    console.log('handleCancelClick');
+    window.electron.ipcRenderer.send('hide-modal');
+  };
+
   return (
     <ActionButtonsContainer>
       <ActionButtonsGroup>
-        <StyledButton>{t('cancel')}</StyledButton>
+        <StyledButton onClick={handleCancelClick}>{t('cancel')}</StyledButton>
         <StyledButton onClick={handleOkClick}>{t('ok')}</StyledButton>
       </ActionButtonsGroup>
     </ActionButtonsContainer>
