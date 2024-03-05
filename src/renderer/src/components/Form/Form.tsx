@@ -56,6 +56,9 @@ export const FormControl = styled.input`
   font-size: ${({ theme }) => theme.fontSizes.s};
   line-height: ${({ theme }) => theme.lineHeights.l};
   color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme, disabled }) => (disabled ? theme.colors.lightGray : theme.colors.white)};
+  background-color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.darkGray : theme.colors.softGray};
   border: 0;
   background-clip: padding-box;
   appearance: none;

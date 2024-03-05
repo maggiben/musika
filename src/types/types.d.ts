@@ -44,13 +44,6 @@ interface IFontSizes {
   xxl: string;
 }
 
-// declare global {
-//   interface Window {
-//     electron: Electron;
-//     ipcRenderer: Electron.IpcRenderer;
-//     commands: Record<string, (...args: unknown) => Promise<unknown>>;
-//   }
-// }
 
 declare module 'styled-components' {
   export interface DefaultTheme {

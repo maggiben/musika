@@ -1,11 +1,4 @@
-import {
-  app,
-  ipcMain,
-  IpcMainInvokeEvent,
-  BrowserWindow,
-  dialog,
-  nativeTheme,
-} from 'electron';
+import { app, ipcMain, IpcMainInvokeEvent, BrowserWindow, dialog, nativeTheme } from 'electron';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { is } from '@electron-toolkit/utils';
@@ -71,6 +64,9 @@ export function setPreferencesModal(mainWindow: BrowserWindow): BrowserWindow {
       });
       ipcMain.on('hide-modal', async (_event: IpcMainInvokeEvent, options) => {
         console.log('hide-modal', options);
+        if (options?.sync) {
+          mainWindow?.webContents.send('sync-preferences', options);
+        }
         modal.hide();
       });
     });

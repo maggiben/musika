@@ -1,19 +1,10 @@
-// import * as utils from '@utils/utils';
-// const App = (): JSX.Element => {
-//   const bytes = utils.toHumanSize(1099511627776);
-//   return (
-//     <h1>A Hexabyte is {bytes} size</h1>
-//   );
-// };
-
-// export default App;
-
 import '@assets/styles/App.css';
 import { useEffect, Suspense } from 'react';
 import i18n from '@utils/i18n';
-import { I18nextProvider } from 'react-i18next';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, useRecoilState } from 'recoil';
+import { preferencesState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
 // import Playlist from '@containers/playlist/Playlist';
 import Download from '@containers/download/Download';
@@ -92,13 +83,21 @@ const theme: DefaultTheme = {
   },
 };
 
-const App = (): JSX.Element => {
+const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
+  const { i18n } = useTranslation();
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
   const handleMenuClick = (_event: IpcRendererEvent, message: { id: string }): void => {
-    console.log('menu id', message);
     switch (message?.id) {
       case 'menu.app.preferences':
         window.electron.ipcRenderer.send('show-modal', {
           type: 'preferences',
+        });
+        window.electron.ipcRenderer.once('sync-preferences', async () => {
+          const newPreferences = await window.preferences.loadPreferences();
+          // Update Language
+          preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
+            i18n.changeLanguage(newPreferences?.behaviour?.language);
+          setPreferences(newPreferences);
         });
         break;
       default:
@@ -129,18 +128,22 @@ const App = (): JSX.Element => {
       }
     };
   }, []);
+  return <Container>{children}</Container>;
+};
+
+const App = (): JSX.Element => {
   return (
     <ThemeProvider theme={theme}>
       <RecoilRoot>
         <I18nextProvider i18n={i18n}>
-          <Container>
-            <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<div>Loading...</div>}>
+            <AppContainer>
               {/* <Preferences /> */}
               <Download />
-            </Suspense>
-            {/* <Download /> */}
-            {/* <Playlist /> */}
-          </Container>
+            </AppContainer>
+          </Suspense>
+          {/* <Download /> */}
+          {/* <Playlist /> */}
         </I18nextProvider>
       </RecoilRoot>
     </ThemeProvider>

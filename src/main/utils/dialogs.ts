@@ -1,16 +1,10 @@
-import {
-  dialog as nativeDialog,
-  BrowserWindow,
-  OpenDialogReturnValue,
-  OpenDialogOptions,
-} from 'electron';
+import { dialog, BrowserWindow, OpenDialogReturnValue, OpenDialogOptions } from 'electron';
 
-const dialog = (
+export const showOpenDialog = (
   options: OpenDialogOptions,
   mainWindow?: BrowserWindow,
 ): Promise<OpenDialogReturnValue> | null => {
   const activeWindow = mainWindow ?? BrowserWindow.getFocusedWindow();
-  return activeWindow && nativeDialog.showOpenDialog(activeWindow, options);
+  console.log('dialog options:', options);
+  return activeWindow && dialog.showOpenDialog(activeWindow, options);
 };
-
-export default dialog;

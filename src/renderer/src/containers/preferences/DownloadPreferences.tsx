@@ -20,13 +20,21 @@ const DownloadOptions = (): JSX.Element => {
   const openFolderDialog = async (): Promise<void> => {
     const result = await window.commands.dialogs({
       defaultPath: preferences?.downloads?.savePath,
-      properties: ['openDirectory', 'promptToCreate'],
+      properties: ['openDirectory', 'createDirectory'],
     });
     if (!result.canceled) {
       const savePath = result.filePaths[0];
-      !result.canceled && setPreferences({ ...preferences, downloads: { savePath } });
+      console.log('savePath:', savePath);
+      // setPreferences({ ...preferences, downloads: { savePath } });
+      setPreferences((prev) => {
+        return (
+          prev &&
+          structuredClone({ ...preferences, downloads: { ...preferences?.downloads, savePath } })
+        );
+      });
     }
   };
+  console.log('savePath:', preferences?.downloads?.savePath);
   return (
     <StyledDFieldset>
       <legend>{t('downloads')}</legend>
@@ -38,8 +46,9 @@ const DownloadOptions = (): JSX.Element => {
               type="text"
               id="savePath"
               name="savePath"
+              disabled={true}
               className="form-control"
-              defaultValue={preferences?.downloads?.savePath}
+              value={preferences?.downloads?.savePath}
               placeholder={t('save files to')}
             />
             <StyledButton type="button" id="button" onClick={openFolderDialog}>
@@ -54,7 +63,7 @@ const DownloadOptions = (): JSX.Element => {
               type="text"
               id="fileNameTmpl"
               name="fileNameTmpl"
-              defaultValue={preferences?.downloads?.fileNameTmpl}
+              value={preferences?.downloads?.fileNameTmpl}
               placeholder={t('file name template')}
             />
           </InputGroup>

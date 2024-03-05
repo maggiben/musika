@@ -28,13 +28,16 @@ const ActionButtons = (): JSX.Element => {
   const { t } = useTranslation();
   const preferences = useRecoilValue(preferencesState);
   const handleOkClick = async (): Promise<void> => {
-    window.preferences.savePreferences(preferences);
-    alert('preferences saved');
+    await window.preferences.savePreferences(preferences);
+    window.electron.ipcRenderer.send('hide-modal', {
+      sync: true,
+    });
   };
 
   const handleCancelClick = async (): Promise<void> => {
-    console.log('handleCancelClick');
-    window.electron.ipcRenderer.send('hide-modal');
+    window.electron.ipcRenderer.send('hide-modal', {
+      sync: false,
+    });
   };
 
   return (

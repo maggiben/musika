@@ -13,7 +13,7 @@ import { getMenu } from './menu';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
 import type { IPreferences } from 'types/types';
-import dialogs from './utils/dialogs';
+import { showOpenDialog } from './utils/dialogs';
 import { savePreferences, loadPreferences, setPreferencesModal } from './utils/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
 import pjson from '@pjson';
@@ -52,7 +52,7 @@ function createWindow(_preferences: IPreferences): void {
   });
 
   ipcMain.handle('dialogs', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
-    dialogs(options),
+    showOpenDialog(options),
   );
 
   ipcMain.handle('getVideoInfo', async (_event: IpcMainInvokeEvent, url: string) =>
