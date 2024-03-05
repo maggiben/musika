@@ -11,6 +11,7 @@ import {
   InputGroup,
   InputPairContainer,
   StyledSelect,
+  InputGroupText,
 } from '@renderer/components/Form/Form';
 
 const DownloadOptions = (): JSX.Element => {
@@ -101,6 +102,7 @@ const DownloadOptions = (): JSX.Element => {
               defaultValue={preferences?.downloads?.timeout}
               placeholder={t('timeout')}
             />
+            <InputGroupText>ms</InputGroupText>
           </InputGroup>
         </InputPairContainer>
       </div>

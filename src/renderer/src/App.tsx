@@ -9,12 +9,13 @@
 // export default App;
 
 import '@assets/styles/App.css';
-import { useEffect, Suspense, useState } from 'react';
+import { useEffect, Suspense } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
 import { RecoilRoot } from 'recoil';
-import Playlist from '@containers/playlist/Playlist';
+import type { IpcRendererEvent } from 'electron';
+// import Playlist from '@containers/playlist/Playlist';
 import Download from '@containers/download/Download';
 // import Preferences from '@renderer/containers/preferences/Preferences';
 
@@ -24,7 +25,6 @@ const Container = styled.div`
 `;
 
 const theme: DefaultTheme = {
-  main: 'red',
   fontFamily: {
     primary: 'Roboto, sans-serif',
     mono: '"Roboto Mono", monospace',
@@ -93,16 +93,19 @@ const theme: DefaultTheme = {
 };
 
 const App = (): JSX.Element => {
-  const [showModal, setShowModa] = useState<boolean>(false);
-
-  const handleMenuClick = (_event, message): void => {
-    console.log('handleMenuClick', message);
-    if (!showModal) {
-      window.electron.ipcRenderer.send('show-modal', message);
-    } else {
-      window.electron.ipcRenderer.send('hide-modal', message);
+  const handleMenuClick = (_event: IpcRendererEvent, message: { id: string }): void => {
+    console.log('menu id', message);
+    switch (message?.id) {
+      case 'menu.app.preferences':
+        window.electron.ipcRenderer.send('show-modal', {
+          type: 'preferences',
+        });
+        break;
+      default:
+        break;
     }
   };
+
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent): void => {
       // Get the clipboard content
@@ -112,7 +115,7 @@ const App = (): JSX.Element => {
 
     // Add event listener for paste
     document.addEventListener('paste', handlePaste);
-    // Use contextBridge
+    // Add event listener for menu bar clicks
     window.electron.ipcRenderer.on('menu-click', handleMenuClick);
 
     // Remove event listener on cleanup
@@ -125,7 +128,7 @@ const App = (): JSX.Element => {
         window.electron.ipcRenderer.off('menu-click', handleMenuClick);
       }
     };
-  }, [window.electron.ipcRenderer]);
+  }, []);
   return (
     <ThemeProvider theme={theme}>
       <RecoilRoot>

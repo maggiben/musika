@@ -81,7 +81,7 @@ const theme: DefaultTheme = {
 };
 
 const Modal = (): JSX.Element => {
-  const [showModal, setShowModa] = useState<boolean>(false);
+  const [showModal] = useState<boolean>(false);
 
   const handleMenuClick = (_event, message): void => {
     console.log('handleMenuClick', message);

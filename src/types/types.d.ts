@@ -1,5 +1,6 @@
 import 'styled-components';
-export { IDownloadWorkerMessage } from '../main/utils/DownloadWorker';
+export type { IDownloadWorkerMessage } from '@main/utils/DownloadWorker';
+export type { IMenuClickMessage } from '@main/menu';
 
 interface IAnimation {
   duration: string;

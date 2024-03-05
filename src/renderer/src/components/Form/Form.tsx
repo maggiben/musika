@@ -65,6 +65,21 @@ export const FormControl = styled.input`
     box-shadow 0.15s ease-in-out;
 `;
 
+export const InputGroupText = styled.span`
+  display: flex;
+  align-items: center;
+  padding: ${({ theme }) => theme.spacing.xs};
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  background-color: ${({ theme }) => theme.colors.midGray};
+  color: ${({ theme }) => theme.colors.white};
+  text-align: center;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 0;
+`;
+
 export const StyledButton = styled.button`
   display: inline-block;
   font-weight: 400;
@@ -77,7 +92,6 @@ export const StyledButton = styled.button`
   user-select: none;
   border: 0;
   padding: ${({ theme }) => theme.spacing.xs};
-  font-size: 1rem;
   border-radius: 0;
   transition:
     color 0.15s ease-in-out,

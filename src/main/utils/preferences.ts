@@ -1,7 +1,14 @@
+import {
+  app,
+  ipcMain,
+  IpcMainInvokeEvent,
+  BrowserWindow,
+  dialog,
+  nativeTheme,
+} from 'electron';
 import * as fs from 'node:fs/promises';
-// import { is } from '@electron-toolkit/utils';
-import * as path from 'path';
-import { app, nativeTheme, BrowserWindow, dialog } from 'electron';
+import * as path from 'node:path';
+import { is } from '@electron-toolkit/utils';
 import type { IPreferences } from 'types/types';
 
 const preferencesPath = path.join(app.getPath('userData'), 'config', 'preferences.json');
@@ -45,6 +52,41 @@ const getDefaultPreferences = (): IPreferences => {
     },
   };
 };
+
+export function setPreferencesModal(mainWindow: BrowserWindow): BrowserWindow {
+  const modal = new BrowserWindow({
+    parent: mainWindow,
+    modal: true,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js'),
+      sandbox: false,
+    },
+  });
+  const setEventHandlers = (modal: BrowserWindow): void => {
+    modal.once('ready-to-show', () => {
+      ipcMain.on('show-modal', async (_event: IpcMainInvokeEvent, options) => {
+        console.log('show-modal', options);
+        modal.show();
+      });
+      ipcMain.on('hide-modal', async (_event: IpcMainInvokeEvent, options) => {
+        console.log('hide-modal', options);
+        modal.hide();
+      });
+    });
+  };
+
+  // HMR for renderer base on electron-vite cli.
+  // Load the remote URL for development or the local html file for production.
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    modal.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/modal.html`);
+    setEventHandlers(modal);
+  } else {
+    modal.loadFile(path.join(__dirname, '../renderer/modal.html'));
+    setEventHandlers(modal);
+  }
+  return modal;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPreferences> {

@@ -8,12 +8,12 @@
     "src/preload/*.d.ts",
     "src/shared/*",
     "src/shared/lib/*",
-    "src/types/*", 
+    "src/types/*",
+    "src/main/*",
   ],
   "compilerOptions": {
     "composite": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -33,6 +33,7 @@
       "@utils/*": ["src/renderer/src/utils/*"],
       "@states/*": ["src/renderer/src/states/*"],
       "@shared/*": ["src/shared/*"],
+      "@main/*": ["src/main/*"],
       "types/*": ["src/types/*"],
       "@locale/*": ["src/shared/locale/*"],
       "@pjson": ["package.json"],

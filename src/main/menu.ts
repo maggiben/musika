@@ -2,13 +2,17 @@ import { app, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import pjson from '@pjson';
 import i18n from './utils/i18n';
 
-interface MenuItem extends MenuItemConstructorOptions {
+interface IMenuItem extends MenuItemConstructorOptions {
   label?: string;
-  submenu?: MenuItem[];
+  submenu?: IMenuItem[];
 }
 
-export const getMenu = (mainWindow?: BrowserWindow): (MenuItemConstructorOptions | MenuItem)[] => {
-  const template: MenuItem[] = [
+export interface IMenuClickMessage {
+  id: string;
+}
+
+export const getMenu = (mainWindow?: BrowserWindow): (MenuItemConstructorOptions | IMenuItem)[] => {
+  const template: IMenuItem[] = [
     {
       label: 'File',
       submenu: [
