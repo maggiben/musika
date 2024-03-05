@@ -33,6 +33,9 @@ export const StyledForm = styled.form`
 
 export const StyledDFieldset = styled.fieldset`
   border: 1px solid ${({ theme }) => theme.colors.midGray};
+  &:not(:last-of-type) {
+    margin-bottom: ${({ theme }) => theme.spacing.xs};
+  }
 `;
 
 export const InputGroup = styled.div`
