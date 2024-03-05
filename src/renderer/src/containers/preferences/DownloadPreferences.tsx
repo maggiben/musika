@@ -63,7 +63,7 @@ const DownloadOptions = (): JSX.Element => {
               type="text"
               id="fileNameTmpl"
               name="fileNameTmpl"
-              value={preferences?.downloads?.fileNameTmpl}
+              defaultValue={preferences?.downloads?.fileNameTmpl}
               placeholder={t('file name template')}
             />
           </InputGroup>

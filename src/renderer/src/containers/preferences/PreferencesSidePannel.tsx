@@ -67,6 +67,7 @@ const StyledInputRadio = styled.input`
 
 interface IPreferencesSidePannelProps {
   preferences?: IPreferences;
+  pannels: Record<string, unknown>;
   defaultSelected?: string;
   onChange?: (id: string) => void;
 }
@@ -80,22 +81,10 @@ const PreferencesSidePannel = (props: IPreferencesSidePannelProps): JSX.Element 
     props.onChange && props.onChange(id);
   };
 
-  const preferencesIcons = {
-    behaviour: {
-      icon: '🖥️',
-    },
-    downloads: {
-      icon: '⬇️',
-    },
-    advanced: {
-      icon: '⚙️',
-    },
-  };
-
   return (
     <StyledList>
       {props.preferences &&
-        Object.entries(props.preferences).map(([key], index) => {
+        Object.entries(props.pannels).map(([key, value], index) => {
           return (
             <StyledListItem key={index}>
               <StyledInputRadio
@@ -106,7 +95,7 @@ const PreferencesSidePannel = (props: IPreferencesSidePannelProps): JSX.Element 
                 checked={checkedRadio === key}
               />
               <StyledLabel htmlFor={key}>
-                <i>{preferencesIcons[key]?.icon}</i>
+                <i>{value?.['icon']}</i>
                 <span>{key}</span>
               </StyledLabel>
             </StyledListItem>

@@ -37,24 +37,32 @@ const MainPannelContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding-left: ${({ theme }) => theme.spacing.xs};
+  padding-right: ${({ theme }) => theme.spacing.xs};
   background-color: ${({ theme }) => theme.colors.darkGray};
   color: ${({ theme }) => theme.colors.midGray};
 `;
 
 const Preferences = (): JSX.Element => {
   const pannels = {
-    downloads: (
-      <>
-        <DownloadPreferences />
-      </>
-    ),
-    behaviour: (
-      <>
-        <BehaviourPreferences />
-      </>
-    ),
-    // advanced: <AdvancedContainer />,
+    behaviour: {
+      icon: '🖥️',
+      node: (
+        <>
+          <BehaviourPreferences />
+        </>
+      ),
+    },
+    downloads: {
+      icon: '⬇️',
+      node: (
+        <>
+          <DownloadPreferences />
+        </>
+      ),
+    },
   };
+
   const [preferences] = useRecoilState(preferencesState);
   const firstPreference = preferences && Object.keys(preferences).slice(0, 1).pop();
   const [selectedPreferenceGroup, setSelectedPreferenceGroup] = useState<string | undefined>(
@@ -68,6 +76,7 @@ const Preferences = (): JSX.Element => {
         <Suspense fallback={<div>Loading...</div>}>
           <PreferencesSidePannel
             preferences={preferences}
+            pannels={pannels}
             onChange={onSelectPreference}
             defaultSelected={selectedPreferenceGroup}
           />
@@ -75,7 +84,7 @@ const Preferences = (): JSX.Element => {
       </SidePannelContainer>
       <MainPannelContainer data-testid="main-pannel-container">
         <Suspense fallback={<div>Loading...</div>}>
-          <>{selectedPreferenceGroup && pannels[selectedPreferenceGroup]}</>
+          <>{selectedPreferenceGroup && pannels[selectedPreferenceGroup].node}</>
         </Suspense>
         <ActionButtons />
       </MainPannelContainer>

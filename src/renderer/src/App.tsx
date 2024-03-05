@@ -98,7 +98,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
           // Update Language
           preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
             i18n.changeLanguage(newPreferences?.behaviour?.language);
-          setPreferences(newPreferences);
+          setPreferences(structuredClone(newPreferences));
         });
         break;
       default:
