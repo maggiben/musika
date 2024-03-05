@@ -35,28 +35,53 @@
 
 import sanitizeName from 'sanitize-filename';
 
+export const timeStringToSeconds = (timeString: string): number => {
+  const parts = timeString.split(':').map((part) => parseInt(part, 10));
+  let seconds = 0;
+
+  if (parts.length === 3) {
+    // If hours, minutes, and seconds are provided
+    seconds += parts[0] * 3600; // Convert hours to seconds
+    seconds += parts[1] * 60; // Convert minutes to seconds
+    seconds += parts[2]; // Add seconds
+  } else if (parts.length === 2) {
+    // If only minutes and seconds are provided
+    seconds += parts[0] * 60; // Convert minutes to seconds
+    seconds += parts[1]; // Add seconds
+  } else {
+    throw new Error('Invalid time format');
+  }
+
+  return seconds;
+};
+
 /**
  * Converts seconds into human readable time hh:mm:ss
  *
  * @param {number} seconds
  * @return {string}
  */
-export const toHumanTime = (seconds: number): string => {
-  const h: number = Math.floor(seconds / 3600);
+export const toHumanTime = (
+  seconds: number,
+  zeroPadding: boolean = false,
+  maxHours: number = 0,
+): string => {
+  const h = Math.floor(seconds / 3600);
   let m: number | string = Math.floor(seconds / 60) % 60;
+  let s: number | string = seconds % 60;
 
-  let time;
-  if (h > 0) {
-    time = `${h}:`;
-    if (m < 10) {
-      m = `0${m}`;
-    }
+  let time = '';
+
+  if (zeroPadding || h > 0 || maxHours > 9) {
+    time = `${String(h).padStart(String(maxHours).length, '0')}:`;
+    m = String(m).padStart(2, '0');
   } else {
-    time = '';
+    m = String(m);
   }
 
-  const secs: string = seconds % 60 < 10 ? `0${seconds % 60}` : `${seconds % 60}`;
-  return `${time}${m}:${secs}`;
+  s = String(s).padStart(2, '0');
+
+  return `${time}${m}:${s}`;
 };
 
 /**

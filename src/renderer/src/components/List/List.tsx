@@ -3,6 +3,7 @@ import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
 import { padZeroes } from '@utils/string';
 import type ytpl from '@distube/ytpl';
+import * as utils from '@shared/lib/utils';
 import type { IpcRendererEvent } from 'electron';
 import type { IDownloadWorkerMessage } from 'types/types';
 import type { Progress } from 'progress-stream';
@@ -42,18 +43,23 @@ const ListBase = css`
       text-align: right;
       font-weight: bold;
     }
-    &:nth-child(2) {
+    &:nth-child(3) {
       flex-basis: content;
       margin: 0px 6px;
       text-align: center;
       font-weight: bold;
     }
-    &:nth-child(3) {
+    &:nth-child(4) {
       flex-basis: 65%;
       flex-grow: 1;
     }
     &:nth-child(5) {
       flex-basis: 10%;
+      text-align: right;
+      align-self: flex-end;
+    }
+    &:nth-child(6) {
+      flex-basis: 12%;
       text-align: right;
       align-self: flex-end;
     }
@@ -122,6 +128,16 @@ const ListItemWrapper = styled.li<{
         transition-timing-function: ${({ theme }) => theme.transition.timingFunction};
       `}
   }
+`;
+
+const ListHeader = styled.li`
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  min-height: ${({ theme }) => theme.spacing.xs};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.softGray};
+  /* margin: ${({ theme }) => theme.spacing.xxl}; */
 `;
 
 interface IListProps {
@@ -251,27 +267,36 @@ const List = (props: IListProps): JSX.Element | null => {
   // }, []);
 
   const getItem = (items: IPlaylist['items']): JSX.Element[] => {
+    const maxHours = Math.max(
+      ...items.map(({ duration }) => Math.floor(utils.timeStringToSeconds(duration ?? '0') / 3600)),
+    );
     return items.map((item, index) => {
       const songIndex = padZeroes(index + 1, items.length.toString().split('').length);
       return (
         <ListItemWrapper key={`${item.id}-${index}`} $progress={progress?.[item.id]}>
           <ListBack data-testid="list-item-back">
+            <input type="checkbox" />
             <SongIndex>{songIndex}</SongIndex>
             <span>·</span>
             <span>
               <SongName>{item.title}</SongName>
             </span>
             <Stars stars={3} />
-            <SongDuration>{item.duration}</SongDuration>
+            <SongDuration>
+              {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
+            </SongDuration>
           </ListBack>
           <ListFront $progress={progress?.[item.id]} data-testid="list-item-front">
+            <input type="checkbox" />
             <SongIndex>{songIndex}</SongIndex>
             <span>·</span>
             <span>
               <SongName>{item.title}</SongName>
             </span>
             <Stars stars={3} />
-            <SongDuration>{item.duration}</SongDuration>
+            <SongDuration>
+              {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
+            </SongDuration>
           </ListFront>
         </ListItemWrapper>
       );
@@ -279,7 +304,21 @@ const List = (props: IListProps): JSX.Element | null => {
   };
 
   return props.items ? (
-    <ListWrapper data-testid="list-wrapper">{getItem(props.items)}</ListWrapper>
+    <ListWrapper data-testid="list-wrapper">
+      <ListHeader>
+        <ListBack data-testid="list-header">
+          <input type="checkbox" />
+          <SongIndex>#</SongIndex>
+          <span>·</span>
+          <span>
+            <SongName>Title</SongName>
+          </span>
+          <span style={{textAlign: 'left'}}>Rating</span>
+          <SongDuration>Duration</SongDuration>
+        </ListBack>
+      </ListHeader>
+      {getItem(props.items)}
+    </ListWrapper>
   ) : null;
 };
 

@@ -76,13 +76,6 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
   const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>): Promise<void> => {
     if (event.key === 'Enter') {
       setSearchLoadingClass('loading');
-      // const datum = (await window.commands.getVideoInfo(search)) as {
-      //   playlistId: string;
-      //   videoId: string;
-      //   playlist: ytpl.result;
-      //   videoInfo: ytdl.videoInfo;
-      // };
-      // console.log('datum', datum);
       const searchResults = (await window.commands.search(search)) as {
         playlistId: string;
         videoId: string;
@@ -92,6 +85,10 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
       };
 
       console.log('search', searchResults);
+      // if (searchResults.playlistId) {
+      //   const download = await window.commands.download(search);
+      //   console.log('download', download);
+      // };
       onSearch(searchResults);
       setSearchLoadingClass('');
     }
@@ -118,7 +115,7 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
         data-testid="search-input"
         onChange={handleOnChange}
         onKeyDown={handleKeyDown}
-        defaultValue="https://youtube.com/watch?v=nRfDgXdInoM&list=PL_xObc8HwOwtwHHn7dZCsst07KMv6lzo9&index=2"
+        value={search}
         className={searchLoadingClass}
       />
     </SearchBarContainer>
