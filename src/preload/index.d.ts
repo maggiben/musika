@@ -9,6 +9,7 @@ export declare global {
     commands: {
       dialogs: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
       getVideoInfo: (url: string) => Promise<Record<string, unknown>>;
+      search: (searchString: string) => Promise<Record<string, unknown>>;
       download: (url: string) => Promise<OpenDialogReturnValue>;
     };
     preferences: {

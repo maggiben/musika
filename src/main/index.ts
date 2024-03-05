@@ -12,6 +12,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { getMenu } from './menu';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
+import search from './commands/search';
 import type { IPreferences } from 'types/types';
 import { showOpenDialog } from './utils/dialogs';
 import { savePreferences, loadPreferences, setPreferencesModal } from './utils/preferences';
@@ -57,6 +58,10 @@ function createWindow(_preferences: IPreferences): void {
 
   ipcMain.handle('getVideoInfo', async (_event: IpcMainInvokeEvent, url: string) =>
     getVideoInfo(url),
+  );
+
+  ipcMain.handle('search', async (_event: IpcMainInvokeEvent, searchString: string) =>
+    search(searchString),
   );
 
   ipcMain.handle('download', async (_event: IpcMainInvokeEvent, url: string) =>

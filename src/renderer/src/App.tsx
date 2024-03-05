@@ -44,6 +44,7 @@ const theme: DefaultTheme = {
     l: '1.5',
   },
   colors: {
+    accentColor: '#007AFFFF',
     white: 'var(--color-white)',
     black: 'var(--color-black)',
     // blue
@@ -128,25 +129,28 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
       }
     };
   }, []);
-  return <Container>{children}</Container>;
+  // theme.colors.accentColor = 'red';
+  return (
+    <ThemeProvider theme={theme}>
+      <Container>{children}</Container>
+    </ThemeProvider>
+  );
 };
 
 const App = (): JSX.Element => {
   return (
-    <ThemeProvider theme={theme}>
-      <RecoilRoot>
-        <I18nextProvider i18n={i18n}>
-          <Suspense fallback={<div>Loading...</div>}>
-            <AppContainer>
-              {/* <Preferences /> */}
-              <Download />
-            </AppContainer>
-          </Suspense>
-          {/* <Download /> */}
-          {/* <Playlist /> */}
-        </I18nextProvider>
-      </RecoilRoot>
-    </ThemeProvider>
+    <RecoilRoot>
+      <I18nextProvider i18n={i18n}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <AppContainer>
+            {/* <Preferences /> */}
+            <Download />
+          </AppContainer>
+        </Suspense>
+        {/* <Download /> */}
+        {/* <Playlist /> */}
+      </I18nextProvider>
+    </RecoilRoot>
   );
 };
 

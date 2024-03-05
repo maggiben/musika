@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+export { default as ToggleSwitch } from './ToggleSwitch';
 
 export const StyledLabel = styled.label`
   flex-basis: auto;

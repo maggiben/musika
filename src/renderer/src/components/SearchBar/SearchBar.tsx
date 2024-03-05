@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ytpl from '@distube/ytpl';
+import { useRecoilValue } from 'recoil';
 import ytdl from 'ytdl-core';
+import ytpl from '@distube/ytpl';
+import ytsr from '@distube/ytsr';
 import styled from 'styled-components';
+import { preferencesState } from '@states/atoms';
 
 const SearchBarContainer = styled.div`
   width: 100%;
@@ -60,11 +63,10 @@ interface ISearchBar {
   onSearch: (results) => void;
 }
 export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
+  const preferences = useRecoilValue(preferencesState);
   const { t } = useTranslation();
   const [searchLoadingClass, setSearchLoadingClass] = useState<string>('');
-  const [search, setSearch] = useState<string>(
-    'https://youtube.com/watch?v=nRfDgXdInoM&list=PL_xObc8HwOwtwHHn7dZCsst07KMv6lzo9&index=2',
-  );
+  const [search, setSearch] = useState<string>(preferences.behaviour?.search?.defaultSearch ?? '');
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { value } = event.target;
@@ -74,16 +76,23 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
   const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>): Promise<void> => {
     if (event.key === 'Enter') {
       setSearchLoadingClass('loading');
-      const datum = (await window.commands.getVideoInfo(search)) as {
+      // const datum = (await window.commands.getVideoInfo(search)) as {
+      //   playlistId: string;
+      //   videoId: string;
+      //   playlist: ytpl.result;
+      //   videoInfo: ytdl.videoInfo;
+      // };
+      // console.log('datum', datum);
+      const searchResults = (await window.commands.search(search)) as {
         playlistId: string;
         videoId: string;
-        playlist: ytpl.result;
         videoInfo: ytdl.videoInfo;
+        playlist: ytpl.result;
+        searchResults: ytsr.PlaylistResult;
       };
-      console.log('datum', datum);
-      const download = await window.commands.download(search);
-      console.log('download', download);
-      onSearch(datum);
+
+      console.log('search', searchResults);
+      onSearch(searchResults);
       setSearchLoadingClass('');
     }
   };

@@ -1,5 +1,4 @@
 import i18n, { Module } from 'i18next';
-import { is } from '@electron-toolkit/utils';
 import { initReactI18next } from 'react-i18next';
 import translationES from '@locale/es/translation.json';
 import translationEN from '@locale/en/translation.json';
@@ -33,7 +32,7 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-    debug: is.dev,
+    debug: true,
   });
 
 export default i18n;

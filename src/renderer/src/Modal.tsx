@@ -1,9 +1,11 @@
 import '@assets/styles/Modal.css';
 import { useEffect, Suspense, useState } from 'react';
 import i18n from '@utils/i18n';
-import { I18nextProvider } from 'react-i18next';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, useRecoilState } from 'recoil';
+import type { IpcRendererEvent } from 'electron';
+import { preferencesState } from '@states/atoms';
 import Preferences from '@renderer/containers/preferences/Preferences';
 
 const Container = styled.div`
@@ -12,7 +14,6 @@ const Container = styled.div`
 `;
 
 const theme: DefaultTheme = {
-  main: 'red',
   fontFamily: {
     primary: 'Roboto, sans-serif',
     mono: '"Roboto Mono", monospace',
@@ -41,9 +42,10 @@ const theme: DefaultTheme = {
     l: '1.5',
   },
   colors: {
+    accentColor: '#007AFFFF',
     white: 'var(--color-white)',
     black: 'var(--color-black)',
-    // blue
+    blue: '#0000ff',
     // brown
     // gray
     // green
@@ -78,6 +80,59 @@ const theme: DefaultTheme = {
     l: '24px',
     xl: '32px',
   },
+};
+
+const ModalContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
+  const { i18n } = useTranslation();
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const handleMenuClick = (_event: IpcRendererEvent, message: { id: string }): void => {
+    switch (message?.id) {
+      case 'menu.app.preferences':
+        window.electron.ipcRenderer.send('show-modal', {
+          type: 'preferences',
+        });
+        window.electron.ipcRenderer.once('sync-preferences', async () => {
+          const newPreferences = await window.preferences.loadPreferences();
+          // Update Language
+          preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
+            i18n.changeLanguage(newPreferences?.behaviour?.language);
+          setPreferences(newPreferences);
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    const handlePaste = (event: ClipboardEvent): void => {
+      // Get the clipboard content
+      const text = event.clipboardData?.getData('text');
+      console.log('Clipboard content:', text);
+    };
+
+    // Add event listener for paste
+    document.addEventListener('paste', handlePaste);
+    // Add event listener for menu bar clicks
+    window.electron.ipcRenderer.on('menu-click', handleMenuClick);
+
+    // Remove event listener on cleanup
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+      if (
+        'off' in window.electron.ipcRenderer &&
+        typeof window.electron.ipcRenderer.off === 'function'
+      ) {
+        window.electron.ipcRenderer.off('menu-click', handleMenuClick);
+      }
+    };
+  }, []);
+  // theme.colors.accentColor = 'red';
+  return (
+    <ThemeProvider theme={theme}>
+      <Container>{children}</Container>
+    </ThemeProvider>
+  );
 };
 
 const Modal = (): JSX.Element => {
@@ -115,17 +170,15 @@ const Modal = (): JSX.Element => {
     };
   }, []);
   return (
-    <ThemeProvider theme={theme}>
-      <RecoilRoot>
-        <I18nextProvider i18n={i18n}>
-          <Container>
-            <Suspense fallback={<div>Loading...</div>}>
-              <Preferences />
-            </Suspense>
-          </Container>
-        </I18nextProvider>
-      </RecoilRoot>
-    </ThemeProvider>
+    <RecoilRoot>
+      <I18nextProvider i18n={i18n}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <ModalContainer>
+            <Preferences />
+          </ModalContainer>
+        </Suspense>
+      </I18nextProvider>
+    </RecoilRoot>
   );
 };
 

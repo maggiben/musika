@@ -16,6 +16,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('commands', {
       getVideoInfo: (url: string) => ipcRenderer.invoke('getVideoInfo', url),
       download: (url: string) => ipcRenderer.invoke('download', url),
+      search: (searchString: string) => ipcRenderer.invoke('search', searchString),
       dialogs: (type: string) => ipcRenderer.invoke('dialogs', type),
     });
   } catch (error) {

@@ -1,4 +1,12 @@
-import { app, ipcMain, IpcMainInvokeEvent, BrowserWindow, dialog, nativeTheme } from 'electron';
+import {
+  app,
+  systemPreferences,
+  ipcMain,
+  IpcMainInvokeEvent,
+  BrowserWindow,
+  dialog,
+  nativeTheme,
+} from 'electron';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { is } from '@electron-toolkit/utils';
@@ -6,6 +14,27 @@ import type { IPreferences } from 'types/types';
 
 const preferencesPath = path.join(app.getPath('userData'), 'config', 'preferences.json');
 
+export type TColor =
+  | 'blue'
+  | 'brown'
+  | 'gray'
+  | 'green'
+  | 'orange'
+  | 'pink'
+  | 'purple'
+  | 'red'
+  | 'yellow';
+const colors: TColor[] = [
+  'blue',
+  'brown',
+  'gray',
+  'green',
+  'orange',
+  'pink',
+  'purple',
+  'red',
+  'yellow',
+];
 const getDefaultPreferences = (): IPreferences => {
   const nodeEnv = process.env.NODE_ENV;
   const preferredSystemLanguages = app.getPreferredSystemLanguages();
@@ -14,6 +43,21 @@ const getDefaultPreferences = (): IPreferences => {
       shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
       language: preferredSystemLanguages?.[0]?.split('-')?.[0] ?? 'en',
       preferredSystemLanguages,
+      theme: {
+        accentColor: `#${systemPreferences.getAccentColor()}`,
+        colors: colors.map((color) => {
+          return {
+            [color]: systemPreferences.getSystemColor(color),
+          };
+        }),
+      },
+      search: {
+        defaultSearch:
+          'https://youtube.com/watch?v=nRfDgXdInoM&list=PL_xObc8HwOwtwHHn7dZCsst07KMv6lzo9&index=2',
+        safeSearch: false,
+        limit: 100,
+        type: 'playlist',
+      },
     },
     downloads: {
       savePath: app.getPath('downloads'),

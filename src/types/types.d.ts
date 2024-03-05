@@ -44,7 +44,6 @@ interface IFontSizes {
   xxl: string;
 }
 
-
 declare module 'styled-components' {
   export interface DefaultTheme {
     colors: Record<string, string>;
@@ -65,6 +64,13 @@ export interface IPreferences {
     shouldUseDarkColors?: boolean;
     language?: string;
     preferredSystemLanguages?: string[];
+    theme?: Record<string, unknown>;
+    search?: {
+      defaultSearch?: string;
+      safeSearch?: boolean;
+      limit?: number | Infinity;
+      type?: 'video' | 'playlist';
+    };
   };
   advanced?: {
     nodeEnv?: string;

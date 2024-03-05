@@ -1,10 +1,10 @@
 import { app, dialog } from 'electron';
-import { is } from '@electron-toolkit/utils';
 
 export const checkAndInstall = (): boolean | void => {
   const name = app.name ?? app.getName();
+  const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 
-  if (!is.dev && process.platform === 'darwin' && !app.isInApplicationsFolder()) {
+  if (!isDev && process.platform === 'darwin' && !app.isInApplicationsFolder()) {
     return dialog.showMessageBoxSync({
       type: 'error',
       message: 'Move to Applications folder?',

@@ -12,6 +12,7 @@ import {
   InputGroup,
   StyledButton,
   FormControl,
+  ToggleSwitch,
 } from '@renderer/components/Form/Form';
 
 const BehaviourPreferences = (): JSX.Element => {
@@ -129,8 +130,78 @@ const BehaviourPreferences = (): JSX.Element => {
           <legend>{t('desktop')}</legend>
           <div>
             <InputPairContainer>
-              <input type="checkbox" id="auto-update" onChange={handleAutomatedUpdate}></input>
+              {/* <input type="checkbox" id="auto-update" onChange={handleAutomatedUpdate}></input> */}
               <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
+              <ToggleSwitch
+                id="auto-update"
+                checked={preferences.advanced?.update?.automatic}
+                onChange={handleAutomatedUpdate}
+              />
+            </InputPairContainer>
+          </div>
+        </StyledDFieldset>
+        <StyledDFieldset>
+          <legend>{t('search options')}</legend>
+          <div>
+            <InputPairContainer>
+              <StyledLabel htmlFor="default-search">{t('default search')}</StyledLabel>
+              <InputGroup>
+                <FormControl
+                  type="text"
+                  id="default-search"
+                  name="default-search"
+                  className="form-control"
+                  defaultValue={preferences.behaviour?.search?.defaultSearch}
+                  placeholder={t('save files to')}
+                />
+              </InputGroup>
+            </InputPairContainer>
+            <InputPairContainer>
+              <StyledLabel htmlFor="safe-search">{t('safe search')}</StyledLabel>
+              <ToggleSwitch
+                id="safe-search"
+                name="safe-search"
+                defaultChecked={preferences.behaviour?.search?.safeSearch}
+              />
+            </InputPairContainer>
+            <InputPairContainer>
+              <StyledLabel htmlFor="search-limit">{t('limit')}</StyledLabel>
+              <InputGroup>
+                <FormControl
+                  type="number"
+                  id="search-limit"
+                  name="search-limit"
+                  min="1"
+                  max={Infinity}
+                  defaultValue={preferences.behaviour?.search?.limit}
+                  placeholder={t('limits the pulled items')}
+                />
+              </InputGroup>
+            </InputPairContainer>
+            <InputPairContainer>
+              <StyledLabel htmlFor="filter-search">
+                {t('filter for a specific type of item')}
+              </StyledLabel>
+              <StyledSelect
+                id="filter-search"
+                className="form-select"
+                defaultValue={preferences?.behaviour?.search?.type}
+              >
+                {['video', 'playlist'].map((options, index) => (
+                  <option key={index} value={options}>
+                    {options}
+                  </option>
+                ))}
+
+                {/*
+              <option>highest</option>
+              <option>highestvideo</option>
+              <option defaultValue={'selected'}>highestaudio</option>
+              <option>lowest</option>
+              <option>lowestvideo</option>
+              <option>lowestaudio</option>
+            */}
+              </StyledSelect>
             </InputPairContainer>
           </div>
         </StyledDFieldset>
