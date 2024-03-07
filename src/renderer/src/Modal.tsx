@@ -5,10 +5,10 @@ import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import type { IpcRendererEvent } from 'electron';
-import useCloseOnEscapeKey from '@hooks/useCloseOnEscapeKey';
 import { preferencesState } from '@states/atoms';
 import Loading from './containers/loading/Loading';
 import { defaultTheme } from '@assets/themes';
+import useShowModal from '@hooks/useShowModal';
 
 // Global style to set the background color of the body
 const GlobalStyle = createGlobalStyle`
@@ -62,31 +62,7 @@ const ModalContainer = ({
 };
 
 const Modal = (): JSX.Element => {
-  useCloseOnEscapeKey();
-  const [modal, setModal] = useState<
-    | {
-        type?: string;
-        options?: Record<string, unknown>;
-      }
-    | undefined
-  >(undefined);
-  const showModalListener = (
-    _event: IpcRendererEvent,
-    type: string,
-    options?: Record<string, unknown>,
-  ): void => {
-    setModal({
-      type,
-      options,
-    });
-  };
-
-  useEffect(() => {
-    const removeShowModalListener = window.electron.ipcRenderer.on('show-modal', showModalListener);
-    return () => {
-      removeShowModalListener();
-    };
-  }, []);
+  const modal = useShowModal();
 
   return (
     <RecoilRoot>
