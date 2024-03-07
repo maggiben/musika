@@ -25,8 +25,8 @@ export const Coverflow = (props: IIconProps): JSX.Element => {
       <StyledIcon
         color="#d21d30"
         src={coverflowImage}
-        width={props.width ?? 32}
-        height={props.height ?? 32}
+        width={props.width ?? 128}
+        height={props.height ?? 128}
         alt={props.alt}
       />
     </>

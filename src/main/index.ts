@@ -6,6 +6,8 @@ import {
   BrowserWindow,
   OpenDialogOptions,
   Menu,
+  protocol,
+  net,
 } from 'electron';
 import * as path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
@@ -15,6 +17,7 @@ import download from './commands/download';
 import search from './commands/search';
 import type { IPreferences } from 'types/types';
 import { showOpenDialog } from './utils/dialogs';
+import modal from './utils/modal';
 import { savePreferences, loadPreferences, setPreferencesModal } from './utils/preferences';
 import creatWorker from './workers/worker-simple?nodeWorker';
 import pjson from '@pjson';
@@ -64,6 +67,13 @@ function createWindow(_preferences: IPreferences): void {
     search(searchString),
   );
 
+  ipcMain.handle(
+    'modal',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async (_event: IpcMainInvokeEvent, type: string, options?: Record<string, unknown>) =>
+      modal(type, options, mainWindow),
+  );
+
   ipcMain.handle('download', async (_event: IpcMainInvokeEvent, url: string) =>
     download(url, mainWindow),
   );
@@ -79,8 +89,6 @@ function createWindow(_preferences: IPreferences): void {
     mainWindow?.webContents.send('main-process-message', new Date().toLocaleString());
   });
 
-  setPreferencesModal(mainWindow);
-
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -88,6 +96,8 @@ function createWindow(_preferences: IPreferences): void {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
   }
+
+  // setPreferencesModal(mainWindow);
 }
 
 // This method will be called when Electron has finished
@@ -105,6 +115,10 @@ app.whenReady().then(async () => {
 
   app.setName(pjson?.name?.charAt(0).toUpperCase() + pjson?.name?.slice(1));
 
+  // protocol.handle(pjson.name, (request) =>
+  //   net.fetch('file://' + request.url.slice(`${pjson.name}://`.length)),
+  // );
+
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -114,7 +128,7 @@ app.whenReady().then(async () => {
 
   const preferences = await loadPreferences();
 
-  checkAndInstall();
+  // checkAndInstall();
 
   createWindow(preferences);
 

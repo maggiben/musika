@@ -72,6 +72,14 @@ export const FormControl = styled.input`
     box-shadow 0.15s ease-in-out;
 `;
 
+// Styled textarea extending from BaseInput
+export const StyledTextarea = styled(FormControl).attrs({ as: 'textarea' })`
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+`;
+
 export const InputGroupText = styled.span`
   display: flex;
   align-items: center;
@@ -102,12 +110,18 @@ export const StyledButton = styled.button`
   border-radius: 0;
   transition:
     color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
-  &:hover {
-    color: ${({ theme }) => theme.colors.white};
+    background-color 0.1s ease-in-out,
+    border-color 0.1s ease-in-out;
+  &:not([disabled]):hover {
     background-color: ${({ theme }) => theme.colors.lightGray};
+  }
+  &:not([disabled]):active {
+    background-color: ${({ theme }) => theme.colors.midGray};
+  }
+  &[disabled] {
+    color: ${({ theme }) => theme.colors.lightGray};
+    border: 1px solid ${({ theme }) => theme.colors.midGray};
+    cursor: inherit;
   }
 `;
 

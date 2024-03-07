@@ -7,7 +7,16 @@ import type { IPreferences } from 'types/types';
 // just add to the DOM global.
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld('electron', electronAPI);
+    contextBridge.exposeInMainWorld('electron', {
+      ...electronAPI,
+      ipcRenderer: {
+        ...electronAPI.ipcRenderer,
+        off: (channel, listener) => {
+          console.log('calling off listener', channel);
+          return ipcRenderer.off(channel, listener);
+        },
+      },
+    });
     contextBridge.exposeInMainWorld('preferences', {
       loadPreferences: () => ipcRenderer.invoke('loadPreferences', {}),
       savePreferences: (preferences: IPreferences) =>
@@ -18,6 +27,8 @@ if (process.contextIsolated) {
       download: (url: string) => ipcRenderer.invoke('download', url),
       search: (searchString: string) => ipcRenderer.invoke('search', searchString),
       dialogs: (type: string) => ipcRenderer.invoke('dialogs', type),
+      modal: (type: string, options?: Record<string, unknown>) =>
+        ipcRenderer.invoke('modal', type, options),
     });
   } catch (error) {
     console.error(error);

@@ -1,12 +1,14 @@
 import '@assets/styles/Modal.css';
-import { useEffect, Suspense, useState } from 'react';
+import { useEffect, Suspense, useState, useMemo, lazy } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
-import { RecoilRoot, useRecoilState } from 'recoil';
+import { RecoilRoot, useRecoilState, useRecoilValue } from 'recoil';
 import type { IpcRendererEvent } from 'electron';
 import { preferencesState } from '@states/atoms';
-import Preferences from '@renderer/containers/preferences/Preferences';
+import Loading from './containers/loading/Loading';
+// import Preferences from '@renderer/containers/preferences/Preferences';
+import NewPlaylist from './containers/playlist/NewPlaylist';
 
 const Container = styled.div`
   width: 100%;
@@ -82,102 +84,81 @@ const theme: DefaultTheme = {
   },
 };
 
-const ModalContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
-  const { i18n } = useTranslation();
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const handleMenuClick = (_event: IpcRendererEvent, message: { id: string }): void => {
-    switch (message?.id) {
-      case 'menu.app.preferences':
-        window.electron.ipcRenderer.send('show-modal', {
-          type: 'preferences',
-        });
-        window.electron.ipcRenderer.once('sync-preferences', async () => {
-          const newPreferences = await window.preferences.loadPreferences();
-          // Update Language
-          preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
-            i18n.changeLanguage(newPreferences?.behaviour?.language);
-          setPreferences(newPreferences);
-        });
-        break;
-      default:
-        break;
-    }
+window.electron.ipcRenderer.on('test', (_event, message) => {
+  console.log('test in modal 2', message);
+});
+
+const ModalContainer = ({ modalType }: { modalType: string }): JSX.Element => {
+  const preferences = useRecoilValue(preferencesState);
+
+  // import Preferences from '@renderer/containers/preferences/Preferences';
+  // import NewPlaylist from './containers/playlist/NewPlaylist';
+  const modals = {
+    preferences: lazy(() => import('@renderer/containers/preferences/Preferences')),
+    'new-playlist': lazy(() => import('@renderer/containers/playlist/NewPlaylist')),
+    playlist: lazy(() => import('@renderer/containers/playlist/Playlist')),
   };
 
-  useEffect(() => {
-    const handlePaste = (event: ClipboardEvent): void => {
-      // Get the clipboard content
-      const text = event.clipboardData?.getData('text');
-      console.log('Clipboard content:', text);
-    };
+  // useEffect(() => {
+  //   console.log('call use effect !');
+  //   window.electron.ipcRenderer.on('test', (_event, message) => {
+  //     console.log('test in modal', message);
+  //   });
+  //   window.electron.ipcRenderer.on(
+  //     'show-modal',
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //     (_event, type: string, options: Record<string, unknown>) => {
+  //       console.log('show-modal in modal', type, options);
+  //       setModalType(type);
+  //     },
+  //   );
+  // }, []);
 
-    // Add event listener for paste
-    document.addEventListener('paste', handlePaste);
-    // Add event listener for menu bar clicks
-    window.electron.ipcRenderer.on('menu-click', handleMenuClick);
+  const ModalContent = modals[modalType];
 
-    // Remove event listener on cleanup
-    return () => {
-      document.removeEventListener('paste', handlePaste);
-      if (
-        'off' in window.electron.ipcRenderer &&
-        typeof window.electron.ipcRenderer.off === 'function'
-      ) {
-        window.electron.ipcRenderer.off('menu-click', handleMenuClick);
-      }
-    };
-  }, []);
-  // theme.colors.accentColor = 'red';
   return (
     <ThemeProvider theme={theme}>
-      <Container>{children}</Container>
+      <Suspense fallback={<Loading />}>
+        <Container>
+          <ModalContent {...preferences} />
+        </Container>
+      </Suspense>
     </ThemeProvider>
   );
 };
 
 const Modal = (): JSX.Element => {
-  const [showModal] = useState<boolean>(false);
-
-  const handleMenuClick = (_event, message): void => {
-    console.log('handleMenuClick', message);
-    if (!showModal) {
-      window.electron.ipcRenderer.send('show-modal', message);
-    } else {
-      window.electron.ipcRenderer.send('hide-modal', message);
+  const [modalType, setModalType] = useState<string | undefined>(undefined);
+  const showModalListener = (
+    _event: IpcRendererEvent,
+    type: string,
+    options: Record<string, unknown>,
+  ): void => {
+    setModalType(type);
+  };
+  const handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape') {
+      window.electron.ipcRenderer.send('hide-modal', {
+        sync: false,
+      });
     }
   };
   useEffect(() => {
-    const handlePaste = (event: ClipboardEvent): void => {
-      // Get the clipboard content
-      const text = event.clipboardData?.getData('text');
-      console.log('Clipboard content:', text);
-    };
-
-    // Add event listener for paste
-    document.addEventListener('paste', handlePaste);
-    // Use contextBridge
-    window.electron.ipcRenderer.on('menu-click', handleMenuClick);
-
-    // Remove event listener on cleanup
+    const removeShowModalListener = window.electron.ipcRenderer.on('show-modal', showModalListener);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('paste', handlePaste);
-      if (
-        'off' in window.electron.ipcRenderer &&
-        typeof window.electron.ipcRenderer.off === 'function'
-      ) {
-        window.electron.ipcRenderer.off('menu-click', handleMenuClick);
-      }
+      removeShowModalListener();
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
   return (
     <RecoilRoot>
-      <I18nextProvider i18n={i18n}>
-        <Suspense fallback={<div>Loading...</div>}>
-          <ModalContainer>
-            <Preferences />
-          </ModalContainer>
-        </Suspense>
-      </I18nextProvider>
+      <Suspense fallback={<Loading />}>
+        <I18nextProvider i18n={i18n}>
+          {modalType && <ModalContainer modalType={modalType} />}
+        </I18nextProvider>
+      </Suspense>
     </RecoilRoot>
   );
 };

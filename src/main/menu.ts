@@ -16,7 +16,28 @@ export const getMenu = (mainWindow?: BrowserWindow): (MenuItemConstructorOptions
     {
       label: 'File',
       submenu: [
-        { label: 'New File', accelerator: 'CmdOrCtrl+N' },
+        {
+          label: 'New',
+          submenu: [
+            {
+              label: 'Playlist',
+              accelerator: 'CmdOrCtrl+N',
+              click: async () => {
+                console.log('menu click !');
+                mainWindow?.webContents.send('menu-click', { id: 'menu.file.new.playlist' });
+                return;
+              },
+            },
+            {
+              label: 'Playlist from YouTube',
+              accelerator: 'CmdOrCtrl+Shift+N',
+              click: async () =>
+                mainWindow?.webContents.send('menu-click', {
+                  id: 'menu.file.new.playlist-from-yt',
+                }),
+            },
+          ],
+        },
         { label: 'Open File', accelerator: 'CmdOrCtrl+O' },
         { type: 'separator' },
         { label: 'Save', accelerator: 'CmdOrCtrl+S' },

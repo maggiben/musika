@@ -35,7 +35,7 @@ progress:not([value])::-webkit-progress-bar{
   background: #2f2f2f;
   outline: none;
 } */
-
+/* 
 
 
 input[type="checkbox"] {
@@ -85,4 +85,4 @@ input[type="checkbox"]:checked + label {
     top: 50%;
     transform-origin: 0% 50%;
   }
-}
+} */

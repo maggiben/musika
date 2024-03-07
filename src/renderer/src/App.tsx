@@ -6,6 +6,7 @@ import styled, { ThemeProvider, DefaultTheme } from 'styled-components';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
+import Loading from './containers/loading/Loading';
 // import Playlist from '@containers/playlist/Playlist';
 import Download from '@containers/download/Download';
 // import Preferences from '@renderer/containers/preferences/Preferences';
@@ -87,12 +88,15 @@ const theme: DefaultTheme = {
 const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   const { i18n } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const handleMenuClick = (_event: IpcRendererEvent, message: { id: string }): void => {
+  const handleMenuClick = async (
+    _event: IpcRendererEvent,
+    message: { id: string },
+  ): Promise<void> => {
+    console.log('handleMenuClick called', message);
     switch (message?.id) {
       case 'menu.app.preferences':
-        window.electron.ipcRenderer.send('show-modal', {
-          type: 'preferences',
-        });
+        console.log('menu.app.preferences');
+        await window.commands.modal('preferences');
         window.electron.ipcRenderer.once('sync-preferences', async () => {
           const newPreferences = await window.preferences.loadPreferences();
           // Update Language
@@ -101,32 +105,21 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
           setPreferences(structuredClone(newPreferences));
         });
         break;
+      case 'menu.file.new.playlist':
+        console.log('menu.file.new.playlist');
+        await window.commands.modal('new-playlist', { width: 320, height: 480 });
+        break;
       default:
         break;
     }
   };
 
   useEffect(() => {
-    const handlePaste = (event: ClipboardEvent): void => {
-      // Get the clipboard content
-      const text = event.clipboardData?.getData('text');
-      console.log('Clipboard content:', text);
-    };
-
-    // Add event listener for paste
-    document.addEventListener('paste', handlePaste);
     // Add event listener for menu bar clicks
-    window.electron.ipcRenderer.on('menu-click', handleMenuClick);
-
+    const removeListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
     // Remove event listener on cleanup
     return () => {
-      document.removeEventListener('paste', handlePaste);
-      if (
-        'off' in window.electron.ipcRenderer &&
-        typeof window.electron.ipcRenderer.off === 'function'
-      ) {
-        window.electron.ipcRenderer.off('menu-click', handleMenuClick);
-      }
+      removeListener();
     };
   }, []);
   // theme.colors.accentColor = 'red';
@@ -141,7 +134,7 @@ const App = (): JSX.Element => {
   return (
     <RecoilRoot>
       <I18nextProvider i18n={i18n}>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loading />}>
           <AppContainer>
             {/* <Preferences /> */}
             <Download />

@@ -20,5 +20,13 @@ export default defineConfig({
   },
   renderer: {
     plugins: [react(), tsconfigPaths()],
+    build: {
+      rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'src/renderer/index.html'),
+          modal: resolve(__dirname, 'src/renderer/modal.html'),
+        },
+      },
+    },
   },
 });
