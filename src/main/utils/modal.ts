@@ -25,16 +25,10 @@ export default async function modal(
     modal.once('ready-to-show', () => {
       console.log('show-modal', type, options);
       modal?.webContents.send('show-modal', type, options);
-      modal?.webContents.send('test', type, options);
       modal.show();
-      // modal?.webContents.on('did-finish-load', () => {
-      //   modal?.webContents.send('show-modal', type, options);
-      //   modal?.webContents.send('test', type, options);
-      // });
-      // modal?.webContents.send('show-modal', type, options);
-      ipcMain.once('hide-modal', async (_event: IpcMainInvokeEvent, options) => {
-        console.log('hide-modal', options);
-        mainWindow?.webContents.send('hide-modal', options);
+      ipcMain.once('close-modal', async (_event: IpcMainInvokeEvent, options) => {
+        console.log('close-modal', options);
+        mainWindow?.webContents.send('close-modal', options);
         modal.hide();
         modal.destroy();
         modal = undefined as unknown as BrowserWindow;

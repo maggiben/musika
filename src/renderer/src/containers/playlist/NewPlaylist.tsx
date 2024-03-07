@@ -7,6 +7,7 @@ import {
   InputGroup,
   StyledTextarea,
 } from '@renderer/components/Form/Form';
+import coverflowImage from '@assets/images/coverflow.svg';
 import { useTranslation } from 'react-i18next';
 
 const NewPlaylistContainer = styled.div`
@@ -17,7 +18,7 @@ const NewPlaylistContainer = styled.div`
   padding: ${({ theme }) => theme.spacing.xs};
   box-sizing: border-box;
   height: 100%;
-  & > :not(:last-child) {
+  & > :not(:first-child):not(:last-child) {
     margin-bottom: ${({ theme }) => theme.spacing.xs};
   }
 `;
@@ -25,6 +26,7 @@ const NewPlaylistContainer = styled.div`
 const ThumbnailContainer = styled.div`
   width: 240px;
   height: 240px;
+  margin: ${({ theme }) => theme.spacing.xl};
   border: 2px solid ${({ theme }) => theme.colors.red};
 `;
 
@@ -37,7 +39,7 @@ const ButtonsContainer = styled.div`
 `;
 
 const NewPlaylist = (): JSX.Element => {
-  const [imageSrc, setImageSrc] = useState('file:///Users/bmaggi/myprj/musika/build/icon.png');
+  const [imageSrc, setImageSrc] = useState(coverflowImage);
   const { t } = useTranslation();
 
   const openFileDialog = async (): Promise<void> => {
@@ -53,7 +55,7 @@ const NewPlaylist = (): JSX.Element => {
   };
 
   const handleCancelClick = async (): Promise<void> => {
-    window.electron.ipcRenderer.send('hide-modal', {
+    window.electron.ipcRenderer.send('close-modal', {
       sync: false,
     });
   };

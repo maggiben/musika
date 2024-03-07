@@ -32,6 +32,7 @@
       "@assets/*": ["src/renderer/src/assets/*"],
       "@utils/*": ["src/renderer/src/utils/*"],
       "@states/*": ["src/renderer/src/states/*"],
+      "@hooks/*": ["src/renderer/src/hooks/*"],
       "@shared/*": ["src/shared/*"],
       "@main/*": ["src/main/*"],
       "types/*": ["src/types/*"],

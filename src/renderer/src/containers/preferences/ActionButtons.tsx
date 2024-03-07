@@ -29,13 +29,13 @@ const ActionButtons = (): JSX.Element => {
   const preferences = useRecoilValue(preferencesState);
   const handleOkClick = async (): Promise<void> => {
     await window.preferences.savePreferences(preferences);
-    window.electron.ipcRenderer.send('hide-modal', {
+    window.electron.ipcRenderer.send('close-modal', {
       sync: true,
     });
   };
 
   const handleCancelClick = async (): Promise<void> => {
-    window.electron.ipcRenderer.send('hide-modal', {
+    window.electron.ipcRenderer.send('close-modal', {
       sync: false,
     });
   };

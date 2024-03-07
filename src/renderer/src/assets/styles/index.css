@@ -10,6 +10,15 @@
   /* Default colors */
   --color-white: white;
   --color-black: black;
+  --color-blue: blue;
+  --color-brown: brown;
+  --color-gray: gray;
+  --color-green: green;
+  --color-orange: orange;
+  --color-pink: pink;
+  --color-purple: purple;
+  --color-yellow: yellow;
+  --color-red: #d21d30;
   --text-color: var(--color-white);
   --background-color: var(--color-black);
 
@@ -43,6 +52,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   color: var(--text-color);
-  background-color: var(--background-color);
+  /* background-color: var(--background-color); */
+  background-color: inherit;
   box-sizing: border-box;
 }
