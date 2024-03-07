@@ -17,7 +17,7 @@ const SidePannelContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: red;
+  box-sizing: border-box;
 `;
 
 const MainPannelContainer = styled.div`
@@ -27,7 +27,7 @@ const MainPannelContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: blue;
+  box-sizing: border-box;
 `;
 
 const Peferences = (): JSX.Element => {

@@ -24,6 +24,8 @@ const SidePannelContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   overflow: hidden;
+  box-sizing: border-box;
+  padding: ${({ theme }) => theme.spacing.xs};
   background-color: ${({ theme }) => theme.colors.dark};
   color: ${({ theme }) => theme.colors.midGray};
   /* border-right: 1px solid ${({ theme }) => theme.colors.lightGray}; */
@@ -37,8 +39,8 @@ const MainPannelContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-left: ${({ theme }) => theme.spacing.xs};
-  padding-right: ${({ theme }) => theme.spacing.xs};
+  box-sizing: border-box;
+  padding: ${({ theme }) => theme.spacing.xs};
   background-color: ${({ theme }) => theme.colors.darkGray};
   color: ${({ theme }) => theme.colors.midGray};
 `;

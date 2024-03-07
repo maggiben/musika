@@ -308,13 +308,13 @@ const List = (props: IListProps): JSX.Element | null => {
       <ListHeader>
         <ListBack data-testid="list-header">
           <input type="checkbox" />
-          <SongIndex>#</SongIndex>
+          <SongIndex style={{ fontFamily: 'inherit' }}>#</SongIndex>
           <span>·</span>
           <span>
             <SongName>Title</SongName>
           </span>
-          <span style={{textAlign: 'left'}}>Rating</span>
-          <SongDuration>Duration</SongDuration>
+          <span style={{ textAlign: 'left' }}>Rating</span>
+          <SongDuration style={{ fontFamily: 'inherit' }}>Duration</SongDuration>
         </ListBack>
       </ListHeader>
       {getItem(props.items)}

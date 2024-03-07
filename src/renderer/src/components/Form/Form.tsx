@@ -33,6 +33,7 @@ export const StyledForm = styled.form`
 
 export const StyledDFieldset = styled.fieldset`
   border: 1px solid ${({ theme }) => theme.colors.midGray};
+  margin: 0px;
   &:not(:last-of-type) {
     margin-bottom: ${({ theme }) => theme.spacing.xs};
   }
@@ -59,7 +60,6 @@ export const FormControl = styled.input`
   padding: ${({ theme }) => theme.spacing.xs};
   font-size: ${({ theme }) => theme.fontSizes.s};
   line-height: ${({ theme }) => theme.lineHeights.l};
-  color: ${({ theme }) => theme.colors.white};
   color: ${({ theme, disabled }) => (disabled ? theme.colors.lightGray : theme.colors.white)};
   background-color: ${({ theme, disabled }) =>
     disabled ? theme.colors.darkGray : theme.colors.softGray};

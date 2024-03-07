@@ -1,10 +1,9 @@
 import '@assets/styles/Modal.css';
-import { useEffect, Suspense, useState, lazy } from 'react';
+import { Suspense, useMemo, lazy } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { RecoilRoot, useRecoilValue } from 'recoil';
-import type { IpcRendererEvent } from 'electron';
 import { preferencesState } from '@states/atoms';
 import Loading from './containers/loading/Loading';
 import { defaultTheme } from '@assets/themes';
@@ -47,7 +46,7 @@ const ModalContainer = ({
     },
   };
 
-  const ModalContent = modals[modal];
+  const ModalContent = useMemo(() => modals[modal], [modal]);
 
   return (
     <ThemeProvider theme={currentTheme}>

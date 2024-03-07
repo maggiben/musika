@@ -85,10 +85,10 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
       };
 
       console.log('search', searchResults);
-      // if (searchResults.playlistId) {
-      //   const download = await window.commands.download(search);
-      //   console.log('download', download);
-      // };
+      if (searchResults.playlistId) {
+        const download = await window.commands.download(search);
+        console.log('download', download);
+      }
       onSearch(searchResults);
       setSearchLoadingClass('');
     }

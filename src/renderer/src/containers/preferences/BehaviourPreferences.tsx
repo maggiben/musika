@@ -23,7 +23,10 @@ const BehaviourPreferences = (): JSX.Element => {
   ): Promise<void> => {
     const { value } = event.target;
     try {
-      const newPreferences = { ...preferences, behaviour: { language: value } };
+      const newPreferences = {
+        ...preferences,
+        behaviour: { ...preferences.behaviour, language: value },
+      };
       i18n.changeLanguage(value);
       setPreferences(newPreferences);
     } catch (error) {
