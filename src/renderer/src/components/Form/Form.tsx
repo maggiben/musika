@@ -161,6 +161,27 @@ export const CircularButton = styled(StyledButton)`
   border-radius: 50%;
 `;
 
+export const ClearButton = styled(StyledButton)`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  color: ${({ theme }) => theme.colors.lightGray};
+  &:not([disabled]):hover {
+    background-color: transparent;
+    color: ${({ theme }) => theme.colors.white};
+  }
+  &:not([disabled]):active {
+    background-color: transparent;
+    color: ${({ theme }) => theme.colors.white};
+  }
+  &[disabled] {
+    color: ${({ theme }) => theme.colors.softGray};
+    cursor: inherit;
+  }
+`;
+
 export const StyledSelect = styled.select`
   display: block;
   width: 100%;

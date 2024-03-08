@@ -1,6 +1,8 @@
-import { app, shell, BrowserWindow, MenuItemConstructorOptions, Menu } from 'electron';
+import { app, clipboard, shell, BrowserWindow, MenuItemConstructorOptions, Menu } from 'electron';
 import pjson from '@pjson';
 import i18n from './utils/i18n';
+
+const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 
 interface IMenuItem extends MenuItemConstructorOptions {
   label?: string;
@@ -159,14 +161,23 @@ export const contextMenu = async (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   options?: Record<string, unknown>,
   mainWindow?: BrowserWindow | null,
-): Promise<void | null> => {
+): Promise<boolean> => {
   const playlist: IMenuItem[] = [
     {
       label: 'Get Info',
+      click: async (menuItem: Electron.MenuItem) => {
+        console.log('menu click !', menuItem);
+        mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.get-media-info' });
+      },
     },
     { type: 'separator' },
     {
       label: 'Copy URL',
+      click: async (menuItem: Electron.MenuItem) => {
+        console.log('menu click !', menuItem);
+        mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.copy-link' });
+        options && clipboard.writeText(options?.url as string);
+      },
     },
     {
       label: 'Open in Browser',
@@ -185,8 +196,39 @@ export const contextMenu = async (
       },
     },
   ];
-  const menu = Menu.buildFromTemplate(playlist);
-  const focusedWindow = BrowserWindow.getFocusedWindow();
-  const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
-  return window && menu.popup({ window, ...options });
+
+  let template: IMenuItem[] = playlist;
+  if (isDev) {
+    template = template.concat([
+      { type: 'separator' },
+      {
+        label: 'Inspect Element',
+        click: async (
+          menuItem: Electron.MenuItem,
+          browserWindow: Electron.BrowserWindow | undefined,
+        ) => {
+          console.log('menu click !', menuItem, options);
+          const focusedWindow = BrowserWindow.getFocusedWindow();
+          const window = browserWindow === focusedWindow ? browserWindow : focusedWindow;
+          options && window?.webContents.inspectElement(options.x as number, options.y as number);
+          if (window?.webContents.isDevToolsOpened()) {
+            window?.webContents?.devToolsWebContents?.focus();
+          }
+          mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.open-link' });
+          return;
+        },
+      },
+    ]);
+  }
+
+  try {
+    const menu = Menu.buildFromTemplate(template);
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
+    window && menu.popup({ window });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };

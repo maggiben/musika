@@ -141,7 +141,7 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
             <SpaceRight size="xs" />
             <DarwinButton
               onClick={async () => {
-                await window.commands.contextMenu('playlist');
+                await window.commands.contextMenu('playlist', { ...playlist });
               }}
             >
               <BsShuffle /> Shuffle

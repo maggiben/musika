@@ -7,6 +7,7 @@ import { useRecoilState } from 'recoil';
 import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
 import useDownload from '@hooks/useDownload';
 // import useFakeProgress from '@hooks/useFakeProgress';
+import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { playlistState, IPlaylist } from '@renderer/states/atoms';
 
@@ -68,7 +69,6 @@ const ListBase = css`
       flex-basis: 5%;
       text-align: center;
       align-self: flex-end;
-      color: red;
     }
   }
 `;
@@ -224,7 +224,9 @@ const List = (_props: IListProps): JSX.Element | null => {
               {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
             </SongDuration>
             <span>
-              <BsThreeDots />
+              <ClearButton>
+                <BsThreeDots />
+              </ClearButton>
             </span>
           </ListBack>
           <ListFront $progress={progress?.[item.id]} data-testid="list-item-front">
@@ -244,7 +246,18 @@ const List = (_props: IListProps): JSX.Element | null => {
               {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
             </SongDuration>
             <span>
-              <BsThreeDots />
+              <ClearButton
+                onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
+                  const { clientX, clientY } = event;
+                  await window.commands.contextMenu('playlist-item', {
+                    ...item,
+                    x: clientX,
+                    y: clientY,
+                  });
+                }}
+              >
+                <BsThreeDots />
+              </ClearButton>
             </span>
           </ListFront>
         </ListItemWrapper>
