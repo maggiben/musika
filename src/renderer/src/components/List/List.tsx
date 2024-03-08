@@ -249,7 +249,7 @@ const List = (_props: IListProps): JSX.Element | null => {
                 onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
                   const { clientX, clientY } = event;
                   await window.commands.contextMenu('playlist-item', {
-                    ...item,
+                    item,
                     x: clientX,
                     y: clientY,
                   });

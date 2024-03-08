@@ -29,7 +29,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   const [preferences, setPreferences] = useRecoilState(preferencesState);
   const handleMenuClick = async (
     _event: IpcRendererEvent,
-    message: { id: string },
+    message: { id: string; options?: Record<string, unknown> },
   ): Promise<void> => {
     console.log('handleMenuClick called', message);
     switch (message?.id) {
@@ -49,8 +49,8 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         await window.commands.modal('new-playlist', { width: 420, height: 580 });
         break;
       case 'contextmenu.get-media-info':
-        console.log('menu.file.new.playlist');
-        await window.commands.modal('media-info', { width: 600, height: 660 });
+        console.log('menu.file.new.playlist', message);
+        await window.commands.modal('media-info', { width: 600, height: 660, ...message.options });
         break;
       default:
         break;

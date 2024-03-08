@@ -1,4 +1,10 @@
-import { ipcMain, IpcMainInvokeEvent, BrowserWindow, OpenDialogOptions } from 'electron';
+import {
+  ipcMain,
+  nativeTheme,
+  IpcMainInvokeEvent,
+  BrowserWindow,
+  OpenDialogOptions,
+} from 'electron';
 import { contextMenu } from './menu';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
@@ -44,4 +50,17 @@ export const setRpcHandlers = (mainWindow?: BrowserWindow | null): void => {
   ipcMain.handle('savePreferences', async (_event: IpcMainInvokeEvent, preferences: IPreferences) =>
     savePreferences(preferences, window),
   );
+
+  ipcMain.handle('dark-mode:toggle', () => {
+    if (nativeTheme.shouldUseDarkColors) {
+      nativeTheme.themeSource = 'light';
+    } else {
+      nativeTheme.themeSource = 'dark';
+    }
+    return nativeTheme.shouldUseDarkColors;
+  });
+
+  ipcMain.handle('dark-mode:system', () => {
+    nativeTheme.themeSource = 'system';
+  });
 };

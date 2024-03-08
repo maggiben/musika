@@ -1,11 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import styled from 'styled-components';
+import type ytdl from 'ytdl-core';
+import type { IPlaylistItem } from 'types/types';
 import {
   FormControl,
   InputGroup,
-  StyledTextarea,
+  InputPairContainer,
+  StyledLabel,
   DarwinButton,
 } from '@renderer/components/Form/Form';
+import Loading from '@containers/loading/Loading';
 import { useTranslation } from 'react-i18next';
 
 const MediaInfoContainer = styled.div`
@@ -36,8 +40,13 @@ const HeaderContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   overflow: hidden;
+`;
+
+const HeaderTitle = styled.h1`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.white};
 `;
 
 const StyledImg = styled.img`
@@ -52,7 +61,45 @@ const StyledImg = styled.img`
     );
 `;
 
-const MediaInfo = (): JSX.Element => {
+interface IMediInfoProps {
+  options: {
+    item: IPlaylistItem;
+  };
+}
+
+const AsyncComponentWrapper = ({ item }: { item: IPlaylistItem }): JSX.Element => {
+  const AsyncComponent = React.lazy(async () => {
+    try {
+      const result = await window.commands.getVideoInfo(item.url);
+      const MediaInfoContent = await import('./MediaInfoContent');
+      return {
+        default: ({ item }: { item: IPlaylistItem }) => {
+          return (
+            <MediaInfoContent.default
+              item={item}
+              videoInfo={result['videoInfo'] as ytdl.videoInfo}
+            />
+          );
+        },
+        result,
+      };
+    } catch (error) {
+      console.error(error);
+      return Promise.reject(error);
+    }
+  });
+
+  return (
+    <Suspense fallback={<div>Loading Async...</div>}>
+      <AsyncComponent item={item} />
+    </Suspense>
+  );
+};
+
+// return { default: () => <StyledPre>{JSON.stringify(data, null, 2)}</StyledPre>, data }; // Pass the data along with the component
+
+const MediaInfo = (props: IMediInfoProps): JSX.Element => {
+  const { item } = props.options;
   const { t } = useTranslation();
 
   const handleCancelClick = async (): Promise<void> => {
@@ -64,17 +111,25 @@ const MediaInfo = (): JSX.Element => {
   return (
     <MediaInfoContainer>
       <HeaderContainer>
-        <StyledImg src="https://picsum.photos/320/320"></StyledImg>
+        <StyledImg src={item.thumbnail}></StyledImg>
+        <HeaderTitle>{item.title}</HeaderTitle>
       </HeaderContainer>
-      <InputGroup>
-        <FormControl
-          type="text"
-          id="playlist-title"
-          name="playlist-title"
-          placeholder="Playlist Title"
-        />
-      </InputGroup>
-      <StyledTextarea placeholder="Description (Optional)" style={{ flex: 1, resize: 'none' }} />
+      <Suspense fallback={<Loading />}>
+        {/* <AsyncComponent {...item}>
+          {({ default: Component, data }) => (
+            <>
+              <pre style={{ width: '100%', height: '100%' }}>{JSON.stringify(data, null, 2)}</pre>
+            </>
+          )}
+        </AsyncComponent> */}
+        {/* <AsyncComponent {...item}>
+          {({ default: Component, data }) => {
+            console.log('data', data, 'Component', Component);
+            return undefined;
+          }}
+        </AsyncComponent> */}
+        <AsyncComponentWrapper item={item} />
+      </Suspense>
       <ButtonsContainer>
         <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
         <DarwinButton disabled onClick={() => {}}>

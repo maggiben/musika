@@ -145,6 +145,27 @@ export const tmpl = (
   return sanitizeName(result, { replacement });
 };
 
+/**
+ * Retrieves a nested property from an object using a dot-separated path.
+ *
+ * @param {T} obj The object from which to retrieve the nested property.
+ * @param {string} path The dot-separated path to the nested property.
+ * @return {unknown | undefined} The value of the nested property, or undefined if not found.
+ */
+export const getNestedProperty = <T>(obj: T, path: string): unknown | undefined => {
+  return path.split('.').reduce((acc, key) => {
+    if (!acc || typeof acc !== 'object') {
+      return undefined;
+    }
+    const [propertyName, index] = key.replace(/\]/g, '').split('[');
+    const value = acc[propertyName as keyof typeof acc];
+    if (index && Array.isArray(value)) {
+      return value[parseInt(index, 10)];
+    }
+    return value;
+  }, obj);
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ThrottledFunction<T extends (...args: any[]) => any> = (
   ...args: Parameters<T>

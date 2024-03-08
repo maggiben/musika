@@ -102,7 +102,7 @@ const windowsColorKeys = [
   'scrollbar', // Scroll bar gray area.
   'window', // Window background.
   'window-frame', // Window frame.
-  'window-text' // Text in windows.
+  'window-text', // Text in windows.
 ] as const;
 
 const getDefaultPreferences = (): IPreferences => {

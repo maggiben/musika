@@ -1,6 +1,7 @@
 import 'styled-components';
 export type { IDownloadWorkerMessage } from '@main/utils/DownloadWorker';
 export type { IMenuClickMessage } from '@main/menu';
+export type { IPlaylistItem, IPlaylist } from '@states/atoms';
 
 interface IAnimation {
   duration: string;

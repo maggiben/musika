@@ -6,6 +6,7 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
   Menu,
+  systemPreferences,
 } from 'electron';
 import sharp from 'sharp';
 import pjson from '@pjson';
@@ -199,7 +200,7 @@ export const contextMenu = async (
       label: 'Get Info',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        window?.webContents.send('menu-click', { id: 'contextmenu.get-media-info' });
+        window?.webContents.send('menu-click', { id: 'contextmenu.get-media-info', options });
       },
     },
     { type: 'separator' },
@@ -207,7 +208,7 @@ export const contextMenu = async (
       label: 'Copy URL',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        window?.webContents.send('menu-click', { id: 'contextmenu.copy-link' });
+        window?.webContents.send('menu-click', { id: 'contextmenu.copy-link', options });
         options && clipboard.writeText(options?.url as string);
       },
     },
@@ -231,31 +232,16 @@ export const contextMenu = async (
 
   let template: IMenuItem[] = playlist;
   if (isDev) {
-    const imgBackground = Buffer.from(`
-      <svg>
-        <rect x="0" y="0" width="16" height="16" rx="3.2" ry="3.2" fill="transparent"/>
-      </svg>
-    `);
-    // const iconBuffer = Buffer.from(ReactDOMServer.renderToString(React.createElement(LuInspect)));
     // Render LuInspect component inside IconContext.Provider
     const IconElement = React.createElement(
       IconContext.Provider,
-      { value: { color: 'white' } },
+      { value: { color: systemPreferences.getColor('selected-menu-item-text') } },
       React.createElement(LuInspect),
     );
 
     // Render to string
     const iconBuffer = Buffer.from(ReactDOMServer.renderToString(IconElement));
-    const buffer = await sharp(imgBackground)
-      .composite([
-        {
-          input: iconBuffer,
-          blend: 'over',
-        },
-      ])
-      .resize(16, 16)
-      .png()
-      .toBuffer();
+    const buffer = await sharp(iconBuffer).resize(16, 16).png().toBuffer();
     template = template.concat([
       { type: 'separator' },
       {
