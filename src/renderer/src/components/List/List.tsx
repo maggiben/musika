@@ -7,7 +7,9 @@ import * as utils from '@shared/lib/utils';
 import type { IpcRendererEvent } from 'electron';
 import type { IDownloadWorkerMessage } from 'types/types';
 import type { Progress } from 'progress-stream';
-import type { IPlaylist } from '@renderer/states/atoms';
+import { useRecoilValue } from 'recoil';
+import { SpaceRight } from '@components/Spacing/Spacing';
+import { playlistState, IPlaylist } from '@renderer/states/atoms';
 
 const SongIndex = styled.span`
   user-select: none;
@@ -68,6 +70,10 @@ const ListBase = css`
 
 const ListBack = styled.div`
   ${ListBase}
+  box-sizing: border-box;
+  padding: ${({ theme }) => theme.spacing.xs};
+  top: 0;
+  left: 0;
   color: ${({ theme }) => theme.colors.white};
   & > span:nth-child(4) {
     & .full {
@@ -78,6 +84,8 @@ const ListBack = styled.div`
 
 const ListFront = styled.div<{ $progress: number[] | undefined }>`
   ${ListBase}
+  box-sizing: border-box;
+  padding: ${({ theme }) => theme.spacing.xs};
   color: ${({ theme }) => theme.colors.lightGray};
   position: absolute;
   top: 0;
@@ -99,9 +107,6 @@ const ListWrapper = styled.ul`
   margin: 0px;
   width: 100%;
   overflow-y: scroll;
-  & > li {
-    ${ListBase}
-  }
 `;
 
 const ListItemWrapper = styled.li<{
@@ -111,7 +116,6 @@ const ListItemWrapper = styled.li<{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  margin: ${({ theme }) => theme.spacing.xxl};
   &::before {
     content: '';
     position: absolute;
@@ -131,13 +135,17 @@ const ListItemWrapper = styled.li<{
 `;
 
 const ListHeader = styled.li`
-  position: relative;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   min-height: ${({ theme }) => theme.spacing.xs};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.softGray};
-  /* margin: ${({ theme }) => theme.spacing.xxl}; */
+  border-bottom: 1px solid ${({ theme }) => theme.colors['separator']};
+  &:first-child {
+    position: sticky;
+    top: 0; /* Stick to the top of the container */
+    background-color: ${({ theme }) => theme.colors['window-background']};
+    z-index: 1;
+  }
 `;
 
 interface IListProps {
@@ -146,6 +154,7 @@ interface IListProps {
 
 const List = (props: IListProps): JSX.Element | null => {
   const [progress, setProgress] = useState<Record<string, number[]>>();
+  const { playlist } = useRecoilValue(playlistState);
   const playlistItemsListener = (
     _event: IpcRendererEvent,
     message: IDownloadWorkerMessage,
@@ -266,7 +275,7 @@ const List = (props: IListProps): JSX.Element | null => {
   //   return () => clearInterval(interval);
   // }, []);
 
-  const getItem = (items: IPlaylist['items']): JSX.Element[] => {
+  const getItems = (items: IPlaylist['items'] = []): JSX.Element[] => {
     const maxHours = Math.max(
       ...items.map(({ duration }) => Math.floor(utils.timeStringToSeconds(duration ?? '0') / 3600)),
     );
@@ -303,13 +312,13 @@ const List = (props: IListProps): JSX.Element | null => {
     });
   };
 
-  return props.items ? (
+  return playlist?.items ? (
     <ListWrapper data-testid="list-wrapper">
       <ListHeader>
         <ListBack data-testid="list-header">
           <input type="checkbox" />
-          <SongIndex style={{ fontFamily: 'inherit' }}>#</SongIndex>
-          <span>·</span>
+          <SpaceRight size="l" />
+          <SpaceRight size="s" />
           <span>
             <SongName>Title</SongName>
           </span>
@@ -317,7 +326,7 @@ const List = (props: IListProps): JSX.Element | null => {
           <SongDuration style={{ fontFamily: 'inherit' }}>Duration</SongDuration>
         </ListBack>
       </ListHeader>
-      {getItem(props.items)}
+      {getItems(playlist.items)}
     </ListWrapper>
   ) : null;
 };

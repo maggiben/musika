@@ -6,6 +6,7 @@ import {
   FormControl,
   InputGroup,
   StyledTextarea,
+  DarwinButton,
 } from '@renderer/components/Form/Form';
 import coverflowImage from '@assets/images/coverflow.svg';
 import { useTranslation } from 'react-i18next';
@@ -85,8 +86,9 @@ const ThumbnailContainer = styled.div`
   &:has(${ThumbnailImg}) > ${FileInputWrapper}:hover {
     opacity: 1;
     & > ${PlusSign} {
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(2px) grayscale(0.75);
       border: 1px solid ${({ theme }) => theme.colors.white};
+      box-shadow: 0px 0px 1px 0px ${({ theme }) => theme.colors.black};
       -webkit-text-stroke: 1px ${({ theme }) => theme.colors.lightGray};
     }
   }
@@ -165,10 +167,10 @@ const NewPlaylist = (): JSX.Element => {
       </InputGroup>
       <StyledTextarea placeholder="Description (Optional)" style={{ flex: 1, resize: 'none' }} />
       <ButtonsContainer>
-        <StyledButton onClick={handleCancelClick}>{t('cancel')}</StyledButton>
-        <StyledButton disabled onClick={() => {}}>
+        <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
+        <DarwinButton disabled onClick={() => {}}>
           {t('create')}
-        </StyledButton>
+        </DarwinButton>
       </ButtonsContainer>
     </NewPlaylistContainer>
   );

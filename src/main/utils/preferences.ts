@@ -106,7 +106,7 @@ const windowsColorKeys = [
 ] as const;
 
 const getDefaultPreferences = (): IPreferences => {
-  const nodeEnv = process.env.NODE_ENV;
+  const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
   const preferredSystemLanguages = app.getPreferredSystemLanguages();
   return {
     behaviour: {
@@ -145,8 +145,7 @@ const getDefaultPreferences = (): IPreferences => {
       fileNameTmpl: '{videoDetails.title}',
     },
     advanced: {
-      // isDev: is.dev,
-      nodeEnv,
+      isDev,
       preferencesPath,
       update: {
         automatic: true,

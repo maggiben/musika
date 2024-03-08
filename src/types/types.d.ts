@@ -73,7 +73,7 @@ export interface IPreferences {
     };
   };
   advanced?: {
-    nodeEnv?: string;
+    isDev?: boolean;
     preferencesPath?: string;
     update?: {
       automatic?: boolean;

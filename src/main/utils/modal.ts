@@ -1,4 +1,4 @@
-import { app, ipcMain, IpcMainInvokeEvent, BrowserWindow } from 'electron';
+import { app, powerMonitor, ipcMain, IpcMainInvokeEvent, BrowserWindow } from 'electron';
 import * as path from 'node:path';
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
@@ -23,12 +23,18 @@ export default async function modal(
   });
   const setEventHandlers = (modal: BrowserWindow): void => {
     modal.once('ready-to-show', () => {
+      const resumeEventHander = (): void => {
+        console.log('Computer resume');
+        modal?.webContents.send('show-modal', type, options);
+      };
+      powerMonitor.on('resume', resumeEventHander);
       console.log('show-modal', type, options);
       modal?.webContents.send('show-modal', type, options);
       modal.show();
       ipcMain.once('close-modal', async (_event: IpcMainInvokeEvent, options) => {
         console.log('close-modal', options);
         mainWindow?.webContents.send('close-modal', options);
+        powerMonitor.off('resume', resumeEventHander);
         modal.hide();
         modal.destroy();
         modal = undefined as unknown as BrowserWindow;

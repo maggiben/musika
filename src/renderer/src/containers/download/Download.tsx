@@ -36,6 +36,8 @@ const Download = (): JSX.Element => {
             thumbnail={playlist.thumbnail}
             title={playlist.title}
             views={playlist.views}
+            totalItems={playlist.total_items}
+            items={playlist.items}
           />
           <List items={playlist.items} />
         </>

@@ -35,11 +35,9 @@ progress:not([value])::-webkit-progress-bar{
   background: #2f2f2f;
   outline: none;
 } */
-/* 
-
 
 input[type="checkbox"] {
-  display: none;
+  /* display: none; */
 }
 
 input[type="checkbox"] + label {
@@ -50,7 +48,7 @@ input[type="checkbox"] + label {
   line-height: 1;
   display: inline-block;
   white-space: nowrap;
-  font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
   background-color: transparent;
   color: #666;
   text-align: center;
@@ -63,6 +61,7 @@ input[type="checkbox"] + label {
     color: #c1c1c1;
   }
 }
+
 input[type="checkbox"]:checked + label {
  color: #d21d30;
 }
@@ -85,4 +84,4 @@ input[type="checkbox"]:checked + label {
     top: 50%;
     transform-origin: 0% 50%;
   }
-} */
+}

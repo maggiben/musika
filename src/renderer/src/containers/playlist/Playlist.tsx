@@ -5,15 +5,15 @@ import List from '@components/List/List';
 import PlayerControls from '@components/PlayerControls/PlayerControls';
 
 const PlaylistContainer = styled.div`
-  color: #484848;
   max-height: 100vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ListContainer = styled.div`
   overflow: hidden;
   overflow-y: scroll;
-  max-height: 100vh;
 `;
 
 const Playlist = (): JSX.Element => {
