@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
 import { padZeroes } from '@utils/string';
-import type ytpl from '@distube/ytpl';
 import * as utils from '@shared/lib/utils';
-import type { IpcRendererEvent } from 'electron';
-import type { IDownloadWorkerMessage } from 'types/types';
-import type { Progress } from 'progress-stream';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
+import useDownload from '@hooks/useDownload';
+// import useFakeProgress from '@hooks/useFakeProgress';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { playlistState, IPlaylist } from '@renderer/states/atoms';
 
@@ -139,6 +137,7 @@ const ListHeader = styled.li`
   flex-direction: row;
   flex-wrap: wrap;
   min-height: ${({ theme }) => theme.spacing.xs};
+  border-top: 1px solid ${({ theme }) => theme.colors['separator']};
   border-bottom: 1px solid ${({ theme }) => theme.colors['separator']};
   &:first-child {
     position: sticky;
@@ -148,143 +147,66 @@ const ListHeader = styled.li`
   }
 `;
 
+interface SelectAllCheckboxProps {
+  indeterminate?: boolean;
+}
+
+const SelectAllCheckbox: React.FC<SelectAllCheckboxProps> = ({ indeterminate }) => {
+  const checkboxRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = indeterminate ?? false;
+    }
+  }, [indeterminate]);
+
+  return <input type="checkbox" ref={checkboxRef} />;
+};
+
 interface IListProps {
   items?: IPlaylist['items'];
 }
 
-const List = (props: IListProps): JSX.Element | null => {
-  const [progress, setProgress] = useState<Record<string, number[]>>();
-  const { playlist } = useRecoilValue(playlistState);
-  const playlistItemsListener = (
-    _event: IpcRendererEvent,
-    message: IDownloadWorkerMessage,
-  ): void => {
-    const { length } = message?.details?.playlistItems as ytpl.result['items'];
-    console.log(`total items: ${length}`);
-  };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const List = (_props: IListProps): JSX.Element | null => {
+  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
+  const progress = useDownload();
 
-  const contentLengthListener = (
-    _event: IpcRendererEvent,
-    message: IDownloadWorkerMessage,
-  ): void => {
-    const contentLength = message?.details?.contentLength as number;
-    console.log(`contentLength: ${contentLength}`);
-  };
-
-  const endListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
-    setProgress((prevState) => {
-      const newState = { ...prevState };
-      delete newState[message?.source?.id];
-      return newState;
-    });
-  };
-
-  const timeoutListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
-    setProgress((prevState) => {
-      const newState = { ...prevState };
-      delete newState[message?.source?.id];
-      return newState;
-    });
-  };
-
-  const exitListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
-    setProgress((prevState) => {
-      const newState = { ...prevState };
-      delete newState[message?.source?.id];
-      return newState;
-    });
-  };
-
-  const progressListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
-    const { source } = message;
-    const { percentage } = message?.details?.progress as Progress;
-    // setProgress((prevProgress) => {
-    //   return { ...prevProgress, [source?.id]: Math.floor(percentage) };
-    // });
-    setProgress((prevProgress) => {
+  const handleItemSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_itemId, index] = event.target.getAttribute('data-item-selector')!.split(':');
+    // Create a new array with the modified item
+    setPlaylist((prev) => {
+      if (!prev || !prev.playlist) {
+        return prev;
+      }
+      const items: IPlaylist['items'] = [
+        ...prev.playlist.items.slice(0, parseInt(index, 10)), // Copy items before the modified item
+        { ...prev.playlist.items[parseInt(index, 10)], selected: checked }, // Copy the modified item with the new name
+        ...prev.playlist.items.slice(parseInt(index, 10) + 1), // Copy items after the modified item
+      ];
       return {
-        ...prevProgress,
-        [source?.id]: [prevProgress?.[source?.id]?.[1] ?? 0, Math.floor(percentage)],
+        ...prev,
+        playlist: {
+          ...prev.playlist,
+          items,
+        },
       };
     });
   };
-
-  useEffect(() => {
-    if (
-      'on' in window.electron.ipcRenderer &&
-      typeof window.electron.ipcRenderer.on === 'function'
-    ) {
-      window.electron.ipcRenderer.on('playlistItems', playlistItemsListener);
-      window.electron.ipcRenderer.on('contentLength', contentLengthListener);
-      window.electron.ipcRenderer.on('end', endListener);
-      window.electron.ipcRenderer.on('timeout', timeoutListener);
-      window.electron.ipcRenderer.on('exit', exitListener);
-      window.electron.ipcRenderer.on('progress', progressListener);
-    }
-    return () => {
-      if (
-        'off' in window.electron.ipcRenderer &&
-        typeof window.electron.ipcRenderer.off === 'function'
-      ) {
-        window.electron.ipcRenderer.off('playlistItems', playlistItemsListener);
-        window.electron.ipcRenderer.off('contentLength', contentLengthListener);
-        window.electron.ipcRenderer.off('end', endListener);
-        window.electron.ipcRenderer.off('timeout', timeoutListener);
-        window.electron.ipcRenderer.off('exit', exitListener);
-        window.electron.ipcRenderer.off('progress', progressListener);
-      }
-    };
-  }, []);
-
-  // const [pp, setPp] = useState<Record<string, number[]>>({});
-
-  // useEffect(() => {
-  //   if (props?.items) {
-  //     const hash = props.items
-  //       .map((item) => {
-  //         const start = Math.floor(Math.random() * 10);
-  //         return {
-  //           [item.id]: [start, start + 5], // Math.floor(Math.random() * 101),
-  //         };
-  //       })
-  //       .reduce((acc, curr) => {
-  //         const [id, value] = Object.entries(curr)[0];
-  //         acc[id] = value;
-  //         return acc;
-  //       }, {});
-  //     setPp(hash);
-  //   }
-
-  //   const interval = setInterval(() => {
-  //     if (props?.items && !window['abortx']) {
-  //       setPp((prevHash) => {
-  //         for (const key in prevHash) {
-  //           if (prevHash[key][1] < 100) {
-  //             const end = Math.floor(Math.random() * 5);
-  //             prevHash[key] = [prevHash[key][1], prevHash[key][1] + end];
-  //           } else {
-  //             prevHash[key][0] = 0;
-  //             prevHash[key][1] = 0;
-  //           }
-  //         }
-  //         return { ...prevHash };
-  //       });
-  //     }
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   const getItems = (items: IPlaylist['items'] = []): JSX.Element[] => {
     const maxHours = Math.max(
       ...items.map(({ duration }) => Math.floor(utils.timeStringToSeconds(duration ?? '0') / 3600)),
     );
+
     return items.map((item, index) => {
       const songIndex = padZeroes(index + 1, items.length.toString().split('').length);
       return (
-        <ListItemWrapper key={`${item.id}-${index}`} $progress={progress?.[item.id]}>
+        <ListItemWrapper key={`${item.id}:${index}`} $progress={progress?.[item.id]}>
           <ListBack data-testid="list-item-back">
-            <input type="checkbox" />
+            <input type="checkbox" style={{ display: 'hidden' }} />
             <SongIndex>{songIndex}</SongIndex>
             <span>·</span>
             <span>
@@ -296,7 +218,12 @@ const List = (props: IListProps): JSX.Element | null => {
             </SongDuration>
           </ListBack>
           <ListFront $progress={progress?.[item.id]} data-testid="list-item-front">
-            <input type="checkbox" />
+            <input
+              type="checkbox"
+              defaultChecked={item.selected}
+              data-item-selector={`${item.id}:${index}`}
+              onChange={handleItemSelect}
+            />
             <SongIndex>{songIndex}</SongIndex>
             <span>·</span>
             <span>
@@ -316,7 +243,7 @@ const List = (props: IListProps): JSX.Element | null => {
     <ListWrapper data-testid="list-wrapper">
       <ListHeader>
         <ListBack data-testid="list-header">
-          <input type="checkbox" />
+          <SelectAllCheckbox indeterminate={true} />
           <SpaceRight size="l" />
           <SpaceRight size="s" />
           <span>

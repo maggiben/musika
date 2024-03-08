@@ -127,7 +127,7 @@ export const StyledButton = styled.button`
 
 export const DarwinButton = styled(StyledButton)`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   padding: 6px 14px;
   border-radius: 6px;
@@ -147,6 +147,9 @@ export const DarwinButton = styled(StyledButton)`
     color: ${({ theme }) => theme.colors.lightGray};
     box-shadow: none;
     cursor: inherit;
+  }
+  & > :first-child {
+    margin-right: ${({ theme }) => theme.spacing.xs};;
   }
 `;
 

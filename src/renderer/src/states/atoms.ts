@@ -3,16 +3,24 @@ import type { IPreferences } from 'types/types';
 import ytpl from '@distube/ytpl';
 import { preferencesSelector } from './selectors';
 
-export interface IPlaylist extends Omit<ytpl.result, 'views'> {
+type TytplItem = ytpl.result['items'][number];
+
+export interface IPlaylistItem extends TytplItem {
+  selected?: boolean;
+  favorite?: boolean;
+  dislike?: boolean;
+}
+
+export interface IPlaylist extends Omit<ytpl.result, 'views' | 'items'> {
   thumbnail: {
     height: number;
     width: number;
     url: string;
   };
   views: string | number;
+  items: IPlaylistItem[];
 }
 
-/*
 const mockPlaylist: any = {
   id: 'PLF48AC0919899FFED',
   thumbnail: {
@@ -69,6 +77,7 @@ const mockPlaylist: any = {
         'https://i.ytimg.com/vi/a1QzMNM94-s/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCcF0RewUMgOdmhZy-JxpmGJaD9bw',
       isLive: false,
       duration: '5:01',
+      selected: true,
     },
     {
       title: 'Yo-Yo Ma - Cello Suite No.6 Gigue (HD)',
@@ -402,12 +411,11 @@ const mockPlaylist: any = {
     },
   ],
 };
-*/
 
 export const playlistState = atom<{ playlist: IPlaylist | undefined }>({
   key: 'playlistState',
   default: {
-    playlist: undefined,
+    playlist: mockPlaylist,
   },
 });
 
