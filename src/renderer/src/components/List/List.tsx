@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import { padZeroes } from '@utils/string';
 import * as utils from '@shared/lib/utils';
 import { useRecoilState } from 'recoil';
-import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
+import { BsThreeDots } from 'react-icons/bs';
 import useDownload from '@hooks/useDownload';
 // import useFakeProgress from '@hooks/useFakeProgress';
 import { ClearButton } from '@components/Form/Form';
@@ -66,7 +66,6 @@ const ListBase = css`
       align-self: flex-end;
     }
     &:nth-child(7) {
-      flex-basis: 5%;
       text-align: center;
       align-self: flex-end;
     }
@@ -213,7 +212,7 @@ const List = (_props: IListProps): JSX.Element | null => {
       return (
         <ListItemWrapper key={`${item.id}:${index}`} $progress={progress?.[item.id]}>
           <ListBack data-testid="list-item-back">
-            <input type="checkbox" style={{ display: 'hidden' }} />
+            <input type="checkbox" style={{ visibility: 'hidden' }} />
             <SongIndex>{songIndex}</SongIndex>
             <span>·</span>
             <span>
@@ -277,7 +276,7 @@ const List = (_props: IListProps): JSX.Element | null => {
           </span>
           <span style={{ textAlign: 'left' }}>Rating</span>
           <SongDuration style={{ fontFamily: 'inherit' }}>Duration</SongDuration>
-          <span>
+          <span style={{ visibility: 'hidden' }}>
             <BsThreeDots />
           </span>
         </ListBack>

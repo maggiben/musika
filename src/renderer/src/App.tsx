@@ -7,7 +7,7 @@ import { RecoilRoot, useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
 import Loading from './containers/loading/Loading';
-// import Playlist from '@containers/playlist/Playlist';
+import Playlist from '@containers/playlist/Playlist';
 import Download from '@containers/download/Download';
 // import Preferences from '@renderer/containers/preferences/Preferences';
 import { defaultTheme } from '@assets/themes';
@@ -47,6 +47,10 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
       case 'menu.file.new.playlist':
         console.log('menu.file.new.playlist');
         await window.commands.modal('new-playlist', { width: 420, height: 580 });
+        break;
+      case 'contextmenu.get-media-info':
+        console.log('menu.file.new.playlist');
+        await window.commands.modal('media-info', { width: 600, height: 660 });
         break;
       default:
         break;

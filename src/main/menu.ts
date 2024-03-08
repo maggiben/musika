@@ -1,5 +1,18 @@
-import { app, clipboard, shell, BrowserWindow, MenuItemConstructorOptions, Menu } from 'electron';
+import {
+  app,
+  nativeImage,
+  clipboard,
+  shell,
+  BrowserWindow,
+  MenuItemConstructorOptions,
+  Menu,
+} from 'electron';
+import sharp from 'sharp';
 import pjson from '@pjson';
+import React from 'react';
+import * as ReactDOMServer from 'react-dom/server';
+import { IconContext } from 'react-icons';
+import { LuInspect } from 'react-icons/lu';
 import i18n from './utils/i18n';
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
@@ -155,6 +168,23 @@ export const applicationMenu = (
   return [...template];
 };
 
+export const converToNativeImage = async (imagePath: string): Promise<Electron.NativeImage> => {
+  // Convert the SVG string to a PNG buffer
+  return new Promise((resolve, reject) => {
+    sharp(imagePath)
+      .resize(16, 16)
+      .png()
+      .toBuffer()
+      .then((pngBuffer) => {
+        return resolve(nativeImage.createFromBuffer(pngBuffer));
+      })
+      .catch((error) => {
+        console.error('Error converting SVG to PNG:', error);
+        return reject(error);
+      });
+  });
+};
+
 export const contextMenu = async (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _type: string,
@@ -162,12 +192,14 @@ export const contextMenu = async (
   options?: Record<string, unknown>,
   mainWindow?: BrowserWindow | null,
 ): Promise<boolean> => {
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
   const playlist: IMenuItem[] = [
     {
       label: 'Get Info',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.get-media-info' });
+        window?.webContents.send('menu-click', { id: 'contextmenu.get-media-info' });
       },
     },
     { type: 'separator' },
@@ -175,7 +207,7 @@ export const contextMenu = async (
       label: 'Copy URL',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.copy-link' });
+        window?.webContents.send('menu-click', { id: 'contextmenu.copy-link' });
         options && clipboard.writeText(options?.url as string);
       },
     },
@@ -191,7 +223,7 @@ export const contextMenu = async (
       ) => {
         console.log('menu click !', menuItem);
         options && shell.openExternal(options.url as string);
-        mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.open-link' });
+        window?.webContents.send('context-menu-click', { id: 'contextmenu.open-link' });
         return;
       },
     },
@@ -199,10 +231,36 @@ export const contextMenu = async (
 
   let template: IMenuItem[] = playlist;
   if (isDev) {
+    const imgBackground = Buffer.from(`
+      <svg>
+        <rect x="0" y="0" width="16" height="16" rx="3.2" ry="3.2" fill="transparent"/>
+      </svg>
+    `);
+    // const iconBuffer = Buffer.from(ReactDOMServer.renderToString(React.createElement(LuInspect)));
+    // Render LuInspect component inside IconContext.Provider
+    const IconElement = React.createElement(
+      IconContext.Provider,
+      { value: { color: 'white' } },
+      React.createElement(LuInspect),
+    );
+
+    // Render to string
+    const iconBuffer = Buffer.from(ReactDOMServer.renderToString(IconElement));
+    const buffer = await sharp(imgBackground)
+      .composite([
+        {
+          input: iconBuffer,
+          blend: 'over',
+        },
+      ])
+      .resize(16, 16)
+      .png()
+      .toBuffer();
     template = template.concat([
       { type: 'separator' },
       {
         label: 'Inspect Element',
+        icon: nativeImage.createFromBuffer(buffer),
         click: async (
           menuItem: Electron.MenuItem,
           browserWindow: Electron.BrowserWindow | undefined,
@@ -223,8 +281,6 @@ export const contextMenu = async (
 
   try {
     const menu = Menu.buildFromTemplate(template);
-    const focusedWindow = BrowserWindow.getFocusedWindow();
-    const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
     window && menu.popup({ window });
     return true;
   } catch (error) {

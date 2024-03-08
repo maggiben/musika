@@ -33,6 +33,7 @@ const ModalContainer = ({
   const modals = {
     preferences: lazy(() => import('@renderer/containers/preferences/Preferences')),
     'new-playlist': lazy(() => import('@renderer/containers/playlist/NewPlaylist')),
+    'media-info': lazy(() => import('@renderer/containers/mediaInfo/MediaInfo')),
   };
 
   const currentTheme = {

@@ -6,11 +6,8 @@ import { playlistState } from '@renderer/states/atoms';
 import { DarwinButton, CircularButton } from '../Form/Form';
 import { SpaceRight } from '../Spacing/Spacing';
 import { timeStringToSeconds, toHumanTime } from '@shared/lib/utils';
-import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
-import { BsShuffle } from '@react-icons/all-files/bs/BsShuffle';
-import { FaCloudDownloadAlt } from '@react-icons/all-files/fa/FaCloudDownloadAlt';
-import { FaPencilAlt } from '@react-icons/all-files/fa/FaPencilAlt';
-import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
+import { FaPlay, FaCloudDownloadAlt, FaPencilAlt } from 'react-icons/fa';
+import { BsShuffle, BsThreeDots } from 'react-icons/bs';
 
 const PlaylistInfoContainer = styled.div`
   --thumbnail-height: 120px;

@@ -35,6 +35,9 @@
   "menu.app.quit": "Quit",
   "menu.app.preferences": "Preferences...",
   "create": "Create",
+  "select image": "Select Image",
+  "optional description": "Description (Optional)",
+  "playlist title": "Playlist Title",
   "menu.app.checkForUpdates": "Check for Updates...",
   "move to applications forlder?": "Move to Applications folder?",
   "must live in the applications folder to be able to run correctly": "must live in the Applications folder to be able to run correctly"

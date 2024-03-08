@@ -14,11 +14,11 @@
   ],
   "compilerOptions": {
     "composite": true,
-    "isolatedModules": false,
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "esModuleInterop": true,
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
+    "isolatedModules": false,
     "noEmit": true,
     /* Linting */
     "strict": true,

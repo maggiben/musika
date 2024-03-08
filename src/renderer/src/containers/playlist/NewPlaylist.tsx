@@ -134,7 +134,6 @@ const NewPlaylist = (): JSX.Element => {
     }
   };
 
-  console.log('imageSrc', imageSrc);
   return (
     <NewPlaylistContainer>
       <ThumbnailContainer>
@@ -144,7 +143,7 @@ const NewPlaylist = (): JSX.Element => {
             onChange={handleFileUpload}
             multiple={false}
             accept="image/jpeg, image/png, image/gif, image/svg"
-            title="Select Image"
+            title={t('select image')}
           />
           <PlusSign>+</PlusSign>
         </FileInputWrapper>
@@ -162,10 +161,10 @@ const NewPlaylist = (): JSX.Element => {
           type="text"
           id="playlist-title"
           name="playlist-title"
-          placeholder="Playlist Title"
+          placeholder={t('playlist title')}
         />
       </InputGroup>
-      <StyledTextarea placeholder="Description (Optional)" style={{ flex: 1, resize: 'none' }} />
+      <StyledTextarea placeholder={t('optional description')} style={{ flex: 1, resize: 'none' }} />
       <ButtonsContainer>
         <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
         <DarwinButton disabled onClick={() => {}}>
