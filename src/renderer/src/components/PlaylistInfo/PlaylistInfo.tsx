@@ -1,12 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import type ytpl from '@distube/ytpl';
 import styled from 'styled-components';
-import { DarwinButton } from '../Form/Form';
+import { useRecoilState } from 'recoil';
+import { playlistState } from '@renderer/states/atoms';
+import { DarwinButton, CircularButton } from '../Form/Form';
 import { SpaceRight } from '../Spacing/Spacing';
 import { timeStringToSeconds, toHumanTime } from '@shared/lib/utils';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
 import { BsShuffle } from '@react-icons/all-files/bs/BsShuffle';
 import { FaCloudDownloadAlt } from '@react-icons/all-files/fa/FaCloudDownloadAlt';
+import { FaPencilAlt } from '@react-icons/all-files/fa/FaPencilAlt';
+import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
 
 const PlaylistInfoContainer = styled.div`
   --thumbnail-height: 120px;
@@ -66,6 +70,20 @@ const PlaylistSubTitle = styled.p`
 const ActionGroup = styled.div`
   display: flex;
   width: 100%;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const LeftActions = styled.div`
+  flex: 1;
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const RightActions = styled.div`
+  display: flex;
   justify-content: flex-start;
   align-items: center;
 `;
@@ -90,7 +108,13 @@ const calcTotalPlayTime = (items: ytpl.result['items']): number => {
 
 const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   const { t } = useTranslation();
+  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
   const totalDuration = calcTotalPlayTime(props.items);
+  const downloadSelected = (): void => {
+    const selectedItems = playlist?.items.filter(({ selected }) => Boolean(selected));
+    console.log('selectedItems', selectedItems);
+  };
+
   return (
     <PlaylistInfoContainer>
       <StyledImg
@@ -109,19 +133,38 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
           </PlaylistSubTitle>
         </hgroup>
         <ActionGroup>
-          <DarwinButton>
-            <FaPlay />
-            Play
-          </DarwinButton>
-          <SpaceRight size="xs" />
-          <DarwinButton>
-            <BsShuffle /> Shuffle
-          </DarwinButton>
-          <SpaceRight size="xs" />
-          <DarwinButton>
-            <FaCloudDownloadAlt />
-            Download Selected
-          </DarwinButton>
+          <LeftActions>
+            <DarwinButton>
+              <FaPlay />
+              Play
+            </DarwinButton>
+            <SpaceRight size="xs" />
+            <DarwinButton
+              onClick={async () => {
+                await window.commands.contextMenu('playlist');
+              }}
+            >
+              <BsShuffle /> Shuffle
+            </DarwinButton>
+            <SpaceRight size="xs" />
+            <DarwinButton onClick={downloadSelected}>
+              <FaCloudDownloadAlt />
+              Download Selected
+            </DarwinButton>
+          </LeftActions>
+          <RightActions>
+            <CircularButton>
+              <FaPencilAlt />
+            </CircularButton>
+            <SpaceRight size="m" />
+            <CircularButton
+              onClick={async () => {
+                await window.commands.contextMenu('playlist');
+              }}
+            >
+              <BsThreeDots />
+            </CircularButton>
+          </RightActions>
         </ActionGroup>
       </InfoGroup>
     </PlaylistInfoContainer>

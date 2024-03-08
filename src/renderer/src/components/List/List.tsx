@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import { padZeroes } from '@utils/string';
 import * as utils from '@shared/lib/utils';
 import { useRecoilState } from 'recoil';
+import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
 import useDownload from '@hooks/useDownload';
 // import useFakeProgress from '@hooks/useFakeProgress';
 import { SpaceRight } from '@components/Spacing/Spacing';
@@ -62,6 +63,12 @@ const ListBase = css`
       flex-basis: 12%;
       text-align: right;
       align-self: flex-end;
+    }
+    &:nth-child(7) {
+      flex-basis: 5%;
+      text-align: center;
+      align-self: flex-end;
+      color: red;
     }
   }
 `;
@@ -216,6 +223,9 @@ const List = (_props: IListProps): JSX.Element | null => {
             <SongDuration>
               {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
             </SongDuration>
+            <span>
+              <BsThreeDots />
+            </span>
           </ListBack>
           <ListFront $progress={progress?.[item.id]} data-testid="list-item-front">
             <input
@@ -233,6 +243,9 @@ const List = (_props: IListProps): JSX.Element | null => {
             <SongDuration>
               {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
             </SongDuration>
+            <span>
+              <BsThreeDots />
+            </span>
           </ListFront>
         </ListItemWrapper>
       );
@@ -251,6 +264,9 @@ const List = (_props: IListProps): JSX.Element | null => {
           </span>
           <span style={{ textAlign: 'left' }}>Rating</span>
           <SongDuration style={{ fontFamily: 'inherit' }}>Duration</SongDuration>
+          <span>
+            <BsThreeDots />
+          </span>
         </ListBack>
       </ListHeader>
       {getItems(playlist.items)}

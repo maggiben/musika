@@ -11,7 +11,8 @@ import {
 } from 'electron';
 import * as path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import { getMenu } from './menu';
+import { applicationMenu, contextMenu } from './menu';
+import { setRpcHandlers } from './rpc';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
 import search from './commands/search';
@@ -43,7 +44,7 @@ function createWindow(_preferences: IPreferences): void {
     },
   });
 
-  const menu = Menu.buildFromTemplate(getMenu(mainWindow));
+  const menu = Menu.buildFromTemplate(applicationMenu(mainWindow));
   Menu.setApplicationMenu(menu);
 
   mainWindow.on('ready-to-show', () => {
@@ -55,34 +56,7 @@ function createWindow(_preferences: IPreferences): void {
     return { action: 'deny' };
   });
 
-  ipcMain.handle('dialogs', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
-    showOpenDialog(options),
-  );
-
-  ipcMain.handle('getVideoInfo', async (_event: IpcMainInvokeEvent, url: string) =>
-    getVideoInfo(url),
-  );
-
-  ipcMain.handle('search', async (_event: IpcMainInvokeEvent, searchString: string) =>
-    search(searchString),
-  );
-
-  ipcMain.handle(
-    'modal',
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async (_event: IpcMainInvokeEvent, type: string, options?: Record<string, unknown>) =>
-      modal(type, options, mainWindow),
-  );
-
-  ipcMain.handle('download', async (_event: IpcMainInvokeEvent, url: string) =>
-    download(url, mainWindow),
-  );
-
-  ipcMain.handle('loadPreferences', async () => loadPreferences(mainWindow));
-
-  ipcMain.handle('savePreferences', async (_event: IpcMainInvokeEvent, preferences: IPreferences) =>
-    savePreferences(preferences, mainWindow),
-  );
+  setRpcHandlers(mainWindow);
 
   // Test active push message to Renderer-process.
   mainWindow.webContents.on('did-finish-load', () => {

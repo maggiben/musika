@@ -1,4 +1,4 @@
-import { app, BrowserWindow, MenuItemConstructorOptions } from 'electron';
+import { app, shell, BrowserWindow, MenuItemConstructorOptions, Menu } from 'electron';
 import pjson from '@pjson';
 import i18n from './utils/i18n';
 
@@ -11,7 +11,9 @@ export interface IMenuClickMessage {
   id: string;
 }
 
-export const getMenu = (mainWindow?: BrowserWindow): (MenuItemConstructorOptions | IMenuItem)[] => {
+export const applicationMenu = (
+  mainWindow?: BrowserWindow,
+): (MenuItemConstructorOptions | IMenuItem)[] => {
   const template: IMenuItem[] = [
     {
       label: 'File',
@@ -149,4 +151,42 @@ export const getMenu = (mainWindow?: BrowserWindow): (MenuItemConstructorOptions
     ];
   }
   return [...template];
+};
+
+export const contextMenu = async (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _type: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  options?: Record<string, unknown>,
+  mainWindow?: BrowserWindow | null,
+): Promise<void | null> => {
+  const playlist: IMenuItem[] = [
+    {
+      label: 'Get Info',
+    },
+    { type: 'separator' },
+    {
+      label: 'Copy URL',
+    },
+    {
+      label: 'Open in Browser',
+      click: async (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        menuItem: Electron.MenuItem,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _browserWindow: Electron.BrowserWindow | undefined,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _event: Electron.KeyboardEvent,
+      ) => {
+        console.log('menu click !', menuItem);
+        options && shell.openExternal(options.url as string);
+        mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.open-link' });
+        return;
+      },
+    },
+  ];
+  const menu = Menu.buildFromTemplate(playlist);
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
+  return window && menu.popup({ window, ...options });
 };

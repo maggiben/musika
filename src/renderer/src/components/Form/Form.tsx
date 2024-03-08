@@ -153,6 +153,14 @@ export const DarwinButton = styled(StyledButton)`
   }
 `;
 
+export const CircularButton = styled(StyledButton)`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+`;
+
 export const StyledSelect = styled.select`
   display: block;
   width: 100%;

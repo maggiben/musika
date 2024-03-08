@@ -11,6 +11,7 @@ if (process.contextIsolated) {
       ...electronAPI,
       ipcRenderer: {
         ...electronAPI.ipcRenderer,
+        // A patch for @electron-toolkit
         off: (channel, listener) => {
           console.log('calling off listener', channel);
           return ipcRenderer.off(channel, listener);
@@ -29,6 +30,8 @@ if (process.contextIsolated) {
       dialogs: (type: string) => ipcRenderer.invoke('dialogs', type),
       modal: (type: string, options?: Record<string, unknown>) =>
         ipcRenderer.invoke('modal', type, options),
+      contextMenu: (type: string, options?: Record<string, unknown>) =>
+        ipcRenderer.invoke('contextMenu', type, options),
     });
   } catch (error) {
     console.error(error);

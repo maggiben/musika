@@ -205,7 +205,7 @@ export function setPreferencesModal(mainWindow: BrowserWindow): BrowserWindow {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPreferences> {
+export async function loadPreferences(mainWindow?: BrowserWindow | null): Promise<IPreferences> {
   const defaultPreferences = getDefaultPreferences();
   try {
     await fs.access(preferencesPath, fs.constants.R_OK);
@@ -217,10 +217,12 @@ export async function loadPreferences(mainWindow?: BrowserWindow): Promise<IPref
     };
   } catch (error) {
     try {
-      const save = await savePreferences(defaultPreferences, mainWindow);
+      const focusedWindow = BrowserWindow.getFocusedWindow();
+      const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
+      const save = await savePreferences(defaultPreferences, window);
       if (save) {
-        mainWindow &&
-          dialog.showMessageBox(mainWindow, {
+        window &&
+          dialog.showMessageBox(window, {
             type: 'question',
             buttons: ['Ok'],
             title: 'Default Preferences Created !',
@@ -265,7 +267,7 @@ const checkDirectoryExists = async (directoryPath: string, create?: boolean): Pr
 
 export async function savePreferences(
   preferences: IPreferences,
-  mainWindow?: BrowserWindow,
+  mainWindow?: BrowserWindow | null,
 ): Promise<boolean> {
   try {
     const isDirOk = await checkDirectoryExists(path.dirname(preferencesPath), true);
@@ -275,9 +277,11 @@ export async function savePreferences(
     }
     return false;
   } catch (error) {
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
     console.error(`Error creating: ${preferencesPath}`, error);
-    mainWindow &&
-      dialog.showMessageBox(mainWindow, {
+    window &&
+      dialog.showMessageBox(window, {
         type: 'error',
         title: 'Error',
         defaultId: 1,

@@ -19,6 +19,7 @@ export declare global {
       search: (searchString: string) => Promise<Record<string, unknown>>;
       download: (url: string) => Promise<OpenDialogReturnValue>;
       modal: (type: string, options?: Record<string, unknown>) => Promise<boolean>;
+      contextMenu: (type: string, options?: Record<string, unknown>) => Promise<void | null>;
     };
     preferences: {
       loadPreferences: () => Promise<IPreferences>;

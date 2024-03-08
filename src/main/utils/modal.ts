@@ -8,11 +8,13 @@ export interface IModalOptions {}
 export default async function modal(
   type: string,
   options?: Record<string, unknown>,
-  mainWindow?: BrowserWindow,
+  mainWindow?: BrowserWindow | null,
 ): Promise<boolean> {
   console.log('new modal', type, options, mainWindow);
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  const parentWindow = mainWindow === focusedWindow ? mainWindow : focusedWindow;
   const modal = new BrowserWindow({
-    parent: mainWindow ? mainWindow : BrowserWindow.getFocusedWindow() ?? undefined,
+    parent: parentWindow ?? undefined,
     modal: true,
     show: false,
     ...options,
