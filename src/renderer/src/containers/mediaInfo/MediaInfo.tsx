@@ -1,14 +1,8 @@
-import React, { useState, useRef, useEffect, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import styled from 'styled-components';
 import type ytdl from 'ytdl-core';
 import type { IPlaylistItem } from 'types/types';
-import {
-  FormControl,
-  InputGroup,
-  InputPairContainer,
-  StyledLabel,
-  DarwinButton,
-} from '@renderer/components/Form/Form';
+import { DarwinButton } from '@renderer/components/Form/Form';
 import Loading from '@containers/loading/Loading';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +22,7 @@ const MediaInfoContainer = styled.div`
 const ButtonsContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   width: 100%;
 `;
@@ -115,26 +109,10 @@ const MediaInfo = (props: IMediInfoProps): JSX.Element => {
         <HeaderTitle>{item.title}</HeaderTitle>
       </HeaderContainer>
       <Suspense fallback={<Loading />}>
-        {/* <AsyncComponent {...item}>
-          {({ default: Component, data }) => (
-            <>
-              <pre style={{ width: '100%', height: '100%' }}>{JSON.stringify(data, null, 2)}</pre>
-            </>
-          )}
-        </AsyncComponent> */}
-        {/* <AsyncComponent {...item}>
-          {({ default: Component, data }) => {
-            console.log('data', data, 'Component', Component);
-            return undefined;
-          }}
-        </AsyncComponent> */}
         <AsyncComponentWrapper item={item} />
       </Suspense>
       <ButtonsContainer>
         <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
-        <DarwinButton disabled onClick={() => {}}>
-          {t('create')}
-        </DarwinButton>
       </ButtonsContainer>
     </MediaInfoContainer>
   );
