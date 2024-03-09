@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react';
 import styled from 'styled-components';
 import type ytdl from 'ytdl-core';
+import { useTranslation } from 'react-i18next';
 import type { IPlaylistItem } from 'types/types';
 import { DarwinButton } from '@renderer/components/Form/Form';
 import Loading from '@containers/loading/Loading';
-import { useTranslation } from 'react-i18next';
 
 const MediaInfoContainer = styled.div`
   display: flex;
@@ -84,7 +84,7 @@ const AsyncComponentWrapper = ({ item }: { item: IPlaylistItem }): JSX.Element =
   });
 
   return (
-    <Suspense fallback={<div>Loading Async...</div>}>
+    <Suspense fallback={<Loading />}>
       <AsyncComponent item={item} />
     </Suspense>
   );
