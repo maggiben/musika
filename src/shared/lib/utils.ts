@@ -145,6 +145,50 @@ export const tmpl = (
   return sanitizeName(result, { replacement });
 };
 
+export const padZeroes = (number: number, maxLength: number): string => {
+  const numberString = number.toString();
+  const numZeroes = Math.max(0, maxLength - numberString.length);
+  return '0'.repeat(numZeroes) + numberString;
+};
+
+export const replaceFromRight = (str1: string, str2: string): string => {
+  const reversedStr1 = str1.split('').reverse();
+  const reversedStr2 = str2.split('').reverse();
+
+  let index = 0;
+  for (let i = 0; i < reversedStr1.length; i++) {
+    if (index < reversedStr2.length) {
+      reversedStr1[i] = reversedStr2[index];
+      index++;
+    } else {
+      break;
+    }
+  }
+
+  return reversedStr1.reverse().join('');
+};
+
+export const isObjectEqual = <T>(firstVal: T | undefined, secondVal: T | undefined): boolean => 
+  JSON.stringify(firstVal) === JSON.stringify(secondVal);
+
+export const removeProperty = <T, K extends keyof T>(array: T[], property: K): T[] =>
+  array.map((item) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [property]: removed, ...rest } = item;
+    return rest as T; // Explicit type cast to T
+  });
+
+export const splitIntoTuples = <T>(array: T[], size: number): T[][] => {
+  return array.reduce((result, current, index) => {
+    const tupleIndex = Math.floor(index / size);
+    if (!result[tupleIndex]) {
+      result[tupleIndex] = [];
+    }
+    result[tupleIndex].push(current);
+    return result;
+  }, [] as T[][]);
+};
+
 /**
  * Retrieves a nested property from an object using a dot-separated path.
  *
