@@ -415,7 +415,7 @@ const mockPlaylist: any = {
 export const playlistState = atom<{ playlist: IPlaylist | undefined }>({
   key: 'playlistState',
   default: {
-    playlist: mockPlaylist,
+    playlist: undefined,
   },
 });
 

@@ -3,11 +3,12 @@ import type ytpl from '@distube/ytpl';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { playlistState } from '@renderer/states/atoms';
-import { DarwinButton, CircularButton } from '../Form/Form';
-import { SpaceRight } from '../Spacing/Spacing';
+
 import { timeStringToSeconds, toHumanTime } from '@shared/lib/utils';
 import { FaPlay, FaCloudDownloadAlt, FaPencilAlt } from 'react-icons/fa';
 import { BsShuffle, BsThreeDots } from 'react-icons/bs';
+import { SpaceRight } from '../Spacing/Spacing';
+import { DarwinButton, CircularButton } from '../Form/Form';
 
 const PlaylistInfoContainer = styled.div`
   --thumbnail-height: 120px;
@@ -18,11 +19,17 @@ const PlaylistInfoContainer = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   overflow: hidden;
+  box-sizing: border-box;
+  padding: ${({ theme }) => theme.spacing.xs};
 `;
 
 const StyledImg = styled.img`
   width: auto;
   max-height: var(--thumbnail-height);
+  /* filter: drop-shadow(0 0 0px ${({ theme }) => theme.colors.white})
+    drop-shadow(0 0 4px ${({ theme }) => theme.colors.white});
+  border-radius: ${({ theme }) => theme.spacing.xxxs};
+  border: 1px solid ${({ theme }) => theme.colors.white}; */
   -webkit-box-reflect: below 1px
     linear-gradient(
       to bottom,

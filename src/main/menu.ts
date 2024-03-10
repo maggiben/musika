@@ -57,6 +57,12 @@ export const applicationMenu = (
           ],
         },
         { label: 'Open File', accelerator: 'CmdOrCtrl+O' },
+        {
+          label: 'Open Url',
+          accelerator: 'CmdOrCtrl+U',
+          click: async () =>
+            mainWindow?.webContents.send('menu-click', { id: 'menu.file.open-url' }),
+        },
         { type: 'separator' },
         { label: 'Save', accelerator: 'CmdOrCtrl+S' },
         { label: 'Save As', accelerator: 'CmdOrCtrl+Shift+S' },

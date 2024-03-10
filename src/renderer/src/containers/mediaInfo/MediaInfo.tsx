@@ -46,6 +46,10 @@ const HeaderTitle = styled.h1`
 const StyledImg = styled.img`
   width: auto;
   max-height: var(--thumbnail-height);
+  filter: drop-shadow(0 0 0px ${({ theme }) => theme.colors.white})
+    drop-shadow(0 0 4px ${({ theme }) => theme.colors.white});
+  border-radius: ${({ theme }) => theme.spacing.xxxs};
+  border: 1px solid ${({ theme }) => theme.colors.white};
   -webkit-box-reflect: below 1px
     linear-gradient(
       to bottom,

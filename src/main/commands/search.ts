@@ -36,15 +36,18 @@
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import ytsr from '@distube/ytsr';
+
 import { loadPreferences } from '../utils/preferences';
-// import mockResponse from './__mocks__/search.response.json';
+import mockResponse from './__mocks__/search.response.json';
 
 export default async function search(searchString: string): Promise<Record<string, unknown>> {
-  // return new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     return resolve(mockResponse as Record<string, unknown>);
-  //   }, 2000);
-  // });
+  if (searchString === 'test') {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        return resolve(mockResponse as Record<string, unknown>);
+      }, 500);
+    });
+  }
 
   try {
     const preferences = await loadPreferences();

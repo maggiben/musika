@@ -149,7 +149,7 @@ export const DarwinButton = styled(StyledButton)`
     cursor: inherit;
   }
   & > :first-child {
-    margin-right: ${({ theme }) => theme.spacing.xs};;
+    margin-right: ${({ theme }) => theme.spacing.xs};
   }
 `;
 

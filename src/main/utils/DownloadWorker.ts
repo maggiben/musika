@@ -33,10 +33,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { MessagePort } from 'worker_threads';
-import { Readable, Writable } from 'stream';
-import * as path from 'path';
-import fs from 'fs';
+import { MessagePort } from 'node:worker_threads';
+import { Readable, Writable } from 'node:stream';
+import path from 'node:path';
+import fs from 'node:fs';
+
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import ProgressStream from 'progress-stream';

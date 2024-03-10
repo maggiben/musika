@@ -35,15 +35,17 @@
 
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
-// import mockResponse from './__mocks__/search.response.json';
+import mockResponse from './__mocks__/search.response.json';
 
 export default async function getVideoInfo(url: string): Promise<Record<string, unknown>> {
   // Promise<ytdl.videoInfo>
-  // return new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     return resolve(mockResponse as Record<string, unknown>);
-  //   }, 2000);
-  // });
+  if (url === 'test') {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        return resolve(mockResponse as Record<string, unknown>);
+      }, 500);
+    });
+  }
 
   const playlistOptions = {
     gl: 'US',

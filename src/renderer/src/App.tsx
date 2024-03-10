@@ -6,11 +6,11 @@ import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
-import Loading from './containers/loading/Loading';
 import Playlist from '@containers/playlist/Playlist';
 import Download from '@containers/download/Download';
 // import Preferences from '@renderer/containers/preferences/Preferences';
 import { defaultTheme } from '@assets/themes';
+import Loading from './containers/loading/Loading';
 
 // Global style to set the background color of the body
 const GlobalStyle = createGlobalStyle`
@@ -47,6 +47,10 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
       case 'menu.file.new.playlist':
         console.log('menu.file.new.playlist');
         await window.commands.modal('new-playlist', { width: 420, height: 580 });
+        break;
+      case 'menu.file.open-url':
+        console.log('menu.file.open-url', message);
+        await window.commands.modal('open-url', { width: 480, height: 240, ...message.options });
         break;
       case 'contextmenu.get-media-info':
         console.log('menu.file.new.playlist', message);

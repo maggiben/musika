@@ -168,7 +168,7 @@ export const replaceFromRight = (str1: string, str2: string): string => {
   return reversedStr1.reverse().join('');
 };
 
-export const isObjectEqual = <T>(firstVal: T | undefined, secondVal: T | undefined): boolean => 
+export const isObjectEqual = <T>(firstVal: T | undefined, secondVal: T | undefined): boolean =>
   JSON.stringify(firstVal) === JSON.stringify(secondVal);
 
 export const removeProperty = <T, K extends keyof T>(array: T[], property: K): T[] =>

@@ -1,10 +1,11 @@
 import i18n, { Module } from 'i18next';
 import { is } from '@electron-toolkit/utils';
-import { loadPreferences } from '../utils/preferences';
+
 import { initReactI18next } from 'react-i18next';
 import translationES from '@locale/es/translation.json';
 import translationEN from '@locale/en/translation.json';
 import translationFR from '@locale/fr/translation.json';
+import { loadPreferences } from '../utils/preferences';
 
 const fallbackLng = 'en';
 const languageDetector = {

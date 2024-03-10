@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import {
   app,
   systemPreferences,
@@ -7,8 +9,6 @@ import {
   dialog,
   nativeTheme,
 } from 'electron';
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import { is } from '@electron-toolkit/utils';
 import type { IPreferences } from 'types/types';
 

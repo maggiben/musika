@@ -1,5 +1,5 @@
-import { app, powerMonitor, ipcMain, IpcMainInvokeEvent, BrowserWindow } from 'electron';
 import * as path from 'node:path';
+import { app, powerMonitor, ipcMain, IpcMainInvokeEvent, BrowserWindow } from 'electron';
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 
@@ -17,6 +17,8 @@ export default async function modal(
     parent: parentWindow ?? undefined,
     modal: true,
     show: false,
+    frame: false,
+    titleBarStyle: 'hidden',
     ...options,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),

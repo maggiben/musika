@@ -5,9 +5,10 @@ import { I18nextProvider } from 'react-i18next';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import { preferencesState } from '@states/atoms';
-import Loading from './containers/loading/Loading';
+
 import { defaultTheme } from '@assets/themes';
 import useShowModal from '@hooks/useShowModal';
+import Loading from './containers/loading/Loading';
 
 // Global style to set the background color of the body
 const GlobalStyle = createGlobalStyle`
@@ -34,6 +35,7 @@ const ModalContainer = ({
     preferences: lazy(() => import('@renderer/containers/preferences/Preferences')),
     'new-playlist': lazy(() => import('@renderer/containers/playlist/NewPlaylist')),
     'media-info': lazy(() => import('@renderer/containers/mediaInfo/MediaInfo')),
+    'open-url': lazy(() => import('@renderer/containers/open/OpenUrl')),
   };
 
   const currentTheme = {
@@ -47,15 +49,13 @@ const ModalContainer = ({
     },
   };
 
-  const ModalContent = useMemo(() => modals[modal], [modal]);
+  const ModalContent = useMemo(() => modal in modals && modals[modal], [modal]);
 
   return (
     <ThemeProvider theme={currentTheme}>
       <GlobalStyle />
       <Suspense fallback={<Loading />}>
-        <Container>
-          <ModalContent {...preferences} options={options} />
-        </Container>
+        <Container>{ModalContent && <ModalContent {...preferences} options={options} />}</Container>
       </Suspense>
     </ThemeProvider>
   );
