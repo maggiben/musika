@@ -50,7 +50,8 @@ const StyledListItem = styled.li`
     border-radius: 6px;
     color: ${({ theme }) => theme.colors.lightGray};
     padding-left: ${({ theme }) => theme.spacing.s};
-    transition: all 250ms ease-in-out;
+    padding-right: ${({ theme }) => theme.spacing.s};
+    transition: all 200ms ease-in-out;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -91,16 +92,17 @@ const SidePannel = (): JSX.Element => {
   const { t } = useTranslation();
   const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
   return (
-    <SidePannelContainer>
+    <SidePannelContainer data-testid="sidepannel">
       <StyledNav>
         <StyledNavHeading>Library</StyledNavHeading>
         <StyledList>
           <StyledListItem>
             <StyledInputRadio id="my-playlist" type="radio" name="my-playlist" />
             <StyledLabel htmlFor="my-playlist">
-              <TbPlaylist />
+              <TbPlaylist style={{color: 'violet'}}/>
               <SpaceRight size="xs" />
               Recenttly Added
+              <SpaceRight size="xs" />
             </StyledLabel>
           </StyledListItem>
           <StyledListItem>
@@ -109,6 +111,7 @@ const SidePannel = (): JSX.Element => {
               <BsPersonFill />
               <SpaceRight size="xs" />
               Artist
+              <SpaceRight size="xs" />
             </StyledLabel>
           </StyledListItem>
           <StyledListItem>
@@ -117,6 +120,7 @@ const SidePannel = (): JSX.Element => {
               <BsStar />
               <SpaceRight size="xs" />
               Albums
+              <SpaceRight size="xs" />
             </StyledLabel>
           </StyledListItem>
           <StyledListItem>
@@ -125,6 +129,7 @@ const SidePannel = (): JSX.Element => {
               <BsStar />
               <SpaceRight size="xs" />
               Songs
+              <SpaceRight size="xs" />
             </StyledLabel>
           </StyledListItem>
           <StyledListItem>
@@ -133,6 +138,7 @@ const SidePannel = (): JSX.Element => {
               <BsStar />
               <SpaceRight size="xs" />
               Music Videos
+              <SpaceRight size="xs" />
             </StyledLabel>
           </StyledListItem>
         </StyledList>
@@ -147,6 +153,7 @@ const SidePannel = (): JSX.Element => {
               <TbPlaylist />
               <SpaceRight size="xs" />
               My Playlist
+              <SpaceRight size="xs" />
             </StyledLabel>
           </StyledListItem>
           <StyledListItem>
@@ -155,6 +162,7 @@ const SidePannel = (): JSX.Element => {
               <TbPlaylist style={{ color: 'red' }} />
               <SpaceRight size="xs" />
               Other Playlist
+              <SpaceRight size="xs" />
             </StyledLabel>
           </StyledListItem>
         </StyledList>
