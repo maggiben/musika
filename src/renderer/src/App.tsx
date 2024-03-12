@@ -7,7 +7,7 @@ import { RecoilRoot, useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
 import Playlist from '@containers/playlist/Playlist';
-import SidePannel from '@components/SidePannel/SidePannel';
+import SideBar from '@renderer/components/SideBar/SideBar';
 import Download from '@containers/download/Download';
 // import Preferences from '@renderer/containers/preferences/Preferences';
 import { defaultTheme } from '@assets/themes';
@@ -93,7 +93,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     <ThemeProvider theme={currentTheme}>
       <GlobalStyle />
       <Container>
-        <SidePannel />
+        <SideBar />
         {children}
       </Container>
     </ThemeProvider>
