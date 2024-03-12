@@ -3,6 +3,15 @@ import styled from 'styled-components';
 import InputRange from '@components/InputRange/InputRange';
 
 const PlayerControlsContainer = styled.div`
+  --min-height: 60px;
+  --background-color: ${({ theme }) =>
+    theme.colors['window-background']}; /* any format you want here */
+  --background-color-darker: color-mix(in srgb, var(--background-color), #000 25%);
+  --background-color-darkest: color-mix(in srgb, var(--background-color), #000 50%);
+  background-color: var(--background-color-darkest);
+  min-height: var(--min-height);
+  width: 100%;
+  flex: 1 1 auto;
   border-bottom: 1px solid #313133;
   display: flex;
   justify-content: space-between;
@@ -12,6 +21,7 @@ const PlayerControlsContainer = styled.div`
     border: none;
     font-family: 'Material Icons';
     line-height: 1;
+    font-size: 1.75rem;
     display: inline-block;
     white-space: nowrap;
     background-color: transparent;
@@ -29,18 +39,26 @@ const PlayTime = styled.span`
   margin-right: ${({ theme }) => theme.spacing.xxs};
 `;
 
+const Slider = styled.div`
+  position: absolute;
+  transform: rotate(90deg) translate(50%, 50%);
+  top: 100%;
+  left: 0px;
+  transform-origin: 51px -11px;
+  z-index: 1;
+`;
 const PlayerControls = (): JSX.Element => {
   return (
     <PlayerControlsContainer>
-      <div className="volume">
-        <button>
+      <div className="volume" style={{ lineHeight: '1rem' }}>
+        <button style={{ position: 'relative' }}>
           volume_up
-          <div className="slider">
+          <Slider>
             <InputRange min="0" max="100" value="0" step="1" />
-          </div>
+          </Slider>
         </button>
       </div>
-      <div>
+      <div style={{ lineHeight: '1rem' }}>
         <button>fast_rewind</button>
         <button className="play">play_arrow</button>
         <button>fast_forward</button>
@@ -51,7 +69,7 @@ const PlayerControls = (): JSX.Element => {
         <input id="shuffle" type="checkbox" />
         <label htmlFor="shuffle">shuffle</label>
       </div>
-      <InputRange />
+      <InputRange style={{ minWidth: '180px' }} />
       <PlayTime>3:47</PlayTime>
     </PlayerControlsContainer>
   );

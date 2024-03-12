@@ -49,7 +49,7 @@ const OpenUrl = (): JSX.Element => {
     window.electron.ipcRenderer.send('close-modal', {
       url,
     });
-  }
+  };
 
   return (
     <NewPlaylistContainer>

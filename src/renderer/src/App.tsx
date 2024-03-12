@@ -40,7 +40,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     switch (message?.id) {
       case 'menu.app.preferences':
         console.log('menu.app.preferences');
-        await window.commands.modal('preferences');
+        await window.commands.modal('preferences', { width: 520, height: 680 });
         window.electron.ipcRenderer.once('sync-preferences', async () => {
           const newPreferences = await window.preferences.loadPreferences();
           // Update Language

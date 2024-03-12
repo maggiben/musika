@@ -36,6 +36,7 @@ export interface IInputRangeProps {
   value?: number | string;
   step?: number | string;
   onChange?: (value: number) => void;
+  style?: React.CSSProperties;
 }
 const InputRange = (props: IInputRangeProps): JSX.Element => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +63,7 @@ const InputRange = (props: IInputRangeProps): JSX.Element => {
       defaultValue={props.value}
       onChange={onChange}
       step={props.step}
+      style={props.style}
     />
   );
 };

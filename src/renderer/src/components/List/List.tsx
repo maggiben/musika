@@ -150,7 +150,7 @@ const ListHeader = styled.li`
   &:first-child {
     position: sticky;
     top: 0; /* Stick to the top of the container */
-    background-color: var(--background-color-darker); /* ${({ theme }) => theme.colors['window-background']}; */
+    background-color: var(--background-color-darker-translucent); /* ${({ theme }) => theme.colors['window-background']}; */
     z-index: 1;
   }
 `;
