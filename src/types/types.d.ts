@@ -1,4 +1,5 @@
 import 'styled-components';
+import type ytpl from '@distube/ytpl';
 export type { IDownloadWorkerMessage } from '@main/utils/DownloadWorker';
 export type { IMenuClickMessage } from '@main/menu';
 export type { IPlaylistItem, IPlaylist } from '@states/atoms';
@@ -13,16 +14,26 @@ interface ITransition {
   timingFunction: string;
 }
 
-interface IBorderRadius {
-  xxxs: string;
-  xxs: string;
-  xs: string;
-  s: string;
-  m: string;
-  l: string;
-  xl: string;
-}
-interface ISpacing {
+export type TColorNames =
+  | 'accentColor'
+  | 'white'
+  | 'black'
+  | 'blue'
+  | 'brown'
+  | 'gray'
+  | 'green'
+  | 'orange'
+  | 'pink'
+  | 'purple'
+  | 'yellow'
+  | 'red'
+  | 'darkGray'
+  | 'softGray'
+  | 'midGray'
+  | 'lightGray'
+  | 'violet';
+
+export interface ISpacing {
   xxxs: string;
   xxs: string;
   xs: string;
@@ -34,23 +45,12 @@ interface ISpacing {
   xxxl: string;
 }
 
-interface IFontSizes {
-  xxxs: string;
-  xxs: string;
-  xs: string;
-  s: string;
-  m: string;
-  l: string;
-  xl: string;
-  xxl: string;
-}
-
 declare module 'styled-components' {
   export interface DefaultTheme {
-    colors: Record<string, string>;
-    borderRadius: IBorderRadius;
+    colors: Record<TColorNames, string>;
+    borderRadius: ISpacing;
     spacing: ISpacing;
-    fontSizes: IFontSizes;
+    fontSizes: ISpacing;
     animation: IAnimation;
     transition: ITransition;
     fontFamily: {
@@ -58,6 +58,30 @@ declare module 'styled-components' {
       mono: string;
     };
   }
+}
+
+type TytplItem = ytpl.result['items'][number];
+
+export interface IPlaylistItem extends TytplItem {
+  selected?: boolean;
+  favorite?: boolean;
+  dislike?: boolean;
+}
+
+export interface IPlaylist extends Omit<ytpl.result, 'views' | 'items'> {
+  thumbnail: {
+    height: number;
+    width: number;
+    url: string;
+  };
+  views: string | number;
+  items: IPlaylistItem[];
+}
+
+export interface ISortOptions {
+  filter: 'all' | 'favorites';
+  criteria: 'title' | 'genere' | 'year' | 'author' | 'time';
+  order: 'ascending' | 'descending';
 }
 
 export interface IPreferences {

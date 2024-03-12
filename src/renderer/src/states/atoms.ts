@@ -1,25 +1,6 @@
 import { atom } from 'recoil';
-import type { IPreferences } from 'types/types';
-import ytpl from '@distube/ytpl';
+import type { IPreferences, IPlaylist, ISortOptions } from 'types/types';
 import { preferencesSelector } from './selectors';
-
-type TytplItem = ytpl.result['items'][number];
-
-export interface IPlaylistItem extends TytplItem {
-  selected?: boolean;
-  favorite?: boolean;
-  dislike?: boolean;
-}
-
-export interface IPlaylist extends Omit<ytpl.result, 'views' | 'items'> {
-  thumbnail: {
-    height: number;
-    width: number;
-    url: string;
-  };
-  views: string | number;
-  items: IPlaylistItem[];
-}
 
 const mockPlaylist: any = {
   id: 'PLF48AC0919899FFED',
@@ -412,10 +393,15 @@ const mockPlaylist: any = {
   ],
 };
 
-export const playlistState = atom<{ playlist: IPlaylist | undefined }>({
+export const playlistState = atom<{ playlist: IPlaylist | undefined; sortOptions: ISortOptions }>({
   key: 'playlistState',
   default: {
-    playlist: undefined,
+    sortOptions: {
+      filter: 'all',
+      order: 'ascending',
+      criteria: 'title',
+    },
+    playlist: mockPlaylist,
   },
 });
 

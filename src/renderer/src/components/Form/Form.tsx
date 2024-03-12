@@ -129,8 +129,9 @@ export const DarwinButton = styled(StyledButton)`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 6px 14px;
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.m};
   border-radius: 6px;
+  line-height: 1;
   border: none;
   box-shadow:
     0px 0.5px 1px rgba(0, 0, 0, 0.1),
@@ -151,6 +152,30 @@ export const DarwinButton = styled(StyledButton)`
   & > :first-child {
     margin-right: ${({ theme }) => theme.spacing.xs};
   }
+`;
+
+export const DarwinInput = styled.input`
+  padding: ${({ theme }) => theme.spacing.xs};
+  border-radius: 6px;
+  border: 0;
+  box-shadow:
+    0px 0.5px 1px rgba(0, 0, 0, 0.1),
+    0px 0.5px 0.5px rgba(255, 255, 255, 0.5),
+    0px 0px 0px 0.5px rgba(0, 0, 0, 0.12);
+  &:focus {
+    box-shadow:
+      inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2),
+      0px 0.5px 1px rgba(0, 0, 0, 0.1),
+      0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+    outline: 0;
+  }
+`;
+
+export const DarwinInputSearch = styled(DarwinInput)`
+  padding-left: ${({ theme }) => theme.spacing.xl};
+  background: field
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23f0f0f0' d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'%3E%3C/path%3E%3C/svg%3E")
+    no-repeat ${({ theme }) => theme.spacing.xs} center;
 `;
 
 export const CircularButton = styled(StyledButton)`
@@ -179,6 +204,17 @@ export const ClearButton = styled(StyledButton)`
   &[disabled] {
     color: ${({ theme }) => theme.colors.softGray};
     cursor: inherit;
+  }
+`;
+
+export const ContextMenuButton = styled(ClearButton)`
+  border-radius: 6px;
+  display: flex;
+  &:not([disabled]):hover {
+    background-color: ${({ theme }) => theme.colors.midGray};
+  }
+  &:not([disabled]):active {
+    background-color: ${({ theme }) => theme.colors.midGray};
   }
 `;
 

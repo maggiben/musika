@@ -15,6 +15,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { IconContext } from 'react-icons';
 import { LuInspect } from 'react-icons/lu';
 import i18n from './utils/i18n';
+import { IPlaylistItem, ISortOptions } from 'types/types';
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 
@@ -109,7 +110,6 @@ export const applicationMenu = (
         {
           label: 'Learn More',
           click: async () => {
-            const { shell } = require('electron');
             await shell.openExternal(pjson.homepage);
           },
         },
@@ -193,50 +193,221 @@ export const converToNativeImage = async (imagePath: string): Promise<Electron.N
 };
 
 export const contextMenu = async (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _type: string,
+  type: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   options?: Record<string, unknown>,
   mainWindow?: BrowserWindow | null,
 ): Promise<boolean> => {
   const focusedWindow = BrowserWindow.getFocusedWindow();
   const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
-  const playlist: IMenuItem[] = [
+  const menus = new Map<string, IMenuItem[]>();
+  const playlistItem = (item: IPlaylistItem): IMenuItem[] => [
     {
       label: 'Get Info',
+      id: 'contextmenu.playlist-item.get-media-info',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        window?.webContents.send('menu-click', { id: 'contextmenu.get-media-info', options });
+        window?.webContents.send('context-menu-click', { id: menuItem.id, options });
       },
     },
     { type: 'separator' },
     {
       label: 'Copy URL',
+      id: 'contextmenu.playlist-item.copy-link',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        window?.webContents.send('menu-click', { id: 'contextmenu.copy-link', options });
-        options && clipboard.writeText(options?.url as string);
+        window?.webContents.send('context-menu-click', { id: menuItem.id, options });
+        options && clipboard.writeText(item.url as string);
       },
     },
     {
       label: 'Open in Browser',
+      id: 'contextmenu.playlist-item.open-link',
       click: async (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        menuItem: Electron.MenuItem,
+        { id }: Electron.MenuItem,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _browserWindow: Electron.BrowserWindow | undefined,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _event: Electron.KeyboardEvent,
       ) => {
-        console.log('menu click !', menuItem);
-        options && shell.openExternal(options.url as string);
-        window?.webContents.send('context-menu-click', { id: 'contextmenu.open-link' });
-        return;
+        console.log('open browser', item.url);
+        await shell.openExternal(item.url);
+        window?.webContents.send('context-menu-click', { id, options });
       },
     },
   ];
 
-  let template: IMenuItem[] = playlist;
+  const playlistSort = (sortOptions: ISortOptions): IMenuItem[] => [
+    {
+      label: 'All Media',
+      type: 'radio',
+      checked: sortOptions.filter === 'all',
+      id: 'contextmenu.playlist-sort.filter-all',
+      click: async ({ id, checked, type }: Electron.MenuItem) =>
+        window?.webContents.send('context-menu-click', {
+          id,
+          checked,
+          type,
+          ...options,
+          sortOptions: {
+            ...sortOptions,
+            filter: 'all',
+          },
+        }),
+    },
+    {
+      label: 'Only Favorites',
+      type: 'radio',
+      checked: sortOptions.filter === 'favorites',
+      id: 'contextmenu.playlist-sort.filter-favorites',
+      click: async ({ id, checked, type }: Electron.MenuItem) =>
+        window?.webContents.send('context-menu-click', {
+          id,
+          checked,
+          type,
+          ...options,
+          sortOptions: {
+            ...sortOptions,
+            filter: 'favorites',
+          },
+        }),
+    },
+    { type: 'separator' },
+    {
+      label: 'Sort Options',
+      submenu: [
+        {
+          label: 'Title',
+          type: 'radio',
+          checked: sortOptions.criteria === 'title',
+          id: 'contextmenu.playlist-sort.criteria-title',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                criteria: 'title',
+              },
+            }),
+        },
+        {
+          label: 'Genre',
+          type: 'radio',
+          checked: sortOptions.criteria === 'genere',
+          id: 'contextmenu.playlist-sort.criteria-genere',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                criteria: 'genere',
+              },
+            }),
+        },
+        {
+          label: 'Author',
+          type: 'radio',
+          checked: sortOptions.criteria === 'author',
+          id: 'contextmenu.playlist-sort.criteria-author',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                criteria: 'author',
+              },
+            }),
+        },
+        {
+          label: 'Year',
+          type: 'radio',
+          checked: sortOptions.criteria === 'year',
+          id: 'contextmenu.playlist-sort.criteria-year',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                criteria: 'year',
+              },
+            }),
+        },
+        {
+          label: 'Time',
+          type: 'radio',
+          checked: sortOptions.criteria === 'time',
+          id: 'contextmenu.playlist-sort.criteria-time',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                criteria: 'time',
+              },
+            }),
+        },
+        { type: 'separator' },
+        {
+          label: 'Ascending',
+          type: 'radio',
+          checked: sortOptions.order === 'ascending',
+          id: 'contextmenu.playlist-sort.ascending',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                order: 'ascending',
+              },
+            }),
+        },
+        {
+          label: 'Descending',
+          type: 'radio',
+          checked: sortOptions.order === 'descending',
+          id: 'contextmenu.playlist-sort.descending',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                order: 'descending',
+              },
+            }),
+        },
+      ],
+    },
+  ];
+
+  options?.item && menus.set('playlist-item', playlistItem(options.item as IPlaylistItem));
+  options?.sortOptions &&
+    menus.set('playlist-sort', playlistSort(options.sortOptions as ISortOptions));
+
+  let template: IMenuItem[] | undefined = menus.get(type);
+
+  if (!template) return false;
+
   if (isDev) {
     // Render LuInspect component inside IconContext.Provider
     const IconElement = React.createElement(

@@ -7,6 +7,7 @@ import { RecoilRoot, useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
 import Playlist from '@containers/playlist/Playlist';
+import SidePannel from '@components/SidePannel/SidePannel';
 import Download from '@containers/download/Download';
 // import Preferences from '@renderer/containers/preferences/Preferences';
 import { defaultTheme } from '@assets/themes';
@@ -22,6 +23,10 @@ const GlobalStyle = createGlobalStyle`
 const Container = styled.div`
   width: 100%;
   height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
@@ -52,8 +57,8 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         console.log('menu.file.open-url', message);
         await window.commands.modal('open-url', { width: 480, height: 240, ...message.options });
         break;
-      case 'contextmenu.get-media-info':
-        console.log('menu.file.new.playlist', message);
+      case 'contextmenu.playlist-item.get-media-info':
+        console.log('contextmenu.playlist-item.get-media-info', message);
         await window.commands.modal('media-info', { width: 600, height: 660, ...message.options });
         break;
       default:
@@ -63,10 +68,15 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
 
   useEffect(() => {
     // Add event listener for menu bar clicks
-    const removeListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
+    // const removeMenuClickListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
+    const removeContextClickListener = window.electron.ipcRenderer.on(
+      'context-menu-click',
+      handleMenuClick,
+    );
     // Remove event listener on cleanup
     return () => {
-      removeListener();
+      // removeMenuClickListener();
+      removeContextClickListener();
     };
   }, []);
   const currentTheme = {
@@ -82,7 +92,10 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   return (
     <ThemeProvider theme={currentTheme}>
       <GlobalStyle />
-      <Container>{children}</Container>
+      <Container>
+        <SidePannel />
+        {children}
+      </Container>
     </ThemeProvider>
   );
 };

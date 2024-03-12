@@ -3,12 +3,13 @@ import type ytpl from '@distube/ytpl';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { playlistState } from '@renderer/states/atoms';
-
+import useContextMenu from '@hooks/useContextMenu';
 import { timeStringToSeconds, toHumanTime } from '@shared/lib/utils';
 import { FaPlay, FaCloudDownloadAlt, FaPencilAlt } from 'react-icons/fa';
-import { BsShuffle, BsThreeDots } from 'react-icons/bs';
+import { BsShuffle, BsThreeDots, BsFilter, BsChevronDown } from 'react-icons/bs';
 import { SpaceRight } from '../Spacing/Spacing';
-import { DarwinButton, CircularButton } from '../Form/Form';
+import { DarwinButton, CircularButton, DarwinInputSearch, ContextMenuButton } from '../Form/Form';
+import { ISortOptions } from 'types/types';
 
 const PlaylistInfoContainer = styled.div`
   --thumbnail-height: 120px;
@@ -53,6 +54,13 @@ const InfoGroup = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
+`;
+
+const InfoNav = styled.nav`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 `;
 
 const PlaylistTitle = styled.h1`
@@ -104,6 +112,12 @@ interface IPlaylistInfoProps {
   items: ytpl.result['items'];
 }
 
+interface ISortOrderContextMenuMessage {
+  id: string;
+  checked: boolean;
+  sortOptions: ISortOptions;
+}
+
 const calcTotalPlayTime = (items: ytpl.result['items']): number => {
   return items
     .map((item) => (item.duration ? timeStringToSeconds(item.duration) : 0))
@@ -112,13 +126,37 @@ const calcTotalPlayTime = (items: ytpl.result['items']): number => {
 
 const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   const { t } = useTranslation();
-  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
+  const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
   const totalDuration = calcTotalPlayTime(props.items);
   const downloadSelected = (): void => {
     const selectedItems = playlist?.items.filter(({ selected }) => Boolean(selected));
     console.log('selectedItems', selectedItems);
   };
 
+  useContextMenu<ISortOrderContextMenuMessage>(
+    ({ sortOptions }) => {
+      setPlaylist((prev) => {
+        if (!prev || !prev.playlist) {
+          return prev;
+        }
+        return {
+          ...prev,
+          sortOptions,
+        };
+      });
+    },
+    [
+      'contextmenu.playlist-sort.filter-all',
+      'contextmenu.playlist-sort.filter-favorites',
+      'contextmenu.playlist-sort.criteria-title',
+      'contextmenu.playlist-sort.criteria-genere',
+      'contextmenu.playlist-sort.criteria-author',
+      'contextmenu.playlist-sort.criteria-year',
+      'contextmenu.playlist-sort.criteria-time',
+      'contextmenu.playlist-sort.ascending',
+      'contextmenu.playlist-sort.descending',
+    ],
+  );
   return (
     <PlaylistInfoContainer>
       <StyledImg
@@ -128,32 +166,48 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
         alt={t('thumbnail')}
       />
       <InfoGroup>
-        <hgroup>
-          <PlaylistTitle>{props.title}</PlaylistTitle>
-          <PlaylistSubTitle>
-            <span className="value">{props.totalItems}</span>
-            <span>&nbsp;MUSIC VIDEOS · TOTAL DURATION:&nbsp;</span>
-            <span className="value">{toHumanTime(totalDuration)}</span>
-          </PlaylistSubTitle>
-        </hgroup>
+        <InfoNav>
+          <hgroup>
+            <PlaylistTitle>{props.title}</PlaylistTitle>
+            <PlaylistSubTitle>
+              <span className="value">{props.totalItems}</span>
+              <span>&nbsp;MUSIC VIDEOS · TOTAL DURATION:&nbsp;</span>
+              <span className="value">{toHumanTime(totalDuration)}</span>
+            </PlaylistSubTitle>
+          </hgroup>
+          <RightActions>
+            <ContextMenuButton
+              onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
+                const { clientX, clientY } = event;
+                await window.commands.contextMenu('playlist-sort', {
+                  sortOptions,
+                  x: clientX,
+                  y: clientY,
+                });
+              }}
+            >
+              <BsFilter />
+              <SpaceRight size="xs" />
+              <BsChevronDown size={'0.55rem'} />
+            </ContextMenuButton>
+            <SpaceRight size="m" />
+            <DarwinInputSearch type="search" width={90} placeholder="Filter" />
+          </RightActions>
+        </InfoNav>
         <ActionGroup>
           <LeftActions>
             <DarwinButton>
               <FaPlay />
-              Play
+              {t('play')}
             </DarwinButton>
             <SpaceRight size="xs" />
-            <DarwinButton
-              onClick={async () => {
-                await window.commands.contextMenu('playlist', { ...playlist });
-              }}
-            >
-              <BsShuffle /> Shuffle
+            <DarwinButton>
+              <BsShuffle /> {t('shuffle')}
             </DarwinButton>
             <SpaceRight size="xs" />
             <DarwinButton onClick={downloadSelected}>
               <FaCloudDownloadAlt />
-              Download Selected
+              {t('download selected')}
             </DarwinButton>
           </LeftActions>
           <RightActions>
@@ -161,11 +215,7 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
               <FaPencilAlt />
             </CircularButton>
             <SpaceRight size="m" />
-            <CircularButton
-              onClick={async () => {
-                await window.commands.contextMenu('playlist');
-              }}
-            >
+            <CircularButton>
               <BsThreeDots />
             </CircularButton>
           </RightActions>
