@@ -57,10 +57,10 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         console.log('menu.file.open-url', message);
         await window.commands.modal('open-url', { width: 480, height: 240, ...message.options });
         break;
-      case 'contextmenu.playlist-item.get-media-info':
-        console.log('contextmenu.playlist-item.get-media-info', message);
-        await window.commands.modal('media-info', { width: 600, height: 660, ...message.options });
-        break;
+      // case 'contextmenu.playlist-item.get-media-info':
+      //   console.log('contextmenu.playlist-item.get-media-info', message);
+      //   await window.commands.modal('media-info', { width: 600, height: 660, ...message.options });
+      //   break;
       default:
         break;
     }
@@ -68,15 +68,15 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
 
   useEffect(() => {
     // Add event listener for menu bar clicks
-    // const removeMenuClickListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
-    const removeContextClickListener = window.electron.ipcRenderer.on(
-      'context-menu-click',
-      handleMenuClick,
-    );
+    const removeMenuClickListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
+    // const removeContextClickListener = window.electron.ipcRenderer.on(
+    //   'context-menu-click',
+    //   handleMenuClick,
+    // );
     // Remove event listener on cleanup
     return () => {
-      // removeMenuClickListener();
-      removeContextClickListener();
+      removeMenuClickListener();
+      // removeContextClickListener();
     };
   }, []);
   const currentTheme = {

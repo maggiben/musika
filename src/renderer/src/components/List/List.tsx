@@ -9,7 +9,9 @@ import useDownload from '@hooks/useDownload';
 // import useFakeProgress from '@hooks/useFakeProgress';
 import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
-import { playlistState, IPlaylist } from '@renderer/states/atoms';
+import { playlistState } from '@renderer/states/atoms';
+import { IPlaylist } from 'types/types';
+import useContextMenu from '@renderer/hooks/useContextMenu';
 
 const SongIndex = styled.span`
   user-select: none;
@@ -175,6 +177,16 @@ interface IListProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const List = (_props: IListProps): JSX.Element | null => {
+  useContextMenu<{
+    id: string;
+    options?: Record<string, unknown>;
+  }>(
+    (message) => {
+      window.commands.modal('media-info', { width: 600, height: 660, ...message.options });
+    },
+    ['contextmenu.playlist-item.get-media-info'],
+  );
+
   const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
   const progress = useDownload();
 

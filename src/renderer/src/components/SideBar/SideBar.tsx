@@ -7,8 +7,14 @@ import { TbPlaylist } from 'react-icons/tb';
 import { BsStar, BsPersonFill } from 'react-icons/bs';
 import { SpaceBottom, SpaceRight } from '../Spacing/Spacing';
 
-const SideBarContainer = styled.div`
+interface SideBarContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+  $sidebarwidth: number | string;
+}
+
+const SideBarContainer = styled.div<SideBarContainerProps>`
+  --sidebar-width: ${({ $sidebarwidth }) => $sidebarwidth}px;
   height: 100%;
+  width: var(--sidebar-width);
   box-sizing: border-box;
   padding: ${({ theme }) => theme.spacing.s};
   position: relative;
@@ -68,6 +74,8 @@ const StyledListItem = styled.li`
     justify-content: flex-start;
     align-items: center;
     & :nth-child(1) {
+      min-width: 1rem;
+      min-height: 1rem;
       margin-left: ${({ theme }) => theme.spacing.xs};
     }
   }
@@ -83,6 +91,12 @@ const StyledLabel = styled.label`
   white-space: nowrap;
   position: relative;
   width: 100%;
+  overflow: hidden;
+  & > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 `;
 
 const StyledInputRadio = styled.input`
@@ -105,7 +119,7 @@ const SideBar = (): JSX.Element => {
 
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(268);
+  const [sidebarWidth, setSidebarWidth] = useState(200);
   const startResizing = useCallback(() => {
     setIsResizing(true);
   }, []);
@@ -136,7 +150,7 @@ const SideBar = (): JSX.Element => {
   return (
     <SideBarContainer
       data-testid="sidebar"
-      style={{ width: sidebarWidth }}
+      $sidebarwidth={sidebarWidth}
       ref={sidebarRef}
       onMouseDown={(e) => e.preventDefault()}
     >
@@ -149,7 +163,7 @@ const SideBar = (): JSX.Element => {
               <StyledLabel htmlFor="my-playlist">
                 <TbPlaylist style={{ color: 'violet' }} />
                 <SpaceRight size="xs" />
-                Recenttly Added
+                <span>Recenttly Added</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
@@ -158,7 +172,7 @@ const SideBar = (): JSX.Element => {
               <StyledLabel htmlFor="my-playlist-1">
                 <BsPersonFill />
                 <SpaceRight size="xs" />
-                Artist
+                <span>Artist</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
@@ -167,7 +181,7 @@ const SideBar = (): JSX.Element => {
               <StyledLabel htmlFor="my-playlist-2">
                 <BsStar />
                 <SpaceRight size="xs" />
-                Albums
+                <span>Albums</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
@@ -176,7 +190,7 @@ const SideBar = (): JSX.Element => {
               <StyledLabel htmlFor="my-playlist-3">
                 <BsStar />
                 <SpaceRight size="xs" />
-                Songs
+                <span>Songs</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
@@ -185,7 +199,7 @@ const SideBar = (): JSX.Element => {
               <StyledLabel htmlFor="my-playlist-4">
                 <BsStar />
                 <SpaceRight size="xs" />
-                Music Videos
+                <span>Music Videos</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
@@ -200,7 +214,7 @@ const SideBar = (): JSX.Element => {
               <StyledLabel htmlFor="my-playlist-x1">
                 <TbPlaylist />
                 <SpaceRight size="xs" />
-                My Playlist
+                <span>My Playlist</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
@@ -209,16 +223,16 @@ const SideBar = (): JSX.Element => {
               <StyledLabel htmlFor="my-playlist-12">
                 <TbPlaylist style={{ color: 'red' }} />
                 <SpaceRight size="xs" />
-                Other Playlist
+                <span>Other Playlist</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
             <StyledListItem>
-              <StyledInputRadio id="my-playlist-12" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-12">
+              <StyledInputRadio id="my-playlist-13" type="radio" name="my-playlist" />
+              <StyledLabel htmlFor="my-playlist-13">
                 <TbPlaylist style={{ color: 'red' }} />
                 <SpaceRight size="xs" />
-                My super very long playlist title that cannot fit in a SideBar
+                <span>My super very long playlist title that cannot fit in a SideBar</span>
                 <SpaceRight size="xs" />
               </StyledLabel>
             </StyledListItem>
