@@ -264,43 +264,41 @@ const SideBar = (): JSX.Element => {
       <div>
         {mainSidePanel.map((group, index) => {
           return (
-            <>
-              <StyledNav key={`${group.id}-${index}`}>
-                {index == 0 && <DraggableRegion />}
-                {index == 0 && group.showSearch && (
-                  <>
-                    <DarwinInputSearch
-                      type="search"
-                      id="global-search"
-                      style={{ width: '100%' }}
-                      placeholder="Search"
-                      onChange={group.onSearch}
+            <StyledNav key={`${group.id}-${index}`}>
+              {index == 0 && <DraggableRegion />}
+              {index == 0 && group.showSearch && (
+                <>
+                  <DarwinInputSearch
+                    type="search"
+                    id="global-search"
+                    style={{ width: '100%' }}
+                    placeholder="Search"
+                    onChange={group.onSearch}
+                  />
+                  <SpaceBottom size="m" />
+                </>
+              )}
+              <StyledNavHeading>{group.title}</StyledNavHeading>
+              <StyledList>
+                {group.items.map((item, index) => (
+                  <StyledListItem key={`${item.id}-${index}`}>
+                    <StyledInputRadio
+                      id={`item-${item.id}-${index}`}
+                      type="radio"
+                      name={`items-${group.id}`}
+                      onChange={item.onChange}
                     />
-                    <SpaceBottom size="m" />
-                  </>
-                )}
-                <StyledNavHeading>{group.title}</StyledNavHeading>
-                <StyledList>
-                  {group.items.map((item, index) => (
-                    <StyledListItem key={`${item.id}-${index}`}>
-                      <StyledInputRadio
-                        id={`item-${item.id}-${index}`}
-                        type="radio"
-                        name={`sidebar-items`}
-                        onChange={item.onChange}
-                      />
-                      <StyledLabel htmlFor={`item-${item.id}-${index}`}>
-                        {item.icon}
-                        <SpaceRight size="xs" />
-                        <span>{item.title}</span>
-                        <SpaceRight size="xs" />
-                      </StyledLabel>
-                    </StyledListItem>
-                  ))}
-                </StyledList>
-              </StyledNav>
+                    <StyledLabel htmlFor={`item-${item.id}-${index}`}>
+                      {item.icon}
+                      <SpaceRight size="xs" />
+                      <span>{item.title}</span>
+                      <SpaceRight size="xs" />
+                    </StyledLabel>
+                  </StyledListItem>
+                ))}
+              </StyledList>
               <SpaceBottom size="m" />
-            </>
+            </StyledNav>
           );
         })}
       </div>

@@ -13,6 +13,7 @@ import {
   StyledButton,
   FormControl,
   ToggleSwitch,
+  DarwinSelect,
 } from '@renderer/components/Form/Form';
 
 const BehaviourPreferences = (): JSX.Element => {
@@ -114,7 +115,7 @@ const BehaviourPreferences = (): JSX.Element => {
           <div>
             <InputPairContainer>
               <StyledLabel htmlFor="language">{t('language')}</StyledLabel>
-              <StyledSelect
+              <DarwinSelect
                 className="form-select"
                 id="language"
                 defaultValue={preferences?.behaviour?.language}
@@ -125,7 +126,7 @@ const BehaviourPreferences = (): JSX.Element => {
                     {language.english}
                   </option>
                 ))}
-              </StyledSelect>
+              </DarwinSelect>
             </InputPairContainer>
           </div>
         </StyledDFieldset>
@@ -195,15 +196,6 @@ const BehaviourPreferences = (): JSX.Element => {
                     {options}
                   </option>
                 ))}
-
-                {/*
-              <option>highest</option>
-              <option>highestvideo</option>
-              <option defaultValue={'selected'}>highestaudio</option>
-              <option>lowest</option>
-              <option>lowestvideo</option>
-              <option>lowestaudio</option>
-            */}
               </StyledSelect>
             </InputPairContainer>
           </div>
