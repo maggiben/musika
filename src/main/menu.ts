@@ -51,9 +51,7 @@ export const applicationMenu = (
               label: 'Playlist from YouTube',
               accelerator: 'CmdOrCtrl+Shift+N',
               click: async () =>
-                mainWindow?.webContents.send('menu-click', {
-                  id: 'menu.file.new.playlist-from-yt',
-                }),
+                mainWindow?.webContents.send('menu-click', { id: 'menu.file.open-url' }),
             },
           ],
         },
@@ -294,23 +292,6 @@ export const contextMenu = async (
             }),
         },
         {
-          label: 'Genre',
-          type: 'radio',
-          checked: sortOptions.criteria === 'genere',
-          id: 'contextmenu.playlist-sort.criteria-genere',
-          click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
-              id,
-              checked,
-              type,
-              ...options,
-              sortOptions: {
-                ...sortOptions,
-                criteria: 'genere',
-              },
-            }),
-        },
-        {
           label: 'Author',
           type: 'radio',
           checked: sortOptions.criteria === 'author',
@@ -324,6 +305,23 @@ export const contextMenu = async (
               sortOptions: {
                 ...sortOptions,
                 criteria: 'author',
+              },
+            }),
+        },
+        {
+          label: 'Genre',
+          type: 'radio',
+          checked: sortOptions.criteria === 'genere',
+          id: 'contextmenu.playlist-sort.criteria-genere',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                criteria: 'genere',
               },
             }),
         },

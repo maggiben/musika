@@ -9,7 +9,7 @@ import { FaPlay, FaCloudDownloadAlt, FaPencilAlt } from 'react-icons/fa';
 import { BsShuffle, BsThreeDots, BsFilter, BsChevronDown } from 'react-icons/bs';
 import { SpaceRight } from '../Spacing/Spacing';
 import { DarwinButton, CircularButton, DarwinInputSearch, ContextMenuButton } from '../Form/Form';
-import { ISortOptions } from 'types/types';
+import { IPlaylistSortOptions } from 'types/types';
 
 const PlaylistInfoContainer = styled.div`
   --thumbnail-height: 120px;
@@ -59,7 +59,7 @@ const InfoGroup = styled.div`
 const InfoNav = styled.nav`
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
 `;
 
@@ -115,7 +115,7 @@ interface IPlaylistInfoProps {
 interface ISortOrderContextMenuMessage {
   id: string;
   checked: boolean;
-  sortOptions: ISortOptions;
+  sortOptions: IPlaylistSortOptions;
 }
 
 const calcTotalPlayTime = (items: ytpl.result['items']): number => {

@@ -1,8 +1,7 @@
 import './Playlist.css';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
-  StyledButton,
   FormControl,
   InputGroup,
   StyledTextarea,

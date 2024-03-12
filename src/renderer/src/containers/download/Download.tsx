@@ -6,7 +6,16 @@ import SearchBar from '@renderer/components/SearchBar/SearchBar';
 import ResultsHome from '@renderer/components/ResultsHome/ResultsHome';
 import PlaylistInfo from '@renderer/components/PlaylistInfo/PlaylistInfo';
 import List from '@renderer/components/List/List';
+// background-color: ${({ theme }) => theme.colors.midGray};
+
+
+// --background-color-darker: hsl(from var(--background-color) h s calc(l - 5%));
+// --background-color-darkest: hsl(from var(--background-color) h s calc(l - 10%));
 const DownloadContainer = styled.div`
+  --background-color: ${({ theme }) => theme.colors['window-background']}; /* any format you want here */
+  --background-color-darker: color-mix(in srgb, var(--background-color), #000 15%);
+  --background-color-darkest: color-mix(in srgb, var(--background-color), #000 30%);
+  background-color: var(--background-color-darkest);
   color: #484848;
   max-height: 100vh;
   overflow: hidden;
@@ -20,16 +29,17 @@ const DownloadContainer = styled.div`
 
 const Download = (): JSX.Element => {
   // const resetPlaylist = useResetRecoilState(playlistState);
-  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
+  const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
   const onSearch = ({ playlist }): void => {
     setPlaylist({
       playlist,
+      sortOptions,
     });
   };
 
   return (
     <DownloadContainer>
-      <SearchBar onSearch={onSearch} />
+      {/* <SearchBar onSearch={onSearch} /> */}
       {playlist ? (
         <>
           <PlaylistInfo

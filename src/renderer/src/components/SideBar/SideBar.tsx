@@ -5,7 +5,9 @@ import styled from 'styled-components';
 import { playlistState } from '@renderer/states/atoms';
 import { TbPlaylist } from 'react-icons/tb';
 import { BsStar, BsPersonFill } from 'react-icons/bs';
+import { MdApps } from 'react-icons/md';
 import { SpaceBottom, SpaceRight } from '../Spacing/Spacing';
+import { DarwinInputSearch } from '../Form/Form';
 
 interface SideBarContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   $sidebarwidth: number | string;
@@ -18,6 +20,7 @@ const SideBarContainer = styled.div<SideBarContainerProps>`
   box-sizing: border-box;
   padding: ${({ theme }) => theme.spacing.s};
   position: relative;
+  user-select: none;
 `;
 
 const StyledNav = styled.div`
@@ -66,8 +69,7 @@ const StyledListItem = styled.li`
     width: 100%;
     border-radius: 6px;
     color: ${({ theme }) => theme.colors.lightGray};
-    padding-left: ${({ theme }) => theme.spacing.s};
-    padding-right: ${({ theme }) => theme.spacing.s};
+    padding: ${({ theme }) => theme.spacing.xxs};
     transition: all 200ms ease-in-out;
     display: flex;
     flex-direction: row;
@@ -152,10 +154,17 @@ const SideBar = (): JSX.Element => {
       data-testid="sidebar"
       $sidebarwidth={sidebarWidth}
       ref={sidebarRef}
-      onMouseDown={(e) => e.preventDefault()}
+      onMouseDown={(e) => isResizing && e.preventDefault()}
     >
       <div>
         <StyledNav>
+          <DarwinInputSearch
+            type="search"
+            id="global-search"
+            style={{ width: '100%' }}
+            placeholder="Search"
+          />
+          <SpaceBottom size="m" />
           <StyledNavHeading>Library</StyledNavHeading>
           <StyledList>
             <StyledListItem>
@@ -209,6 +218,15 @@ const SideBar = (): JSX.Element => {
         <StyledNav>
           <StyledNavHeading>Playlists</StyledNavHeading>
           <StyledList>
+            <StyledListItem>
+              <StyledInputRadio id="my-playlist-x1all" type="radio" name="my-playlist" />
+              <StyledLabel htmlFor="my-playlist-x1all">
+                <MdApps />
+                <SpaceRight size="xs" />
+                <span>All Playlists</span>
+                <SpaceRight size="xs" />
+              </StyledLabel>
+            </StyledListItem>
             <StyledListItem>
               <StyledInputRadio id="my-playlist-x1" type="radio" name="my-playlist" />
               <StyledLabel htmlFor="my-playlist-x1">

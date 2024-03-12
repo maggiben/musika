@@ -78,10 +78,16 @@ export interface IPlaylist extends Omit<ytpl.result, 'views' | 'items'> {
   items: IPlaylistItem[];
 }
 
-export interface ISortOptions {
+export interface IPlaylistSortOptions {
   filter: 'all' | 'favorites';
   criteria: 'title' | 'genere' | 'year' | 'author' | 'time';
   order: 'ascending' | 'descending';
+  seach?: string;
+}
+
+export interface IPlaylistProperties {
+  savePath?: string;
+  color: 'red' | 'violet' | 'blue' | 'yellow' | 'green';
 }
 
 export interface IPreferences {
@@ -96,6 +102,11 @@ export interface IPreferences {
       limit?: number | Infinity;
       type?: 'video' | 'playlist';
     };
+    playlists: {
+      playlist?: IPlaylist;
+      properties?: IPlaylistProperties;
+      sortOptions?: IPlaylistSortOptions;
+    }[];
   };
   advanced?: {
     isDev?: boolean;

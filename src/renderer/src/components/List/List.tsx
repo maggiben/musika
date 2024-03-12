@@ -150,7 +150,7 @@ const ListHeader = styled.li`
   &:first-child {
     position: sticky;
     top: 0; /* Stick to the top of the container */
-    background-color: ${({ theme }) => theme.colors['window-background']};
+    background-color: var(--background-color-darker); /* ${({ theme }) => theme.colors['window-background']}; */
     z-index: 1;
   }
 `;
@@ -187,10 +187,10 @@ const List = (_props: IListProps): JSX.Element | null => {
     ['contextmenu.playlist-item.get-media-info'],
   );
 
-  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
+  const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
   const progress = useDownload();
 
-  const handleItemSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleItemSelect = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { checked } = event.target;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_itemId, index] = event.target.getAttribute('data-item-selector')!.split(':');
@@ -219,7 +219,46 @@ const List = (_props: IListProps): JSX.Element | null => {
       ...items.map(({ duration }) => Math.floor(utils.timeStringToSeconds(duration ?? '0') / 3600)),
     );
 
-    return items.map((item, index) => {
+    const sort = (items: IPlaylist['items'] = []): IPlaylist['items'] => {
+      let sorted = items.slice();
+      switch (sortOptions.criteria) {
+        case 'title':
+          sorted = items.slice().sort((a, b) => a.title.localeCompare(b.title));
+          break;
+        case 'author':
+          sorted = items.slice().sort((a, b) => {
+            // If titles are the same, compare by author name
+            if (a.author && b.author) {
+              return a.author.name.localeCompare(b.author.name);
+            } else if (!a.author && b.author) {
+              return -1; // Put items with no author last
+            } else if (a.author && !b.author) {
+              return 1; // Put items with no author last
+            }
+            return 0; // Both items have no author, consider them equal
+          });
+          break;
+        case 'time':
+          sorted = items.slice().sort((a, b) => {
+            const a_duration = utils.timeStringToSeconds(a.duration ?? '0');
+            const b_duration = utils.timeStringToSeconds(b.duration ?? '0');
+            if (a_duration < b_duration) {
+              return -1;
+            } else if (a_duration > b_duration) {
+              return 1;
+            }
+            return 0;
+          });
+          break;
+        default:
+          sorted = items.slice();
+          break;
+      }
+
+      return sortOptions.order === 'ascending' ? sorted : sorted.reverse();
+    };
+
+    return sort(items).map((item, index) => {
       const songIndex = padZeroes(index + 1, items.length.toString().split('').length);
       return (
         <ListItemWrapper key={`${item.id}:${index}`} $progress={progress?.[item.id]}>

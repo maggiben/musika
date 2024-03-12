@@ -1,5 +1,10 @@
 import { atom } from 'recoil';
-import type { IPreferences, IPlaylist, ISortOptions } from 'types/types';
+import type {
+  IPreferences,
+  IPlaylist,
+  IPlaylistSortOptions,
+  IPlaylistProperties,
+} from 'types/types';
 import { preferencesSelector } from './selectors';
 
 const mockPlaylist: any = {
@@ -393,7 +398,11 @@ const mockPlaylist: any = {
   ],
 };
 
-export const playlistState = atom<{ playlist: IPlaylist | undefined; sortOptions: ISortOptions }>({
+export const playlistState = atom<{
+  playlist?: IPlaylist;
+  sortOptions?: IPlaylistSortOptions;
+  properties?: IPlaylistProperties;
+}>({
   key: 'playlistState',
   default: {
     sortOptions: {
@@ -401,6 +410,7 @@ export const playlistState = atom<{ playlist: IPlaylist | undefined; sortOptions
       order: 'ascending',
       criteria: 'title',
     },
+    properties: undefined,
     playlist: mockPlaylist,
   },
 });
