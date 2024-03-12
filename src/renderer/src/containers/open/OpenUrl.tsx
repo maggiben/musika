@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { StyledTextarea, DarwinButton } from '@renderer/components/Form/Form';
 import { useTranslation } from 'react-i18next';
@@ -32,23 +33,34 @@ const ButtonsContainer = styled.div`
 
 const OpenUrl = (): JSX.Element => {
   const { t } = useTranslation();
+  const [url, setUrl] = useState<string>('');
 
-  const handleCancelClick = async (): Promise<void> => {
+  const handleOnChage = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setUrl(event.target.value);
+  };
+
+  const handleCancelClick = (): void => {
     window.electron.ipcRenderer.send('close-modal', {
       sync: false,
     });
   };
 
-  const onSearch = ({ playlist }): void => {
-    console.log('playlist', playlist);
-  };
+  const handleOpenClick = (): void => {
+    window.electron.ipcRenderer.send('close-modal', {
+      url,
+    });
+  }
 
   return (
     <NewPlaylistContainer>
-      <StyledTextarea placeholder={t('url')} style={{ flex: 1, resize: 'none' }} />
+      <StyledTextarea
+        onChange={handleOnChage}
+        placeholder={t('url')}
+        style={{ flex: 1, resize: 'none' }}
+      />
       <ButtonsContainer>
         <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
-        <DarwinButton disabled onClick={() => {}}>
+        <DarwinButton disabled={!url} onClick={handleOpenClick}>
           {t('open')}
         </DarwinButton>
       </ButtonsContainer>

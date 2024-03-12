@@ -37,7 +37,7 @@ export default async function modal(
       modal.show();
       ipcMain.once('close-modal', async (_event: IpcMainInvokeEvent, options) => {
         console.log('close-modal', options);
-        mainWindow?.webContents.send('close-modal', options);
+        mainWindow?.webContents.send('close-modal', type, options);
         powerMonitor.off('resume', resumeEventHander);
         modal.hide();
         modal.destroy();

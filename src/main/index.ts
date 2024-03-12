@@ -18,6 +18,8 @@ function createWindow(_preferences: IPreferences): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 8, y: 8 },
     ...(process.platform === 'linux'
       ? {
           icon: path.join(__dirname, '../../build/icon.png'),

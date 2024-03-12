@@ -56,8 +56,8 @@ export const defaultTheme: DefaultTheme = {
     m: '12px',
     l: '16px',
     xl: '24px',
-    xxl: '32px',
-    xxxl: '48px',
+    xxl: '28px',
+    xxxl: '32px',
   },
   borderRadius: {
     xxxs: '2px',

@@ -16,7 +16,7 @@ import { savePreferences, loadPreferences } from './utils/preferences';
 
 export const setRpcHandlers = (mainWindow?: BrowserWindow | null): void => {
   const focusedWindow = BrowserWindow.getFocusedWindow();
-  const window = mainWindow === focusedWindow ? mainWindow : focusedWindow;
+  const window = mainWindow === mainWindow ? mainWindow : focusedWindow;
   ipcMain.handle('dialogs', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
     showOpenDialog(options),
   );

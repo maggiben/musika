@@ -23,6 +23,14 @@ const SideBarContainer = styled.div<SideBarContainerProps>`
   user-select: none;
 `;
 
+const DraggableRegion = styled.div`
+  width: 100%;
+  height: 1rem;
+  padding-top: ${({ theme }) => theme.spacing.xxl};
+  user-select: none;
+  -webkit-app-region: drag;
+`;
+
 const StyledNav = styled.div`
   width: 100%;
   height: auto;
@@ -115,6 +123,87 @@ const StyledInputRadio = styled.input`
   }
 `;
 
+const mainSidePanel = [
+  {
+    title: 'Library',
+    id: 'library',
+    showSearch: true,
+    onSearch: () => {},
+    items: [
+      {
+        icon: <TbPlaylist style={{ color: 'violet' }} />,
+        title: 'Recently Added',
+        id: 'recently-added',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('menu 1', event);
+        },
+      },
+      {
+        icon: <BsPersonFill style={{ color: 'yellow' }} />,
+        title: 'Artist',
+        id: 'artist',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('Artist', event);
+        },
+      },
+      {
+        icon: <BsStar />,
+        title: 'Albums',
+        id: 'albums',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('Albums', event);
+        },
+      },
+      {
+        icon: <BsStar />,
+        title: 'Songs',
+        id: 'songs',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('Songs', event);
+        },
+      },
+      {
+        icon: <BsStar />,
+        title: 'Music Music',
+        id: 'music-videos',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('Music Videos', event);
+        },
+      },
+    ],
+  },
+  {
+    title: 'Playlists',
+    id: 'playlists',
+    items: [
+      {
+        icon: <TbPlaylist style={{ color: 'violet' }} />,
+        title: 'All Playlists',
+        id: 'all-playlist',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('menu 1', event);
+        },
+      },
+      {
+        icon: <TbPlaylist style={{ color: 'red' }} />,
+        title: 'My Playlist',
+        id: '234523452345',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('mine', event);
+        },
+      },
+      {
+        icon: <TbPlaylist style={{ color: 'blue' }} />,
+        title: 'My super very long playlist title that cannot fit in a SideBar',
+        id: 'adsfasdfasdf',
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('Albums', event);
+        },
+      },
+    ],
+  },
+];
+
 const SideBar = (): JSX.Element => {
   const { t } = useTranslation();
   const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
@@ -149,6 +238,22 @@ const SideBar = (): JSX.Element => {
     };
   }, [resize, stopResizing]);
 
+  const handleSelectChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    // setSelectedRadio(event.target.value);
+    console.log('event: ', event);
+  };
+
+  function isArrayofArrays(arr) {
+    return Array.isArray(arr) && arr.every((innerArr) => Array.isArray(innerArr));
+  }
+
+  function isArrayofObjects(arr) {
+    return (
+      Array.isArray(arr) &&
+      arr.every((obj) => typeof obj === 'object' && obj !== null && !Array.isArray(obj))
+    );
+  }
+
   return (
     <SideBarContainer
       data-testid="sidebar"
@@ -157,105 +262,47 @@ const SideBar = (): JSX.Element => {
       onMouseDown={(e) => isResizing && e.preventDefault()}
     >
       <div>
-        <StyledNav>
-          <DarwinInputSearch
-            type="search"
-            id="global-search"
-            style={{ width: '100%' }}
-            placeholder="Search"
-          />
-          <SpaceBottom size="m" />
-          <StyledNavHeading>Library</StyledNavHeading>
-          <StyledList>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist">
-                <TbPlaylist style={{ color: 'violet' }} />
-                <SpaceRight size="xs" />
-                <span>Recenttly Added</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-1" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-1">
-                <BsPersonFill />
-                <SpaceRight size="xs" />
-                <span>Artist</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-2" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-2">
-                <BsStar />
-                <SpaceRight size="xs" />
-                <span>Albums</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-3" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-3">
-                <BsStar />
-                <SpaceRight size="xs" />
-                <span>Songs</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-4" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-4">
-                <BsStar />
-                <SpaceRight size="xs" />
-                <span>Music Videos</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-          </StyledList>
-        </StyledNav>
-        <SpaceBottom size="m" />
-        <StyledNav>
-          <StyledNavHeading>Playlists</StyledNavHeading>
-          <StyledList>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-x1all" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-x1all">
-                <MdApps />
-                <SpaceRight size="xs" />
-                <span>All Playlists</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-x1" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-x1">
-                <TbPlaylist />
-                <SpaceRight size="xs" />
-                <span>My Playlist</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-12" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-12">
-                <TbPlaylist style={{ color: 'red' }} />
-                <SpaceRight size="xs" />
-                <span>Other Playlist</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-            <StyledListItem>
-              <StyledInputRadio id="my-playlist-13" type="radio" name="my-playlist" />
-              <StyledLabel htmlFor="my-playlist-13">
-                <TbPlaylist style={{ color: 'red' }} />
-                <SpaceRight size="xs" />
-                <span>My super very long playlist title that cannot fit in a SideBar</span>
-                <SpaceRight size="xs" />
-              </StyledLabel>
-            </StyledListItem>
-          </StyledList>
-        </StyledNav>
+        {mainSidePanel.map((group, index) => {
+          return (
+            <>
+              <StyledNav key={`${group.id}-${index}`}>
+                {index == 0 && <DraggableRegion />}
+                {index == 0 && group.showSearch && (
+                  <>
+                    <DarwinInputSearch
+                      type="search"
+                      id="global-search"
+                      style={{ width: '100%' }}
+                      placeholder="Search"
+                      onChange={group.onSearch}
+                    />
+                    <SpaceBottom size="m" />
+                  </>
+                )}
+                <StyledNavHeading>{group.title}</StyledNavHeading>
+                <StyledList>
+                  {group.items.map((item, index) => (
+                    <StyledListItem key={`${item.id}-${index}`}>
+                      <StyledInputRadio
+                        id={`item-${item.id}-${index}`}
+                        type="radio"
+                        name={`sidebar-items`}
+                        onChange={item.onChange}
+                      />
+                      <StyledLabel htmlFor={`item-${item.id}-${index}`}>
+                        {item.icon}
+                        <SpaceRight size="xs" />
+                        <span>{item.title}</span>
+                        <SpaceRight size="xs" />
+                      </StyledLabel>
+                    </StyledListItem>
+                  ))}
+                </StyledList>
+              </StyledNav>
+              <SpaceBottom size="m" />
+            </>
+          );
+        })}
       </div>
       <StyledResizer onMouseDown={startResizing} data-testid="sidebar-resizer" />
     </SideBarContainer>
