@@ -6,6 +6,7 @@ export const StyledLabel = styled.label`
   align-items: center;
   padding: ${({ theme }) => theme.spacing.xs};
   font-size: ${({ theme }) => theme.fontSizes.s};
+  color: ${({ theme }) => theme.colors['secondary-label']};
   display: block;
   white-space: nowrap;
   cursor: pointer;
@@ -34,7 +35,7 @@ export const StyledForm = styled.form`
 `;
 
 export const StyledDFieldset = styled.fieldset`
-  border: 1px solid ${({ theme }) => theme.colors.midGray};
+  border: 1px solid ${({ theme }) => theme.colors['control']};
   margin: 0px;
   border-radius: ${({ theme }) => theme.borderRadius.xs};
   &:disabled button,
@@ -42,7 +43,7 @@ export const StyledDFieldset = styled.fieldset`
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
   }
   & > legend {
-    color: ${({ theme }) => theme.colors['secondary-label']};
+    color: ${({ theme }) => theme.colors['label']};
   }
   &:disabled > legend {
     & input {
@@ -131,7 +132,6 @@ export const StyledButton = styled.button`
 export const DarwinButton = styled.button`
   --active-color: ${({ theme }) => theme.colors.accentColor};
   --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
-
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -158,9 +158,6 @@ export const DarwinButton = styled.button`
     color: ${({ theme }) => theme.colors.lightGray};
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
     cursor: inherit;
-  }
-  & > :first-child {
-    margin-right: ${({ theme }) => theme.spacing.xs};
   }
 `;
 

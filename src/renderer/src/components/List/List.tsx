@@ -43,30 +43,40 @@ const ListBase = css`
   overflow-y: hidden;
   & > span {
     min-width: 0;
+    /* Checkbox */
     &:nth-child(1) {
       text-align: right;
       font-weight: bold;
     }
+    /* Index */
+    &:nth-child(2) {
+      text-align: right;
+    }
+    /* Dot */
     &:nth-child(3) {
       flex-basis: content;
       margin: 0px 6px;
       text-align: center;
       font-weight: bold;
     }
+    /* Title */
     &:nth-child(4) {
       flex-basis: 65%;
       flex-grow: 1;
     }
+    /* Stars */
     &:nth-child(5) {
       flex-basis: 10%;
       text-align: right;
       align-self: flex-end;
     }
+    /* Duration */
     &:nth-child(6) {
-      flex-basis: 12%;
+      flex-basis: 15%;
       text-align: right;
       align-self: flex-end;
     }
+    /* Menu */
     &:nth-child(7) {
       text-align: center;
       align-self: flex-end;
@@ -221,7 +231,7 @@ const List = (_props: IListProps): JSX.Element | null => {
 
     const sort = (items: IPlaylist['items'] = []): IPlaylist['items'] => {
       let sorted = items.slice();
-      switch (sortOptions.criteria) {
+      switch (sortOptions?.criteria) {
         case 'title':
           sorted = items.slice().sort((a, b) => a.title.localeCompare(b.title));
           break;

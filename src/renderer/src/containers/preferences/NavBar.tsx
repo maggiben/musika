@@ -35,7 +35,7 @@ const StyledListItem = styled.li`
   justify-content: center;
   align-items: center;
   & [type='radio']:checked ~ label {
-    color: ${({ theme }) => theme.colors.red};
+    color: ${({ theme }) => theme.colors.white};
     background-color: ${({ theme }) => theme.colors.softGray};
   }
   & label {
@@ -47,7 +47,7 @@ const StyledListItem = styled.li`
 const StyledLabel = styled.label`
   flex-basis: auto;
   align-items: center;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.borderRadius.xs};
   white-space: nowrap;
   cursor: pointer;
   white-space: nowrap;
@@ -56,7 +56,7 @@ const StyledLabel = styled.label`
   flex-direction: column;
   width: 100%;
   transition: all 200ms ease-in-out;
-  color: ${({ theme }) => theme.colors.lightGray}
+  color: ${({ theme }) => theme.colors.lightGray};
 `;
 
 const StyledLabelContent = styled.span`
@@ -68,21 +68,8 @@ const StyledLabelContent = styled.span`
   border-radius: 6px;
 `;
 
-const StyledInputRadio = styled.input`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  border: none;
-  border-radius: 0;
-  padding: ${({ theme }) => theme.spacing.xs};
-  &.active {
-    color: ${({ theme }) => theme.colors.red};
-  }
-  &[type='radio'] {
-    display: none;
-  }
+const StyledInputRadio = styled.input.attrs({ type: 'radio' })`
+  display: none;
 `;
 
 interface INavBarProps {

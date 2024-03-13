@@ -60,8 +60,6 @@ const DownloadOptions = (): JSX.Element => {
             />
             <SpaceRight size="s" />
             <DarwinButton type="button" id="button" onClick={openFolderDialog}>
-              {t('open folder')}
-              <SpaceRight size="xs" />
               <BsFillFolderFill />
             </DarwinButton>
           </InputGroup>

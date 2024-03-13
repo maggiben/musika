@@ -198,15 +198,19 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
           <LeftActions>
             <DarwinButton>
               <FaPlay />
+              <SpaceRight size="xxs" />
               {t('play')}
             </DarwinButton>
             <SpaceRight size="xs" />
             <DarwinButton>
-              <BsShuffle /> {t('shuffle')}
+              <BsShuffle />
+              <SpaceRight size="xxs" />
+              {t('shuffle')}
             </DarwinButton>
             <SpaceRight size="xs" />
             <DarwinButton onClick={downloadSelected}>
               <FaCloudDownloadAlt />
+              <SpaceRight size="xxs" />
               {t('download selected')}
             </DarwinButton>
           </LeftActions>
