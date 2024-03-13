@@ -41,6 +41,9 @@ export const StyledDFieldset = styled.fieldset`
   &:disabled input {
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
   }
+  & > legend {
+    color: ${({ theme }) => theme.colors['secondary-label']};
+  }
   &:disabled > legend {
     & input {
       box-shadow: inherit;

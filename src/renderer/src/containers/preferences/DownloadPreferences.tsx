@@ -199,7 +199,6 @@ const DownloadPreferences = (): JSX.Element => {
         <DownloadOptions />
         <SpaceBottom size="s" />
         <QualityOptions />
-        <SpaceBottom size="s" />
       </PreferencesForm>
     </>
   );
