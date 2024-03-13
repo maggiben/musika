@@ -135,6 +135,17 @@ const getDefaultPreferences = (): IPreferences => {
         limit: 100,
         type: 'playlist',
       },
+      notifications: {
+        enabled: true,
+      },
+      playlists: [
+        {
+          properties: {
+            savePath: undefined,
+            color: 'red',
+          },
+        },
+      ],
     },
     downloads: {
       savePath: app.getPath('downloads'),

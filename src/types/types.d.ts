@@ -90,13 +90,18 @@ export interface IPlaylistProperties {
   color: 'red' | 'violet' | 'blue' | 'yellow' | 'green';
 }
 
+export interface INotificationOptions {
+  enabled: boolean;
+}
+
 export interface IPreferences {
-  behaviour?: {
-    shouldUseDarkColors?: boolean;
-    language?: string;
+  behaviour: {
+    shouldUseDarkColors: boolean;
+    language: string;
     preferredSystemLanguages?: string[];
-    theme?: Record<string, unknown>;
-    search?: {
+    theme: Record<string, unknown>;
+    notifications: INotificationOptions;
+    search: {
       defaultSearch?: string;
       safeSearch?: boolean;
       limit?: number | Infinity;
@@ -108,13 +113,13 @@ export interface IPreferences {
       sortOptions?: IPlaylistSortOptions;
     }[];
   };
-  advanced?: {
+  advanced: {
     isDev?: boolean;
     preferencesPath?: string;
-    update?: {
+    update: {
       automatic?: boolean;
     };
-    logs?: {
+    logs: {
       enabled?: boolean;
       savePath?: string;
       backup?: {
@@ -127,13 +132,13 @@ export interface IPreferences {
       };
     };
   };
-  downloads?: {
-    savePath?: string;
-    maxconnections?: number;
-    retries?: number;
-    timeout?: number;
-    quality?: string;
+  downloads: {
+    savePath: string;
+    maxconnections: number;
+    retries: number;
+    timeout: number;
+    quality: string;
     filter?: string;
-    fileNameTmpl?: string;
+    fileNameTmpl: string;
   };
 }

@@ -41,6 +41,8 @@
   "playlist title": "Playlist Title",
   "play": "Play",
   "shuffle": "Shuffle",
+  "ui theme": "UI Theme",
+  "enable notifications": "Enable Notifications",
   "download selected": "Download Selected",
   "menu.app.checkForUpdates": "Check for Updates...",
   "move to applications forlder?": "Move to Applications folder?",

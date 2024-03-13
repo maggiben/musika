@@ -139,12 +139,35 @@ const BehaviourPreferences = (): JSX.Element => {
           <legend>{t('desktop')}</legend>
           <div>
             <InputPairContainer>
-              {/* <input type="checkbox" id="auto-update" onChange={handleAutomatedUpdate}></input> */}
+              <StyledLabel htmlFor="language">{t('ui theme')}</StyledLabel>
+              <DarwinSelect
+                className="form-select"
+                id="language"
+                defaultValue={preferences?.behaviour?.language}
+                onChange={handleChangeLanguage}
+                style={{ flexBasis: '100%' }}
+              >
+                {['light', 'dark'].map((name, index) => (
+                  <option key={index} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </DarwinSelect>
+            </InputPairContainer>
+            <InputPairContainer>
               <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
               <ToggleSwitch
                 id="auto-update"
                 checked={preferences.advanced?.update?.automatic}
                 onChange={handleAutomatedUpdate}
+              />
+            </InputPairContainer>
+            <InputPairContainer>
+              <StyledLabel htmlFor="notifications">{t('enable notifications')}</StyledLabel>
+              <ToggleSwitch
+                id="notifications"
+                name="notifications"
+                defaultChecked={preferences.behaviour?.notifications?.enabled}
               />
             </InputPairContainer>
           </div>

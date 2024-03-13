@@ -135,6 +135,9 @@ export const StyledButton = styled.button`
 `;
 
 export const DarwinButton = styled.button`
+  --active-color: ${({ theme }) => theme.colors.accentColor};
+  --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -146,12 +149,15 @@ export const DarwinButton = styled.button`
     0px 0.5px 1px rgba(0, 0, 0, 0.1),
     inset 0px 0.5px 0.5px rgba(255, 255, 255, 0.5),
     0px 0px 0px 0.5px rgba(0, 0, 0, 0.12);
-  &:focus {
+  &:not([disabled]):focus {
     box-shadow:
       inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2),
       0px 0.5px 1px rgba(0, 0, 0, 0.1),
-      0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+      0px 0px 0px 3.5px var(--active-color-shadow);
     outline: 0;
+  }
+  &:not([disabled]):active {
+    background-color: ${({ theme }) => theme.colors.lightGray};
   }
   &[disabled] {
     color: ${({ theme }) => theme.colors.lightGray};
@@ -164,6 +170,8 @@ export const DarwinButton = styled.button`
 `;
 
 export const DarwinInput = styled.input`
+  --active-color: ${({ theme }) => theme.colors.accentColor};
+  --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
   padding: ${({ theme }) => theme.spacing.xs};
   border-radius: 6px;
   border: 0;
@@ -175,7 +183,7 @@ export const DarwinInput = styled.input`
     box-shadow:
       inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2),
       0px 0.5px 1px rgba(0, 0, 0, 0.1),
-      0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+      0px 0px 0px 3.5px var(--active-color-shadow);
     outline: 0;
   }
 `;
@@ -259,6 +267,8 @@ const selectChevron = (color: string, background: string): ReturnType<typeof css
 `;
 
 export const DarwinSelect = styled.select`
+  --active-color: ${({ theme }) => theme.colors.accentColor};
+  --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
   position: relative;
   display: block;
   line-height: 1rem;
@@ -272,7 +282,6 @@ export const DarwinSelect = styled.select`
   background-color: field;
   flex-direction: row;
   align-items: center;
-  /* padding: ${({ theme }) => theme.spacing.xxs} ${({ theme }) => theme.spacing.s}; */
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.m};
   border-radius: 6px;
   border: none;
@@ -284,7 +293,7 @@ export const DarwinSelect = styled.select`
     box-shadow:
       inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2),
       0px 0.5px 1px rgba(0, 0, 0, 0.1),
-      0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+      0px 0px 0px 3.5px var(--active-color-shadow);
     outline: 0;
   }
   &[disabled] {
