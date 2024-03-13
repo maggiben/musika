@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import InputRange from '@components/InputRange/InputRange';
 
 const PlayerControlsContainer = styled.div`
-  --min-height: 60px;
+  --min-height: 48px;
   --background-color: ${({ theme }) =>
     theme.colors['window-background']}; /* any format you want here */
   --background-color-darker: color-mix(in srgb, var(--background-color), #000 25%);
@@ -49,7 +49,7 @@ const Slider = styled.div`
 `;
 const PlayerControls = (): JSX.Element => {
   return (
-    <PlayerControlsContainer>
+    <PlayerControlsContainer data-testid="playlist-controls">
       <div className="volume" style={{ lineHeight: '1rem' }}>
         <button style={{ position: 'relative' }}>
           volume_up

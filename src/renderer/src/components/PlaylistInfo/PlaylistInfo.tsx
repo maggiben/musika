@@ -14,7 +14,7 @@ import { IPlaylistSortOptions } from 'types/types';
 const PlaylistInfoContainer = styled.div`
   --thumbnail-height: 120px;
   width: 100%;
-  min-height: 140px;
+  min-height: calc(var(--thumbnail-height) + ${({ theme }) => theme.spacing.xxxl});
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -158,7 +158,7 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
     ],
   );
   return (
-    <PlaylistInfoContainer>
+    <PlaylistInfoContainer data-testid="playlist-info">
       <StyledImg
         src={props.thumbnail.url}
         width={props.thumbnail.width}

@@ -24,7 +24,7 @@ const HomeHeading = styled.h1`
 const ResultsHome = (): JSX.Element => {
   const { t } = useTranslation();
   return (
-    <ResultsHomeContainer>
+    <ResultsHomeContainer data-testid="results-home">
       <HomeHeading>{t('welcome home')}</HomeHeading>
     </ResultsHomeContainer>
   );
