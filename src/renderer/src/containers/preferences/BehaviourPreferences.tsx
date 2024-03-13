@@ -1,7 +1,9 @@
+import { useEffect, useRef, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import styled from 'styled-components';
+import { BsFillFolderFill } from 'react-icons/bs';
 import languages from '@locale/languages.json';
 import {
   StyledForm,
@@ -14,7 +16,8 @@ import {
   DarwinInput,
   DarwinButton,
 } from '@renderer/components/Form/Form';
-import { SpaceRight } from '@renderer/components/Spacing/Spacing';
+import { SpaceBottom, SpaceRight } from '@components/Spacing/Spacing';
+import useModalResize from '@renderer/hooks/useModalResize';
 
 export const PreferencesForm = styled(StyledForm)`
   padding: ${({ theme }) => theme.spacing.s};
@@ -23,6 +26,9 @@ export const PreferencesForm = styled(StyledForm)`
 const BehaviourPreferences = (): JSX.Element => {
   const { t, i18n } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const formRef = useRef<HTMLFormElement>(null);
+  useModalResize(formRef);
+
   const handleChangeLanguage = async (
     event: React.ChangeEvent<HTMLSelectElement>,
   ): Promise<void> => {
@@ -108,7 +114,8 @@ const BehaviourPreferences = (): JSX.Element => {
   return (
     <>
       <PreferencesForm
-        data-testid="behaviour-preferences"
+        ref={formRef}
+        data-testid="behaviour-preferences-form"
         onSubmit={(e) => {
           e.preventDefault();
         }}
@@ -135,6 +142,7 @@ const BehaviourPreferences = (): JSX.Element => {
             </InputPairContainer>
           </div>
         </StyledDFieldset>
+        <SpaceBottom size="s" />
         <StyledDFieldset>
           <legend>{t('desktop')}</legend>
           <div>
@@ -172,6 +180,7 @@ const BehaviourPreferences = (): JSX.Element => {
             </InputPairContainer>
           </div>
         </StyledDFieldset>
+        <SpaceBottom size="s" />
         <StyledDFieldset>
           <legend>{t('search options')}</legend>
           <div>
@@ -226,6 +235,7 @@ const BehaviourPreferences = (): JSX.Element => {
             </InputPairContainer>
           </div>
         </StyledDFieldset>
+        <SpaceBottom size="s" />
         <StyledDFieldset disabled={!preferences?.advanced?.logs?.enabled}>
           <legend style={{ display: 'flex' }}>
             <input
@@ -252,6 +262,8 @@ const BehaviourPreferences = (): JSX.Element => {
                 <SpaceRight size="s" />
                 <DarwinButton type="button" id="button" onClick={openFolderDialog}>
                   {t('open folder')}
+                  <SpaceRight size="xs" />
+                  <BsFillFolderFill />
                 </DarwinButton>
               </InputGroup>
             </InputPairContainer>

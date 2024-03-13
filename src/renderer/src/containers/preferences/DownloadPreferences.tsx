@@ -1,7 +1,8 @@
-import { useTranslation } from 'react-i18next';
+import { useEffect, useRef, useLayoutEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { BsFillFolderFill } from 'react-icons/bs';
 import styled from 'styled-components';
 import {
   StyledForm,
@@ -13,7 +14,8 @@ import {
   DarwinInput,
   DarwinSelect,
 } from '@components/Form/Form';
-import { SpaceRight } from '@components/Spacing/Spacing';
+import { SpaceBottom, SpaceRight } from '@components/Spacing/Spacing';
+import useModalResize from '@renderer/hooks/useModalResize';
 
 export const PreferencesForm = styled(StyledForm)`
   padding: ${({ theme }) => theme.spacing.s};
@@ -59,6 +61,8 @@ const DownloadOptions = (): JSX.Element => {
             <SpaceRight size="s" />
             <DarwinButton type="button" id="button" onClick={openFolderDialog}>
               {t('open folder')}
+              <SpaceRight size="xs" />
+              <BsFillFolderFill />
             </DarwinButton>
           </InputGroup>
         </InputPairContainer>
@@ -180,15 +184,22 @@ const QualityOptions = (): JSX.Element => {
 };
 
 const DownloadPreferences = (): JSX.Element => {
+  const formRef = useRef<HTMLFormElement>(null);
+  useModalResize(formRef);
+
   return (
     <>
       <PreferencesForm
+        ref={formRef}
+        data-testid="download-preferences-form"
         onSubmit={(e) => {
           e.preventDefault();
         }}
       >
         <DownloadOptions />
+        <SpaceBottom size="s" />
         <QualityOptions />
+        <SpaceBottom size="s" />
       </PreferencesForm>
     </>
   );

@@ -2,7 +2,7 @@ import { Suspense, useState } from 'react';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
-import { BsGear, BsCloudDownloadFill } from "react-icons/bs";
+import { BsGear, BsCloudDownloadFill } from 'react-icons/bs';
 import DownloadPreferences from './DownloadPreferences';
 import BehaviourPreferences from './BehaviourPreferences';
 import NavBar from './NavBar';
@@ -18,7 +18,7 @@ const PreferencesContainer = styled.div`
   align-items: center;
 `;
 
-const SidePannelContainer = styled.div`
+const NavBarContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -26,22 +26,20 @@ const SidePannelContainer = styled.div`
   align-items: center;
   overflow: hidden;
   box-sizing: border-box;
-  /* padding: ${({ theme }) => theme.spacing.xs}; */
   padding: 0px;
-  background-color: ${({ theme }) => theme.colors.dark};
   color: ${({ theme }) => theme.colors.midGray};
-  /* border-right: 1px solid ${({ theme }) => theme.colors.lightGray}; */
+  min-height: 80px;
+  max-height: 80px;
 `;
 
 const MainPannelContainer = styled.div`
-  flex: 1 1 auto;
   width: 100%;
   height: 100%;
   display: flex;
-  overflow: hidden;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  overflow: hidden;
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.colors.darkGray};
   color: ${({ theme }) => theme.colors.midGray};
@@ -76,7 +74,7 @@ const Preferences = (): JSX.Element => {
 
   return (
     <PreferencesContainer>
-      <SidePannelContainer data-testid="side-pannel-container">
+      <NavBarContainer data-testid="nav-bar-container">
         <Suspense fallback={<div>Loading...</div>}>
           <NavBar
             preferences={preferences}
@@ -85,13 +83,13 @@ const Preferences = (): JSX.Element => {
             defaultSelected={selectedPreferenceGroup}
           />
         </Suspense>
-      </SidePannelContainer>
+      </NavBarContainer>
       <MainPannelContainer data-testid="main-pannel-container">
         <Suspense fallback={<div>Loading...</div>}>
           <>{selectedPreferenceGroup && pannels[selectedPreferenceGroup].node}</>
         </Suspense>
-        <ActionButtons />
       </MainPannelContainer>
+      <ActionButtons data-testid="action-buttons" />
     </PreferencesContainer>
   );
 };

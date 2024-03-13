@@ -3,7 +3,6 @@ export { default as ToggleSwitch } from './ToggleSwitch';
 
 export const StyledLabel = styled.label`
   flex-basis: auto;
-  width: 100%;
   align-items: center;
   padding: ${({ theme }) => theme.spacing.xs};
   font-size: ${({ theme }) => theme.fontSizes.s};
@@ -17,16 +16,18 @@ export const StyledLabel = styled.label`
 export const InputPairContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   &:not(:last-child) {
     margin-bottom: ${({ theme }) => theme.spacing.xxs};
+  }
+  & > label {
+    width: 100%;
   }
 `;
 
 export const StyledForm = styled.form`
   width: 100%;
-  height: 100%;
   overflow: hidden;
   overflow-y: scroll;
   box-sizing: border-box;
@@ -35,9 +36,7 @@ export const StyledForm = styled.form`
 export const StyledDFieldset = styled.fieldset`
   border: 1px solid ${({ theme }) => theme.colors.midGray};
   margin: 0px;
-  &:not(:last-of-type) {
-    margin-bottom: ${({ theme }) => theme.spacing.xs};
-  }
+  border-radius: ${({ theme }) => theme.borderRadius.xs};
   &:disabled button,
   &:disabled input {
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
@@ -50,18 +49,10 @@ export const StyledDFieldset = styled.fieldset`
 `;
 
 export const InputGroup = styled.div`
-  position: relative;
   display: flex;
-  flex-wrap: wrap;
   align-items: stretch;
   width: 100%;
-  & .form-control,
-  .form-select {
-    position: relative;
-    flex: 1 1 auto;
-    width: 1%;
-    min-width: 0;
-  }
+  flex-basis: 100%;
 `;
 
 export const FormControl = styled.input`
@@ -145,6 +136,7 @@ export const DarwinButton = styled.button`
   border-radius: 6px;
   line-height: 1;
   border: none;
+  white-space: nowrap;
   box-shadow:
     0px 0.5px 1px rgba(0, 0, 0, 0.1),
     inset 0px 0.5px 0.5px rgba(255, 255, 255, 0.5),
@@ -173,8 +165,9 @@ export const DarwinInput = styled.input`
   --active-color: ${({ theme }) => theme.colors.accentColor};
   --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
   padding: ${({ theme }) => theme.spacing.xs};
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.borderRadius.xs};
   border: 0;
+  width: 100%;
   box-shadow:
     0px 0.5px 1px rgba(0, 0, 0, 0.1),
     0px 0.5px 0.5px rgba(255, 255, 255, 0.5),

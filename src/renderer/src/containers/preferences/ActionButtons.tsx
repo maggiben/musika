@@ -37,7 +37,11 @@ const Left = styled.div`
   justify-content: flex-start;
 `;
 
-const ActionButtons = (): JSX.Element => {
+interface IActionButtonsProps {
+  'data-testid'?: string;
+}
+
+const ActionButtons = (props: IActionButtonsProps): JSX.Element => {
   const { t } = useTranslation();
   const preferences = useRecoilValue(preferencesState);
   const handleOkClick = async (): Promise<void> => {
@@ -54,7 +58,7 @@ const ActionButtons = (): JSX.Element => {
   };
 
   return (
-    <ActionButtonsContainer>
+    <ActionButtonsContainer data-testid={props['data-testid']}>
       <ActionButtonsGroup>
         <Left>
           <DarwinButton onClick={handleOkClick} disabled>

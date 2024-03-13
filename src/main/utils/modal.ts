@@ -31,14 +31,25 @@ export default async function modal(
         console.log('Computer resume');
         modal?.webContents.send('show-modal', type, options);
       };
+      const resizeEventHander = (
+        _event: Electron.IpcMainEvent,
+        size: { height: number; width: number },
+      ): void => {
+        const contentSize = modal.getContentSize();
+        console.log('contentSize', contentSize);
+        console.log('newSize', size);
+        modal.setContentSize(size.width, size.height, true);
+      };
       powerMonitor.on('resume', resumeEventHander);
       console.log('show-modal', type, options);
       modal?.webContents.send('show-modal', type, options);
       modal.show();
+      ipcMain.on('resize-modal', resizeEventHander);
       ipcMain.once('close-modal', async (_event: IpcMainInvokeEvent, options) => {
         console.log('close-modal', options);
         mainWindow?.webContents.send('close-modal', type, options);
         powerMonitor.off('resume', resumeEventHander);
+        ipcMain.off('resize-modal', resizeEventHander);
         modal.hide();
         modal.destroy();
         modal = undefined as unknown as BrowserWindow;
