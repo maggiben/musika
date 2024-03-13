@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { StyledTextarea, DarwinButton } from '@renderer/components/Form/Form';
 import { useTranslation } from 'react-i18next';
-// import SearchBar from '@components/SearchBar/SearchBar';
+import { SpaceBottom } from '@renderer/components/Spacing/Spacing';
 
 const NewPlaylistContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.s};
   box-sizing: border-box;
   height: 100%;
   & > :not(:first-child):not(:last-child) {
@@ -32,6 +32,7 @@ const ButtonsContainer = styled.div`
 `;
 
 const OpenUrl = (): JSX.Element => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { t } = useTranslation();
   const [url, setUrl] = useState<string>('');
 
@@ -51,13 +52,21 @@ const OpenUrl = (): JSX.Element => {
     });
   };
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
+
   return (
     <NewPlaylistContainer>
       <StyledTextarea
+        ref={textareaRef}
         onChange={handleOnChage}
         placeholder={t('url')}
         style={{ flex: 1, resize: 'none' }}
       />
+      <SpaceBottom size="s" />
       <ButtonsContainer>
         <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
         <DarwinButton disabled={!url} onClick={handleOpenClick}>

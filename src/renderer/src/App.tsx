@@ -3,8 +3,8 @@ import { useEffect, Suspense } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
-import { RecoilRoot, useRecoilState } from 'recoil';
-import { preferencesState } from '@states/atoms';
+import { RecoilRoot, useRecoilState, useRecoilCallback, useResetRecoilState } from 'recoil';
+import { preferencesState, playlistState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
 import Playlist from '@containers/playlist/Playlist';
 import SideBar from '@renderer/components/SideBar/SideBar';
@@ -12,6 +12,9 @@ import Download from '@containers/download/Download';
 // import Preferences from '@renderer/containers/preferences/Preferences';
 import { defaultTheme } from '@assets/themes';
 import Loading from './containers/loading/Loading';
+import type ytdl from 'ytdl-core';
+import type ytsr from '@distube/ytsr';
+import type { IPlaylist } from 'types/types';
 
 // Global style to set the background color of the body
 const GlobalStyle = createGlobalStyle`
@@ -32,6 +35,7 @@ const Container = styled.div`
 const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   const { i18n } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const resetPlaylistState = useResetRecoilState(playlistState);
   const handleMenuClick = async (
     _event: IpcRendererEvent,
     message: { id: string; options?: Record<string, unknown> },
@@ -57,10 +61,49 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         console.log('menu.file.open-url', message);
         await window.commands.modal('open-url', { width: 480, height: 240, ...message.options });
         break;
-      // case 'contextmenu.playlist-item.get-media-info':
-      //   console.log('contextmenu.playlist-item.get-media-info', message);
-      //   await window.commands.modal('media-info', { width: 600, height: 660, ...message.options });
-      //   break;
+      default:
+        break;
+    }
+  };
+
+  const asyncSearch = useRecoilCallback(({ set, snapshot }) => async (url: string) => {
+    try {
+      const oldState = await snapshot.getPromise(playlistState);
+      resetPlaylistState();
+      const { playlist } = (await window.commands.search(url)) as {
+        playlistId: string;
+        videoId: string;
+        videoInfo: ytdl.videoInfo;
+        playlist: IPlaylist;
+        searchResults: ytsr.PlaylistResult;
+      };
+      set(playlistState, {
+        ...oldState,
+        playlist,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  const handleCloseModal = async (
+    _event: IpcRendererEvent,
+    type: string,
+    message: Record<string, unknown>,
+  ): Promise<void> => {
+    switch (type) {
+      case 'new-playlist':
+        console.log('new-playlist');
+        break;
+      case 'preferences':
+        console.log('preferences');
+        break;
+      case 'media-info':
+        console.log('media-info');
+        break;
+      case 'open-url':
+        message.url && (await asyncSearch(message.url as string));
+        break;
       default:
         break;
     }
@@ -69,14 +112,11 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   useEffect(() => {
     // Add event listener for menu bar clicks
     const removeMenuClickListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
-    // const removeContextClickListener = window.electron.ipcRenderer.on(
-    //   'context-menu-click',
-    //   handleMenuClick,
-    // );
+    const closeModalListener = window.electron.ipcRenderer.on('close-modal', handleCloseModal);
     // Remove event listener on cleanup
     return () => {
       removeMenuClickListener();
-      // removeContextClickListener();
+      closeModalListener();
     };
   }, []);
   const currentTheme = {

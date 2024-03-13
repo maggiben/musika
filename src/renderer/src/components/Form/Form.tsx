@@ -79,10 +79,24 @@ export const FormControl = styled.input`
 
 // Styled textarea extending from BaseInput
 export const StyledTextarea = styled(FormControl).attrs({ as: 'textarea' })`
+  --active-color: ${({ theme }) => theme.colors.accentColor};
+  --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
   min-height: 100px;
   resize: vertical;
+  border-radius: ${({ theme }) => theme.borderRadius.xs};
   font-family: inherit;
   box-sizing: border-box;
+  box-shadow:
+    0px 0.5px 1px rgba(0, 0, 0, 0.1),
+    0px 0.5px 0.5px rgba(255, 255, 255, 0.5),
+    0px 0px 0px 0.5px rgba(0, 0, 0, 0.12);
+  &:focus {
+    box-shadow:
+      inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2),
+      0px 0.5px 1px rgba(0, 0, 0, 0.1),
+      0px 0px 0px 3.5px var(--active-color-shadow);
+    outline: 0;
+  }
 `;
 
 export const InputGroupText = styled.span`

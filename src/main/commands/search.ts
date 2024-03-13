@@ -45,7 +45,7 @@ export default async function search(searchString: string): Promise<Record<strin
     return new Promise((resolve) => {
       setTimeout(() => {
         return resolve(mockResponse as Record<string, unknown>);
-      }, 500);
+      }, 1000);
     });
   }
 
