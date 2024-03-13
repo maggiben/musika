@@ -29,6 +29,7 @@ export const StyledForm = styled.form`
   height: 100%;
   overflow: hidden;
   overflow-y: scroll;
+  box-sizing: border-box;
 `;
 
 export const StyledDFieldset = styled.fieldset`
@@ -36,6 +37,15 @@ export const StyledDFieldset = styled.fieldset`
   margin: 0px;
   &:not(:last-of-type) {
     margin-bottom: ${({ theme }) => theme.spacing.xs};
+  }
+  &:disabled button,
+  &:disabled input {
+    box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
+  }
+  &:disabled > legend {
+    & input {
+      box-shadow: inherit;
+    }
   }
 `;
 
@@ -120,12 +130,11 @@ export const StyledButton = styled.button`
   }
   &[disabled] {
     color: ${({ theme }) => theme.colors.lightGray};
-    border: 1px solid ${({ theme }) => theme.colors.midGray};
     cursor: inherit;
   }
 `;
 
-export const DarwinButton = styled(StyledButton)`
+export const DarwinButton = styled.button`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -146,7 +155,7 @@ export const DarwinButton = styled(StyledButton)`
   }
   &[disabled] {
     color: ${({ theme }) => theme.colors.lightGray};
-    box-shadow: none;
+    box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
     cursor: inherit;
   }
   & > :first-child {
@@ -263,8 +272,8 @@ export const DarwinSelect = styled.select`
   background-color: field;
   flex-direction: row;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing.xxs} ${({ theme }) => theme.spacing.s};
-  padding-right: calc(${({ theme }) => theme.spacing.m} + 16px);
+  /* padding: ${({ theme }) => theme.spacing.xxs} ${({ theme }) => theme.spacing.s}; */
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.m};
   border-radius: 6px;
   border: none;
   box-shadow:

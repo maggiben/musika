@@ -2,17 +2,22 @@ import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 // import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import {
   StyledForm,
   StyledLabel,
   StyledDFieldset,
-  StyledButton,
-  FormControl,
   InputGroup,
   InputPairContainer,
-  StyledSelect,
-  InputGroupText,
-} from '@renderer/components/Form/Form';
+  DarwinButton,
+  DarwinInput,
+  DarwinSelect,
+} from '@components/Form/Form';
+import { SpaceRight } from '@components/Spacing/Spacing';
+
+export const PreferencesForm = styled(StyledForm)`
+  padding: ${({ theme }) => theme.spacing.s};
+`;
 
 const DownloadOptions = (): JSX.Element => {
   const { t } = useTranslation();
@@ -42,36 +47,38 @@ const DownloadOptions = (): JSX.Element => {
         <InputPairContainer>
           <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
           <InputGroup>
-            <FormControl
+            <DarwinInput
               type="text"
               id="savePath"
               name="savePath"
               disabled={true}
-              className="form-control"
               value={preferences?.downloads?.savePath}
               placeholder={t('save files to')}
+              style={{ flex: 1 }}
             />
-            <StyledButton type="button" id="button" onClick={openFolderDialog}>
+            <SpaceRight size="s" />
+            <DarwinButton type="button" id="button" onClick={openFolderDialog}>
               {t('open folder')}
-            </StyledButton>
+            </DarwinButton>
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
           <StyledLabel htmlFor="fileNameTmpl">{t('file name template')}</StyledLabel>
           <InputGroup>
-            <FormControl
+            <DarwinInput
               type="text"
               id="fileNameTmpl"
               name="fileNameTmpl"
               defaultValue={preferences?.downloads?.fileNameTmpl}
               placeholder={t('file name template')}
+              style={{ flex: 1 }}
             />
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
           <StyledLabel htmlFor="maxconnections">{t('max connections')}</StyledLabel>
           <InputGroup>
-            <FormControl
+            <DarwinInput
               type="number"
               id="maxconnections"
               name="maxconnections"
@@ -80,13 +87,14 @@ const DownloadOptions = (): JSX.Element => {
               className="form-control"
               defaultValue={preferences?.downloads?.maxconnections}
               placeholder={t('max connections')}
+              style={{ flex: 1 }}
             />
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
           <StyledLabel htmlFor="retries">{t('retries')}</StyledLabel>
           <InputGroup>
-            <FormControl
+            <DarwinInput
               type="number"
               id="retries"
               name="retries"
@@ -95,13 +103,14 @@ const DownloadOptions = (): JSX.Element => {
               className="form-control"
               defaultValue={preferences?.downloads?.retries}
               placeholder={t('retries')}
+              style={{ flex: 1 }}
             />
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
           <StyledLabel htmlFor="timeout">{t('timeout')}</StyledLabel>
           <InputGroup>
-            <FormControl
+            <DarwinInput
               type="number"
               id="timeout"
               name="timeout"
@@ -110,8 +119,8 @@ const DownloadOptions = (): JSX.Element => {
               className="form-control"
               defaultValue={preferences?.downloads?.timeout}
               placeholder={t('timeout')}
+              style={{ flex: 1 }}
             />
-            <InputGroupText>ms</InputGroupText>
           </InputGroup>
         </InputPairContainer>
       </div>
@@ -129,7 +138,11 @@ const QualityOptions = (): JSX.Element => {
       <div>
         <InputPairContainer>
           <StyledLabel htmlFor="quality">{t('quality')}</StyledLabel>
-          <StyledSelect className="form-select" defaultValue={preferences?.downloads?.quality}>
+          <DarwinSelect
+            className="form-select"
+            defaultValue={preferences?.downloads?.quality}
+            style={{ flexBasis: '100%' }}
+          >
             {[
               'highest',
               'lowest',
@@ -142,20 +155,15 @@ const QualityOptions = (): JSX.Element => {
                 {options}
               </option>
             ))}
-
-            {/*
-            <option>highest</option>
-            <option>highestvideo</option>
-            <option defaultValue={'selected'}>highestaudio</option>
-            <option>lowest</option>
-            <option>lowestvideo</option>
-            <option>lowestaudio</option>
-          */}
-          </StyledSelect>
+          </DarwinSelect>
         </InputPairContainer>
         <InputPairContainer>
           <StyledLabel htmlFor="filter">{t('filter')}</StyledLabel>
-          <StyledSelect className="form-select" defaultValue={preferences?.downloads?.filter}>
+          <DarwinSelect
+            className="form-select"
+            defaultValue={preferences?.downloads?.filter}
+            style={{ flexBasis: '100%' }}
+          >
             {!preferences?.downloads?.filter && <option value=""></option>}
             {['audioandvideo', 'videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map(
               (options, index) => (
@@ -164,7 +172,7 @@ const QualityOptions = (): JSX.Element => {
                 </option>
               ),
             )}
-          </StyledSelect>
+          </DarwinSelect>
         </InputPairContainer>
       </div>
     </StyledDFieldset>
@@ -174,14 +182,14 @@ const QualityOptions = (): JSX.Element => {
 const DownloadPreferences = (): JSX.Element => {
   return (
     <>
-      <StyledForm
+      <PreferencesForm
         onSubmit={(e) => {
           e.preventDefault();
         }}
       >
         <DownloadOptions />
         <QualityOptions />
-      </StyledForm>
+      </PreferencesForm>
     </>
   );
 };

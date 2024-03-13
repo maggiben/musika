@@ -1,20 +1,24 @@
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
+import styled from 'styled-components';
 import languages from '@locale/languages.json';
-
 import {
   StyledForm,
   StyledLabel,
   StyledDFieldset,
   InputPairContainer,
-  StyledSelect,
   InputGroup,
-  StyledButton,
-  FormControl,
   ToggleSwitch,
   DarwinSelect,
+  DarwinInput,
+  DarwinButton,
 } from '@renderer/components/Form/Form';
+import { SpaceRight } from '@renderer/components/Spacing/Spacing';
+
+export const PreferencesForm = styled(StyledForm)`
+  padding: ${({ theme }) => theme.spacing.s};
+`;
 
 const BehaviourPreferences = (): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -103,7 +107,7 @@ const BehaviourPreferences = (): JSX.Element => {
 
   return (
     <>
-      <StyledForm
+      <PreferencesForm
         data-testid="behaviour-preferences"
         onSubmit={(e) => {
           e.preventDefault();
@@ -120,6 +124,7 @@ const BehaviourPreferences = (): JSX.Element => {
                 id="language"
                 defaultValue={preferences?.behaviour?.language}
                 onChange={handleChangeLanguage}
+                style={{ flexBasis: '100%' }}
               >
                 {supportedLangs.map((language) => (
                   <option key={language.code} value={language.code}>
@@ -149,16 +154,14 @@ const BehaviourPreferences = (): JSX.Element => {
           <div>
             <InputPairContainer>
               <StyledLabel htmlFor="default-search">{t('default search')}</StyledLabel>
-              <InputGroup>
-                <FormControl
-                  type="text"
-                  id="default-search"
-                  name="default-search"
-                  className="form-control"
-                  defaultValue={preferences.behaviour?.search?.defaultSearch}
-                  placeholder={t('save files to')}
-                />
-              </InputGroup>
+              <DarwinInput
+                type="text"
+                id="default-search"
+                name="default-search"
+                defaultValue={preferences.behaviour?.search?.defaultSearch}
+                placeholder={t('save files to')}
+                style={{ flexBasis: '100%' }}
+              />
             </InputPairContainer>
             <InputPairContainer>
               <StyledLabel htmlFor="safe-search">{t('safe search')}</StyledLabel>
@@ -170,66 +173,68 @@ const BehaviourPreferences = (): JSX.Element => {
             </InputPairContainer>
             <InputPairContainer>
               <StyledLabel htmlFor="search-limit">{t('limit')}</StyledLabel>
-              <InputGroup>
-                <FormControl
-                  type="number"
-                  id="search-limit"
-                  name="search-limit"
-                  min="1"
-                  max={Infinity}
-                  defaultValue={preferences.behaviour?.search?.limit}
-                  placeholder={t('limits the pulled items')}
-                />
-              </InputGroup>
+              <DarwinInput
+                type="number"
+                id="search-limit"
+                name="search-limit"
+                min="1"
+                max={Infinity}
+                defaultValue={preferences.behaviour?.search?.limit}
+                placeholder={t('limits the pulled items')}
+                style={{ flexBasis: '100%' }}
+              />
             </InputPairContainer>
             <InputPairContainer>
               <StyledLabel htmlFor="filter-search">
                 {t('filter for a specific type of item')}
               </StyledLabel>
-              <StyledSelect
+              <DarwinSelect
                 id="filter-search"
                 className="form-select"
                 defaultValue={preferences?.behaviour?.search?.type}
+                style={{ flexBasis: '100%' }}
               >
                 {['video', 'playlist'].map((options, index) => (
                   <option key={index} value={options}>
                     {options}
                   </option>
                 ))}
-              </StyledSelect>
+              </DarwinSelect>
             </InputPairContainer>
           </div>
         </StyledDFieldset>
         <StyledDFieldset disabled={!preferences?.advanced?.logs?.enabled}>
-          <legend>
+          <legend style={{ display: 'flex' }}>
             <input
               type="checkbox"
               id="enable-logs"
               defaultChecked={Boolean(preferences?.advanced?.logs?.savePath)}
               onChange={handleEnableLogs}
             ></input>
+            <SpaceRight size="xs" />
             <label htmlFor="enable-logs">{t('log file')}</label>
           </legend>
           <div>
             <InputPairContainer>
               <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
               <InputGroup>
-                <FormControl
+                <DarwinInput
                   type="text"
                   id="savePath"
                   name="savePath"
-                  className="form-control"
                   defaultValue={preferences?.advanced?.logs?.savePath}
                   placeholder={t('save files to')}
+                  style={{ flex: 1 }}
                 />
-                <StyledButton type="button" id="button" onClick={openFolderDialog}>
+                <SpaceRight size="s" />
+                <DarwinButton type="button" id="button" onClick={openFolderDialog}>
                   {t('open folder')}
-                </StyledButton>
+                </DarwinButton>
               </InputGroup>
             </InputPairContainer>
           </div>
         </StyledDFieldset>
-      </StyledForm>
+      </PreferencesForm>
     </>
   );
 };

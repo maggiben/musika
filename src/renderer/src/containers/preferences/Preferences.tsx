@@ -43,7 +43,6 @@ const MainPannelContainer = styled.div`
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  padding: ${({ theme }) => theme.spacing.xs};
   background-color: ${({ theme }) => theme.colors.darkGray};
   color: ${({ theme }) => theme.colors.midGray};
 `;
