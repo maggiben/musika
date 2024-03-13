@@ -15,6 +15,7 @@ import Loading from './containers/loading/Loading';
 import type ytdl from 'ytdl-core';
 import type ytsr from '@distube/ytsr';
 import type { IPlaylist } from 'types/types';
+import useModal from './hooks/useModal';
 
 // Global style to set the background color of the body
 const GlobalStyle = createGlobalStyle`
@@ -86,37 +87,34 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     }
   });
 
-  const handleCloseModal = async (
-    _event: IpcRendererEvent,
-    type: string,
-    message: Record<string, unknown>,
-  ): Promise<void> => {
-    switch (type) {
-      case 'new-playlist':
-        console.log('new-playlist');
-        break;
-      case 'preferences':
-        console.log('preferences');
-        break;
-      case 'media-info':
-        console.log('media-info');
-        break;
-      case 'open-url':
-        message.url && (await asyncSearch(message.url as string));
-        break;
-      default:
-        break;
-    }
-  };
+  useModal<Record<string, unknown>>(
+    async (type, message): Promise<void> => {
+      switch (type) {
+        case 'new-playlist':
+          console.log('new-playlist');
+          break;
+        case 'preferences':
+          console.log('preferences');
+          break;
+        case 'media-info':
+          console.log('media-info');
+          break;
+        case 'open-url':
+          message.url && (await asyncSearch(message.url as string));
+          break;
+        default:
+          break;
+      }
+    },
+    ['open-url'],
+  );
 
   useEffect(() => {
     // Add event listener for menu bar clicks
     const removeMenuClickListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
-    const closeModalListener = window.electron.ipcRenderer.on('close-modal', handleCloseModal);
     // Remove event listener on cleanup
     return () => {
       removeMenuClickListener();
-      closeModalListener();
     };
   }, []);
   const currentTheme = {
