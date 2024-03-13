@@ -44,14 +44,15 @@ const StyledDetail = styled.dd<StyledDetailProps>`
   & input[type='checkbox'] {
     display: none;
   }
-  & input[type='checkbox'] ~ label:hover {
-    color: ${({ theme }) => theme.colors.white};
-    text-decoration: underline;
-  }
   & input[type='checkbox'] ~ label {
+    color: ${({ theme }) => theme.colors['link']};
     &:after {
       content: 'Read More...';
       display: block;
+    }
+    &:hover {
+      color: ${({ theme }) => theme.colors.white};
+      text-decoration: underline;
     }
   }
   & input[type='checkbox']:checked ~ label {
@@ -69,7 +70,6 @@ const ReadMoreButton = styled.label`
   display: inline-block;
   user-select: none;
   cursor: pointer;
-  font-size: 0.75rem;
   margin: 0px;
 `;
 

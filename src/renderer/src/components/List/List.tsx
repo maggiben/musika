@@ -179,8 +179,15 @@ const SelectAllCheckbox: React.FC<SelectAllCheckboxProps> = ({ indeterminate }) 
 
   useEffect(() => {
     if (checkboxRef.current) {
-      checkboxRef.current.indeterminate =
-        items.some((item) => item) && !items.every((item) => item);
+      if (items.some((item) => item) && !items.every((item) => item)) {
+        checkboxRef.current.indeterminate = true;
+        checkboxRef.current.checked = false;
+      } else if (items.every((item) => item)) {
+        checkboxRef.current.indeterminate = false;
+      } else if (!items.some((item) => item)) {
+        checkboxRef.current.indeterminate = false;
+        checkboxRef.current.checked = false;
+      }
     }
   }, [items]);
 

@@ -285,7 +285,7 @@ const SideBar = (): JSX.Element => {
                     <StyledInputRadio
                       id={`item-${item.id}-${index}`}
                       type="radio"
-                      name={`items-${group.id}`}
+                      name={`sidebar-menu-item`}
                       onChange={item.onChange}
                     />
                     <StyledLabel htmlFor={`item-${item.id}-${index}`}>
