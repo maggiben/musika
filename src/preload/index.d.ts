@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload';
-import type { IPreferences } from 'types/types';
+import type { IPreferences, IPlaylistItem } from 'types/types';
 import type { OpenDialogReturnValue, OpenDialogOptions } from 'electron';
 
 interface IExtendedElectronApi extends ElectronAPI {
@@ -17,7 +17,7 @@ export declare global {
       dialogs: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
       getVideoInfo: (url: string) => Promise<Record<string, unknown>>;
       search: (searchString: string) => Promise<Record<string, unknown>>;
-      download: (url: string) => Promise<OpenDialogReturnValue>;
+      download: (source: string | IPlaylistItem[]) => Promise<OpenDialogReturnValue>;
       modal: (type: string, options?: Record<string, unknown>) => Promise<boolean>;
       contextMenu: (type: string, options?: Record<string, unknown>) => Promise<void | null>;
     };

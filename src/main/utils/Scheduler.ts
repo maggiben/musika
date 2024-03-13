@@ -39,12 +39,17 @@ import ytpl from '@distube/ytpl';
 // import { EncoderStream } from './EncoderStream';
 import type { IDownloadWorkerMessage } from './DownloadWorker';
 import creatWorker from '../workers/worker?nodeWorker';
+import { IPlaylistItem } from 'types/types';
 
 export interface ISchedulerOptions {
   /**
    * Youtube playlist id.
    */
-  playlistId: string;
+  playlistId?: string;
+  /**
+   * Youtube playlist items.
+   */
+  playlistItems?: IPlaylistItem[];
   /**
    * Output file name.
    */
@@ -107,7 +112,8 @@ export interface ISchedulerWorkerOptions extends WorkerOptions {
 export class Scheduler extends EventEmitter {
   private workers = new Map<string, Worker>();
   private retryItems = new Map<string, ISchedulerRetryItems>();
-  private playlistId: string;
+  private playlistId?: string;
+  private playlistItems?: IPlaylistItem[];
   private output: string;
   private maxconnections: number;
   private retries: number;
@@ -118,6 +124,7 @@ export class Scheduler extends EventEmitter {
   public constructor(options: ISchedulerOptions) {
     super();
     this.playlistId = options.playlistId;
+    this.playlistItems = options.playlistItems;
     this.output = options.output ?? '{videoDetails.title}';
     this.maxconnections = options.maxconnections ?? 5;
     this.retries = options.retries ?? 5;
@@ -128,21 +135,20 @@ export class Scheduler extends EventEmitter {
   /**
    * Initializes an instance of the Downloader class.
    */
-  public async download(): Promise<Array<ISchedulerResult | undefined>> {
-    console.log('ytpl', typeof ytpl, Object.keys(ytpl));
-    const playlist = await ytpl(this.playlistId, this.playlistOptions);
-    this.emit('playlistItems', { source: playlist, details: { playlistItems: playlist.items } });
-    return this.scheduler(playlist.items);
-    // try {
-    //   return await this.scheduler(playlist.items);
-    // return await scheduler<Scheduler.Result, ytpl.Item>(
-    //   this.maxconnections,
-    //   playlist.items,
-    //   this.downloadWorkers.bind(this)
-    // );
-    // } catch (error) {
-    //   throw new Error(`Scheduler error: ${(error as Error).message}`);
-    // }
+  public async download(): Promise<Array<ISchedulerResult | undefined> | undefined> {
+    console.log('playlistId', this.playlistId, 'playlistItems', this.playlistItems);
+    if (this.playlistId) {
+      const playlist = await ytpl(this.playlistId, this.playlistOptions);
+      this.emit('playlistItems', { source: playlist, details: { playlistItems: playlist.items } });
+      return this.scheduler(playlist.items);
+    } else if (this.playlistItems) {
+      this.emit('playlistItems', {
+        source: this.playlistItems,
+        details: { playlistItems: this.playlistItems },
+      });
+      return this.scheduler(this.playlistItems);
+    }
+    return undefined;
   }
 
   /*

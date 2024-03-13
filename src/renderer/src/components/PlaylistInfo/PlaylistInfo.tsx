@@ -128,9 +128,11 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   const { t } = useTranslation();
   const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
   const totalDuration = calcTotalPlayTime(props.items);
-  const downloadSelected = (): void => {
+  const downloadSelected = async (): Promise<void> => {
     const selectedItems = playlist?.items.filter(({ selected }) => Boolean(selected));
     console.log('selectedItems', selectedItems);
+    const download = selectedItems && (await window.commands.download(selectedItems));
+    console.log('download', download);
   };
 
   useContextMenu<ISortOrderContextMenuMessage>(

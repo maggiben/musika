@@ -6,7 +6,7 @@ import * as utils from '@shared/lib/utils';
 import { useRecoilState } from 'recoil';
 import { BsThreeDots } from 'react-icons/bs';
 import useDownload from '@hooks/useDownload';
-// import useFakeProgress from '@hooks/useFakeProgress';
+import useFakeProgress from '@hooks/useFakeProgress';
 import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { playlistState } from '@renderer/states/atoms';
@@ -43,6 +43,7 @@ const ListBase = css`
   overflow-y: hidden;
   & > span {
     min-width: 0;
+    z-index: 0;
     /* Checkbox */
     &:nth-child(1) {
       text-align: right;
@@ -137,7 +138,7 @@ const ListItemWrapper = styled.li<{
     position: absolute;
     height: 100%;
     background: ${({ theme }) => theme.colors.red};
-    z-index: -1;
+    z-index: 0;
     left: 0;
     ${({ $progress }) =>
       $progress &&
@@ -199,6 +200,9 @@ const List = (_props: IListProps): JSX.Element | null => {
 
   const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
   const progress = useDownload();
+  // const progress = useFakeProgress({
+  //   items: playlist?.items ?? [],
+  // });
 
   const sort = (items: IPlaylist['items'] = []): IPlaylist['items'] => {
     let sorted = items.slice();

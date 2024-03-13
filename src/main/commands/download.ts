@@ -38,6 +38,7 @@ import * as ytdl from 'ytdl-core';
 import { BrowserWindow } from 'electron';
 import { Scheduler } from '../utils/Scheduler';
 import type { IDownloadWorkerMessage } from '../utils/DownloadWorker';
+import type { IPlaylistItem } from 'types/types';
 
 interface IDownloadOptions {
   output: string;
@@ -57,15 +58,18 @@ enum Options {
 export type EncodeOptions = { [key in keyof typeof Options]: string | number };
 
 export default async function download(
-  url: string,
+  source: string | IPlaylistItem[],
   mainWindow: BrowserWindow | null,
   options?: IDownloadOptions,
 ): Promise<Record<string, unknown>> {
-  const playlistId = ytpl.validateID(url) && (await ytpl.getPlaylistID(url));
-  const videoId = ytdl.validateURL(url) && ytdl.getVideoID(url);
-  if (playlistId) {
+  const playlistId =
+    typeof source === 'string' && ytpl.validateID(source) && (await ytpl.getPlaylistID(source));
+  const videoId = typeof source === 'string' && ytdl.validateURL(source) && ytdl.getVideoID(source);
+  const playlistItems = Array.isArray(source) && source.length && source;
+  if (playlistId || playlistItems) {
     const scheduler = new Scheduler({
-      playlistId,
+      ...(playlistId && { playlistId }),
+      ...(playlistItems && { playlistItems }),
       playlistOptions: {
         gl: 'US',
         hl: 'en',
@@ -95,6 +99,7 @@ export default async function download(
     scheduler.download();
   }
   return {
+    source,
     playlistId,
     videoId,
   };
