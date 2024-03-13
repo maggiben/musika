@@ -25,5 +25,9 @@ export declare global {
       loadPreferences: () => Promise<IPreferences>;
       savePreferences: (preferences: IPreferences) => Promise<boolean>;
     };
+    playlist: {
+      loadPlaylist: (location: string) => Promise<IPlaylist | undefined>;
+      savePlaylist: (playlist: IPlaylist, location: string) => Promise<boolean>;
+    };
   }
 }

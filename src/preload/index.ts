@@ -1,6 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
-import type { IPreferences } from 'types/types';
+import type { IPlaylist, IPreferences } from 'types/types';
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -22,6 +22,11 @@ if (process.contextIsolated) {
       loadPreferences: () => ipcRenderer.invoke('loadPreferences', {}),
       savePreferences: (preferences: IPreferences) =>
         ipcRenderer.invoke('savePreferences', preferences),
+    });
+    contextBridge.exposeInMainWorld('playlist', {
+      loadPlaylist: (location: string) => ipcRenderer.invoke('loadPlaylist', location),
+      savePlaylist: (playlist: IPlaylist, location: string) =>
+        ipcRenderer.invoke('savePlaylist', playlist, location),
     });
     contextBridge.exposeInMainWorld('commands', {
       getVideoInfo: (url: string) => ipcRenderer.invoke('getVideoInfo', url),

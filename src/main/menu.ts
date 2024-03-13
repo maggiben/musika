@@ -15,7 +15,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { IconContext } from 'react-icons';
 import { LuInspect } from 'react-icons/lu';
 import i18n from './utils/i18n';
-import { IPlaylistItem, ISortOptions } from 'types/types';
+import { IPlaylistItem } from 'types/types';
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 

@@ -9,10 +9,11 @@ import { contextMenu } from './menu';
 import getVideoInfo from './commands/info';
 import download from './commands/download';
 import search from './commands/search';
-import type { IPreferences } from 'types/types';
+import type { IPlaylist, IPreferences } from 'types/types';
 import { showOpenDialog } from './utils/dialogs';
 import modal from './utils/modal';
 import { savePreferences, loadPreferences } from './utils/preferences';
+import { loadPlaylist, savePlaylist } from './utils/playlist';
 
 export const setRpcHandlers = (mainWindow?: BrowserWindow | null): void => {
   const focusedWindow = BrowserWindow.getFocusedWindow();
@@ -49,6 +50,16 @@ export const setRpcHandlers = (mainWindow?: BrowserWindow | null): void => {
 
   ipcMain.handle('savePreferences', async (_event: IpcMainInvokeEvent, preferences: IPreferences) =>
     savePreferences(preferences, window),
+  );
+
+  ipcMain.handle('loadPlaylist', async (_event: IpcMainInvokeEvent, location: string) =>
+    loadPlaylist(location),
+  );
+
+  ipcMain.handle(
+    'savePlaylist',
+    async (_event: IpcMainInvokeEvent, playlist: IPlaylist, location: string) =>
+      savePlaylist(playlist, location),
   );
 
   ipcMain.handle('dark-mode:toggle', () => {

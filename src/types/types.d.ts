@@ -2,7 +2,6 @@ import 'styled-components';
 import type ytpl from '@distube/ytpl';
 export type { IDownloadWorkerMessage } from '@main/utils/DownloadWorker';
 export type { IMenuClickMessage } from '@main/menu';
-export type { IPlaylistItem, IPlaylist } from '@states/atoms';
 
 interface IAnimation {
   duration: string;
@@ -60,21 +59,34 @@ declare module 'styled-components' {
   }
 }
 
-type TytplItem = ytpl.result['items'][number];
+type TYtplPlaylistItem = ytpl.result['items'][number];
 
-export interface IPlaylistItem extends TytplItem {
+export interface IPlaylistItem
+  extends Omit<TYtplPlaylistItem, 'url_simple' | 'author' | 'duration'> {
   selected?: boolean;
   favorite?: boolean;
   dislike?: boolean;
+  duration?: string | number;
+  author?: {
+    name: string;
+  };
 }
 
-export interface IPlaylist extends Omit<ytpl.result, 'views' | 'items'> {
-  thumbnail: {
-    height: number;
-    width: number;
+export interface IPlaylist
+  extends Omit<
+    ytpl.result,
+    'views' | 'items' | 'visibility' | 'last_updated' | 'url' | 'description' | 'author'
+  > {
+  thumbnail?: {
+    height?: number;
+    width?: number;
     url: string;
   };
-  views: string | number;
+  visibility?: ytpl.result['visibility'];
+  description?: ytpl.result['description'];
+  url?: ytpl.result['url'];
+  author?: ytpl.result['author'];
+  views?: string | number;
   items: IPlaylistItem[];
 }
 

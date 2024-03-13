@@ -101,13 +101,13 @@ const RightActions = styled.div`
 `;
 
 interface IPlaylistInfoProps {
-  thumbnail: {
+  thumbnail?: {
     height: number;
     width: number;
     url: string;
   };
   title: string;
-  views: number | string;
+  views?: number | string;
   totalItems: number;
   items: ytpl.result['items'];
 }
@@ -130,9 +130,7 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   const totalDuration = calcTotalPlayTime(props.items);
   const downloadSelected = async (): Promise<void> => {
     const selectedItems = playlist?.items.filter(({ selected }) => Boolean(selected));
-    console.log('selectedItems', selectedItems);
     const download = selectedItems && (await window.commands.download(selectedItems));
-    console.log('download', download);
   };
 
   useContextMenu<ISortOrderContextMenuMessage>(
@@ -161,12 +159,14 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   );
   return (
     <PlaylistInfoContainer data-testid="playlist-info">
-      <StyledImg
-        src={props.thumbnail.url}
-        width={props.thumbnail.width}
-        height={props.thumbnail.height}
-        alt={t('thumbnail')}
-      />
+      {props.thumbnail && (
+        <StyledImg
+          src={props.thumbnail.url}
+          width={props.thumbnail.width}
+          height={props.thumbnail.height}
+          alt={t('thumbnail')}
+        />
+      )}
       <InfoGroup>
         <InfoNav>
           <hgroup>

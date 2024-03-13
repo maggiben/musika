@@ -3,13 +3,14 @@ import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
 import { padZeroes } from '@utils/string';
 import * as utils from '@shared/lib/utils';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { BsThreeDots } from 'react-icons/bs';
 import useDownload from '@hooks/useDownload';
 import useFakeProgress from '@hooks/useFakeProgress';
 import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { playlistState } from '@renderer/states/atoms';
+import { selectedItems } from '@renderer/states/selectors';
 import { IPlaylist } from 'types/types';
 import useContextMenu from '@renderer/hooks/useContextMenu';
 
@@ -161,7 +162,8 @@ const ListHeader = styled.li`
   &:first-child {
     position: sticky;
     top: 0; /* Stick to the top of the container */
-    background-color: var(--background-color-darker-translucent); /* ${({ theme }) => theme.colors['window-background']}; */
+    background-color: var(--background-color-darker-translucent); /* ${({ theme }) =>
+      theme.colors['window-background']}; */
     z-index: 1;
   }
 `;
@@ -171,15 +173,38 @@ interface SelectAllCheckboxProps {
 }
 
 const SelectAllCheckbox: React.FC<SelectAllCheckboxProps> = ({ indeterminate }) => {
+  const items = useRecoilValue(selectedItems);
+  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
   const checkboxRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = indeterminate ?? false;
+      checkboxRef.current.indeterminate =
+        items.some((item) => item) && !items.every((item) => item);
     }
-  }, [indeterminate]);
+  }, [items]);
 
-  return <input type="checkbox" ref={checkboxRef} />;
+  const handleAllSelect = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const { checked } = event.target;
+    setPlaylist((prev) => {
+      if (!prev || !prev.playlist) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        playlist: {
+          ...prev.playlist,
+          items: prev.playlist.items.map((item) => ({
+            ...item,
+            selected: checked,
+          })),
+        },
+      };
+    });
+  };
+
+  return <input type="checkbox" ref={checkboxRef} onChange={handleAllSelect} />;
 };
 
 interface IListProps {
@@ -316,6 +341,7 @@ const List = (_props: IListProps): JSX.Element | null => {
               id={`${item.id}:${index}`}
               defaultChecked={item.selected}
               data-item-selector={`${item.id}:${index}`}
+              checked={item.selected}
               onChange={handleItemSelect}
             />
             <SongIndex>{songIndex}</SongIndex>

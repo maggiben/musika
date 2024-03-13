@@ -1,4 +1,5 @@
 import { selector } from 'recoil';
+import { playlistState } from './atoms';
 import type { IPreferences } from 'types/types';
 
 // export interface RecoilState {
@@ -18,4 +19,12 @@ import type { IPreferences } from 'types/types';
 export const preferencesSelector = selector({
   key: 'preferencesSelector',
   get: async (): Promise<IPreferences> => window.preferences.loadPreferences(),
+});
+
+export const selectedItems = selector({
+  key: 'selectedItems',
+  get: ({ get }) => {
+    const { playlist } = get(playlistState);
+    return playlist ? playlist.items.map((item) => (item.selected ? true : false)) : [];
+  },
 });

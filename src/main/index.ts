@@ -35,6 +35,11 @@ function createWindow(_preferences: IPreferences): void {
   const menu = Menu.buildFromTemplate(applicationMenu(mainWindow));
   Menu.setApplicationMenu(menu);
 
+  if (menu.items[0].submenu) {
+    // disable updates
+    menu.items[0].submenu.items[1].enabled = false;
+  }
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();
   });
