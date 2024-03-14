@@ -50,7 +50,7 @@ export async function savePlaylist(playlist: IPlaylist, location: string): Promi
     const m3uPlaylist = new M3uPlaylist();
     m3uPlaylist.title = playlist.title;
     m3uPlaylist.attributes['tvg-id'] = playlist.id;
-    m3uPlaylist.attributes['tvg-logo'] = playlist.title;
+    m3uPlaylist.attributes['tvg-logo'] = playlist.thumbnail?.url;
     m3uPlaylist.attributes['author-name'] = playlist.author?.name;
     m3uPlaylist.attributes['author-avatar'] = playlist.author?.avatar;
     playlist.items.forEach((item) => {

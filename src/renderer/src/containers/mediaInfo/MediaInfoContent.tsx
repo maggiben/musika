@@ -13,6 +13,7 @@ const MediaInfoBody = styled.div`
   overflow-y: scroll;
   justify-content: flex-start;
   flex-direction: column;
+  box-sizing: border-box;
 `;
 
 const StyledTerm = styled.dt`

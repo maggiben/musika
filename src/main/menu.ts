@@ -49,6 +49,14 @@ export const applicationMenu = (
                 return;
               },
             },
+            {
+              label: 'Playlist from Selection',
+              id: 'menu.app.file.new.from-selection',
+              enabled: false,
+              accelerator: 'CmdOrCtrl+Shift+N',
+              click: async ({ id }: Electron.MenuItem) =>
+                mainWindow?.webContents.send('menu-click', { id }),
+            },
           ],
         },
         {

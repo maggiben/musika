@@ -5,17 +5,21 @@ import { useTranslation } from 'react-i18next';
 import type { IPlaylistItem } from 'types/types';
 import { DarwinButton } from '@renderer/components/Form/Form';
 import Loading from '@containers/loading/Loading';
+import { SpaceRight } from '@components/Spacing/Spacing';
+import AutoFitHeading from '@components/AutoFitHeading/AutoFitHeading';
 
 const MediaInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing.xs};
   box-sizing: border-box;
   height: 100%;
-  & > :not(:first-child):not(:last-child) {
-    margin-bottom: ${({ theme }) => theme.spacing.xs};
+  & > * {
+    padding: ${({ theme }) => theme.spacing.s};
+  }
+  & > *:nth-child(2) {
+    background-color: ${({ theme }) => theme.colors.darkGray};
   }
 `;
 
@@ -25,28 +29,37 @@ const ButtonsContainer = styled.div`
   justify-content: flex-end;
   align-items: center;
   width: 100%;
+  border-top: 1px solid ${({ theme }) => theme.colors['separator']};
+  box-sizing: border-box;
 `;
 
 const HeaderContainer = styled.div`
   --thumbnail-height: 120px;
   width: 100%;
   min-height: 140px;
+  max-height: 140px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
   overflow: hidden;
+  border-bottom: 1px solid ${({ theme }) => theme.colors['separator']};
+  box-sizing: border-box;
 `;
 
 const HeaderTitle = styled.h1`
   margin: 0;
   color: ${({ theme }) => theme.colors.white};
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  white-space: break-spaces;
 `;
 
 const StyledImg = styled.img`
   width: auto;
   max-height: var(--thumbnail-height);
-  border-radius: ${({ theme }) => theme.spacing.xxxs};
+  border-radius: ${({ theme }) => theme.spacing.xs};
   -webkit-box-reflect: below 1px
     linear-gradient(
       to bottom,
@@ -91,8 +104,6 @@ const AsyncComponentWrapper = ({ item }: { item: IPlaylistItem }): JSX.Element =
   );
 };
 
-// return { default: () => <StyledPre>{JSON.stringify(data, null, 2)}</StyledPre>, data }; // Pass the data along with the component
-
 const MediaInfo = (props: IMediInfoProps): JSX.Element => {
   const { item } = props.options;
   const { t } = useTranslation();
@@ -104,10 +115,11 @@ const MediaInfo = (props: IMediInfoProps): JSX.Element => {
   };
 
   return (
-    <MediaInfoContainer>
+    <MediaInfoContainer data-testid="media-info-container">
       <HeaderContainer>
         <StyledImg src={item.thumbnail}></StyledImg>
-        <HeaderTitle>{item.title}</HeaderTitle>
+        <SpaceRight size="xs" />
+        <AutoFitHeading>{item.title}</AutoFitHeading>
       </HeaderContainer>
       <Suspense fallback={<Loading />}>
         <AsyncComponentWrapper item={item} />
