@@ -63,8 +63,6 @@ export const FormControl = styled.input`
   display: block;
   width: 100%;
   padding: ${({ theme }) => theme.spacing.xs};
-  font-size: ${({ theme }) => theme.fontSizes.s};
-  line-height: ${({ theme }) => theme.lineHeights.l};
   color: ${({ theme, disabled }) => (disabled ? theme.colors.lightGray : theme.colors.white)};
   background-color: ${({ theme, disabled }) =>
     disabled ? theme.colors.darkGray : theme.colors.softGray};
@@ -72,31 +70,7 @@ export const FormControl = styled.input`
   background-clip: padding-box;
   appearance: none;
   border-radius: 0;
-  transition:
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
-`;
-
-// Styled textarea extending from BaseInput
-export const StyledTextarea = styled(FormControl).attrs({ as: 'textarea' })`
-  --active-color: ${({ theme }) => theme.colors.accentColor};
-  --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
-  min-height: 100px;
-  resize: vertical;
-  border-radius: ${({ theme }) => theme.borderRadius.xs};
-  font-family: inherit;
-  box-sizing: border-box;
-  box-shadow:
-    0px 0.5px 1px rgba(0, 0, 0, 0.1),
-    0px 0.5px 0.5px rgba(255, 255, 255, 0.5),
-    0px 0px 0px 0.5px rgba(0, 0, 0, 0.12);
-  &:focus {
-    box-shadow:
-      inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2),
-      0px 0.5px 1px rgba(0, 0, 0, 0.1),
-      0px 0px 0px 3.5px var(--active-color-shadow);
-    outline: 0;
-  }
+  transition: all 0.15s ease-in-out;
 `;
 
 export const InputGroupText = styled.span`
@@ -178,6 +152,7 @@ export const DarwinButton = styled.button`
 export const DarwinInput = styled.input`
   --active-color: ${({ theme }) => theme.colors.accentColor};
   --active-color-shadow: color-mix(in srgb, var(--active-color), #00000080 50%);
+  box-sizing: border-box;
   padding: ${({ theme }) => theme.spacing.xs};
   border-radius: ${({ theme }) => theme.borderRadius.xs};
   border: 0;
@@ -193,6 +168,13 @@ export const DarwinInput = styled.input`
       0px 0px 0px 3.5px var(--active-color-shadow);
     outline: 0;
   }
+`;
+
+// Styled textarea extending from BaseInput
+export const StyledTextarea = styled(DarwinInput).attrs({ as: 'textarea' })`
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
 `;
 
 export const DarwinInputSearch = styled(DarwinInput)`

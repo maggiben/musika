@@ -1,27 +1,12 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import { playlistState } from '@renderer/states/atoms';
+import { playlistState, preferencesState } from '@renderer/states/atoms';
 import { TbPlaylist } from 'react-icons/tb';
 import { BsStar, BsPersonFill } from 'react-icons/bs';
-import { MdApps } from 'react-icons/md';
 import { SpaceBottom, SpaceRight } from '../Spacing/Spacing';
 import { DarwinInputSearch } from '../Form/Form';
-
-interface SideBarContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  $sidebarwidth: number | string;
-}
-
-const SideBarContainer = styled.div<SideBarContainerProps>`
-  --sidebar-width: ${({ $sidebarwidth }) => $sidebarwidth}px;
-  height: 100%;
-  width: var(--sidebar-width);
-  box-sizing: border-box;
-  padding: ${({ theme }) => theme.spacing.s};
-  position: relative;
-  user-select: none;
-`;
+import ResizableContainer from './ResizableContainer';
 
 const DraggableRegion = styled.div`
   width: 100%;
@@ -34,16 +19,6 @@ const DraggableRegion = styled.div`
 const StyledNav = styled.div`
   width: 100%;
   height: auto;
-`;
-
-const StyledResizer = styled.div`
-  width: 1px;
-  height: 100vh;
-  background-color: black;
-  position: absolute;
-  top: 0;
-  left: calc(100% - 1px);
-  cursor: ew-resize;
 `;
 
 const StyledNavHeading = styled.h1`
@@ -123,144 +98,101 @@ const StyledInputRadio = styled.input`
   }
 `;
 
-const mainSidePanel = [
-  {
-    title: 'Library',
-    id: 'library',
-    showSearch: true,
-    onSearch: () => {},
-    items: [
-      {
-        icon: <TbPlaylist style={{ color: 'violet' }} />,
-        title: 'Recently Added',
-        id: 'recently-added',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('menu 1', event);
-        },
-      },
-      {
-        icon: <BsPersonFill style={{ color: 'yellow' }} />,
-        title: 'Artist',
-        id: 'artist',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('Artist', event);
-        },
-      },
-      {
-        icon: <BsStar />,
-        title: 'Albums',
-        id: 'albums',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('Albums', event);
-        },
-      },
-      {
-        icon: <BsStar />,
-        title: 'Songs',
-        id: 'songs',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('Songs', event);
-        },
-      },
-      {
-        icon: <BsStar />,
-        title: 'Music Music',
-        id: 'music-videos',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('Music Videos', event);
-        },
-      },
-    ],
-  },
-  {
-    title: 'Playlists',
-    id: 'playlists',
-    items: [
-      {
-        icon: <TbPlaylist style={{ color: 'violet' }} />,
-        title: 'All Playlists',
-        id: 'all-playlist',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('menu 1', event);
-        },
-      },
-      {
-        icon: <TbPlaylist style={{ color: 'red' }} />,
-        title: 'My Playlist',
-        id: '234523452345',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('mine', event);
-        },
-      },
-      {
-        icon: <TbPlaylist style={{ color: 'blue' }} />,
-        title: 'My super very long playlist title that cannot fit in a SideBar',
-        id: 'adsfasdfasdf',
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('Albums', event);
-        },
-      },
-    ],
-  },
-];
+interface ISideBarItem {
+  title: string;
+  id: string;
+  showSearch?: boolean;
+  onSearch?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  items: {
+    icon: JSX.Element;
+    title: string;
+    id: string;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  }[];
+}
 
 const SideBar = (): JSX.Element => {
   const { t } = useTranslation();
   const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
+  const preferences = useRecoilValue(preferencesState);
 
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(200);
-  const startResizing = useCallback(() => {
-    setIsResizing(true);
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  const resize = useCallback(
-    (mouseMoveEvent) => {
-      if (isResizing) {
-        const rect = sidebarRef.current?.getBoundingClientRect();
-        rect && setSidebarWidth(mouseMoveEvent.clientX - rect.left);
-      }
+  const mainSidePanel: ISideBarItem[] = [
+    {
+      title: 'Library',
+      id: 'library',
+      showSearch: true,
+      onSearch: () => {},
+      items: [
+        {
+          icon: <TbPlaylist style={{ color: 'violet' }} />,
+          title: 'Recently Added',
+          id: 'recently-added',
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            console.log('menu 1', event);
+          },
+        },
+        {
+          icon: <BsPersonFill style={{ color: 'yellow' }} />,
+          title: 'Artist',
+          id: 'artist',
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            console.log('Artist', event);
+          },
+        },
+        {
+          icon: <BsStar />,
+          title: 'Albums',
+          id: 'albums',
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            console.log('Albums', event);
+          },
+        },
+        {
+          icon: <BsStar />,
+          title: 'Songs',
+          id: 'songs',
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            console.log('Songs', event);
+          },
+        },
+        {
+          icon: <BsStar />,
+          title: 'Music Music',
+          id: 'music-videos',
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            console.log('Music Videos', event);
+          },
+        },
+      ],
     },
-    [isResizing],
-  );
-
-  useEffect(() => {
-    window.addEventListener('mousemove', resize);
-    window.addEventListener('mouseup', stopResizing);
-    return () => {
-      window.removeEventListener('mousemove', resize);
-      window.removeEventListener('mouseup', stopResizing);
-    };
-  }, [resize, stopResizing]);
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    // setSelectedRadio(event.target.value);
-    console.log('event: ', event);
-  };
-
-  function isArrayofArrays(arr) {
-    return Array.isArray(arr) && arr.every((innerArr) => Array.isArray(innerArr));
-  }
-
-  function isArrayofObjects(arr) {
-    return (
-      Array.isArray(arr) &&
-      arr.every((obj) => typeof obj === 'object' && obj !== null && !Array.isArray(obj))
-    );
-  }
+    {
+      title: 'Playlists',
+      id: 'playlists',
+      items: [
+        {
+          icon: <TbPlaylist style={{ color: 'red' }} />,
+          title: 'All Playlists',
+          id: 'all-playlist',
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            console.log('menu 1', event);
+          },
+        },
+        ...preferences.playlists.map((playlist) => {
+          return {
+            icon: <TbPlaylist />,
+            id: playlist.id,
+            title: playlist.title,
+            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+              console.log('mine', event);
+            },
+          };
+        }),
+      ],
+    },
+  ];
 
   return (
-    <SideBarContainer
-      data-testid="sidebar"
-      $sidebarwidth={sidebarWidth}
-      ref={sidebarRef}
-      onMouseDown={(e) => isResizing && e.preventDefault()}
-    >
+    <ResizableContainer>
       <div>
         {mainSidePanel.map((group, index) => {
           return (
@@ -302,8 +234,7 @@ const SideBar = (): JSX.Element => {
           );
         })}
       </div>
-      <StyledResizer onMouseDown={startResizing} data-testid="sidebar-resizer" />
-    </SideBarContainer>
+    </ResizableContainer>
   );
 };
 

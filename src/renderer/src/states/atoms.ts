@@ -411,7 +411,7 @@ export const playlistState = atom<{
       criteria: 'title',
     },
     properties: undefined,
-    playlist: mockPlaylist,
+    playlist: undefined,
   },
 });
 

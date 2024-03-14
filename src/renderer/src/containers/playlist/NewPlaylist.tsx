@@ -1,12 +1,7 @@
 import './Playlist.css';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {
-  FormControl,
-  InputGroup,
-  StyledTextarea,
-  DarwinButton,
-} from '@renderer/components/Form/Form';
+import { DarwinInput, StyledTextarea, DarwinButton } from '@renderer/components/Form/Form';
 import coverflowImage from '@assets/images/coverflow.svg';
 import { useTranslation } from 'react-i18next';
 
@@ -155,14 +150,12 @@ const NewPlaylist = (): JSX.Element => {
           />
         )}
       </ThumbnailContainer>
-      <InputGroup>
-        <FormControl
-          type="text"
-          id="playlist-title"
-          name="playlist-title"
-          placeholder={t('playlist title')}
-        />
-      </InputGroup>
+      <DarwinInput
+        type="text"
+        id="playlist-title"
+        name="playlist-title"
+        placeholder={t('playlist title')}
+      />
       <StyledTextarea placeholder={t('optional description')} style={{ flex: 1, resize: 'none' }} />
       <ButtonsContainer>
         <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>

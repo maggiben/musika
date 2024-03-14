@@ -117,10 +117,31 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     ['open-url'],
   );
 
-  useMainMenu<{ filePath: string }>(
-    async ({ filePath }) => window.playlist.savePlaylist(playlist, filePath),
-    'menu.app.file.save-as',
-  );
+  useMainMenu<{ filePath: string }>(async ({ filePath }) => {
+    try {
+      await window.playlist.savePlaylist(playlist, filePath);
+      const newPreferences = playlist && {
+        ...preferences,
+        playlists: [
+          ...preferences.playlists,
+          {
+            filePath,
+            id: playlist.id,
+            url: playlist.url,
+            title: playlist.title,
+            description: playlist.description,
+            thumbnail: playlist.thumbnail,
+          },
+        ],
+      };
+      if (newPreferences) {
+        await window.preferences.savePreferences(newPreferences);
+        setPreferences(newPreferences);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, 'menu.app.file.save-as');
 
   useEffect(() => {
     // Add event listener for menu bar clicks

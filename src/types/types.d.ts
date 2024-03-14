@@ -84,7 +84,7 @@ export interface IPlaylist
   };
   visibility?: ytpl.result['visibility'];
   description?: ytpl.result['description'];
-  url?: ytpl.result['url'];
+  url: ytpl.result['url'];
   author?: ytpl.result['author'];
   views?: string | number;
   items: IPlaylistItem[];
@@ -147,7 +147,7 @@ export interface IPreferences {
   playlists: {
     id: string;
     title: string;
-    description?: string;
+    description?: string | null;
     filePath: string;
     url: string;
     thumbnail?: {
