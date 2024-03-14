@@ -9,10 +9,12 @@ import useDownload from '@hooks/useDownload';
 import useFakeProgress from '@hooks/useFakeProgress';
 import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
-import { playlistState } from '@renderer/states/atoms';
-import { selectedItems } from '@renderer/states/selectors';
-import { IPlaylist } from 'types/types';
+import { playlistState } from '@states/atoms';
+import { selectedItemsSelector } from '@states/selectors';
+import SelectAllCheckbox from './SelectAllCheckbox';
+import { IPlaylist, IPlaylistItem } from 'types/types';
 import useContextMenu from '@renderer/hooks/useContextMenu';
+import sortPlaylist from './sortPlaylist';
 
 const SongIndex = styled.span`
   user-select: none;
@@ -127,9 +129,7 @@ const ListWrapper = styled.ul`
   overflow-y: scroll;
 `;
 
-const ListItemWrapper = styled.li<{
-  $progress?: number[];
-}>`
+const ListItemWrapper = styled.li<{ $progress?: number[] }>`
   position: relative;
   display: flex;
   flex-direction: row;
@@ -164,64 +164,12 @@ const ListHeader = styled.li`
   &:first-child {
     position: sticky;
     top: 0; /* Stick to the top of the container */
-    background-color: var(--background-color-darker-translucent); /* ${({ theme }) =>
-      theme.colors['window-background']}; */
+    background-color: var(--background-color-darker-translucent);
     z-index: 1;
   }
 `;
 
-interface SelectAllCheckboxProps {
-  indeterminate?: boolean;
-}
-
-const SelectAllCheckbox: React.FC<SelectAllCheckboxProps> = ({ indeterminate }) => {
-  const items = useRecoilValue(selectedItems);
-  const [, setPlaylist] = useRecoilState(playlistState);
-  const checkboxRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (checkboxRef.current) {
-      if (items.some((item) => item) && !items.every((item) => item)) {
-        checkboxRef.current.indeterminate = true;
-        checkboxRef.current.checked = false;
-      } else if (items.every((item) => item)) {
-        checkboxRef.current.indeterminate = false;
-      } else if (!items.some((item) => item)) {
-        checkboxRef.current.indeterminate = false;
-        checkboxRef.current.checked = false;
-      }
-    }
-  }, [items]);
-
-  const handleAllSelect = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { checked } = event.target;
-    setPlaylist((prev) => {
-      if (!prev || !prev.playlist) {
-        return prev;
-      }
-
-      return {
-        ...prev,
-        playlist: {
-          ...prev.playlist,
-          items: prev.playlist.items.map((item) => ({
-            ...item,
-            selected: checked,
-          })),
-        },
-      };
-    });
-  };
-
-  return <input type="checkbox" ref={checkboxRef} onChange={handleAllSelect} />;
-};
-
-interface IListProps {
-  items?: IPlaylist['items'];
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const List = (_props: IListProps): JSX.Element | null => {
+const List = (): JSX.Element | null => {
   useContextMenu<{
     id: string;
     options?: Record<string, unknown>;
@@ -233,106 +181,23 @@ const List = (_props: IListProps): JSX.Element | null => {
   );
 
   const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
+  const [, setSelectedItems] = useRecoilState(selectedItemsSelector);
   const progress = useDownload();
   // const progress = useFakeProgress({
   //   items: playlist?.items ?? [],
   // });
 
-  const sort = (items: IPlaylist['items'] = []): IPlaylist['items'] => {
-    let sorted = items.slice();
-    switch (sortOptions?.criteria) {
-      case 'title':
-        sorted = items.slice().sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case 'author':
-        sorted = items.slice().sort((a, b) => {
-          // If titles are the same, compare by author name
-          if (a.author && b.author) {
-            return a.author.name.localeCompare(b.author.name);
-          } else if (!a.author && b.author) {
-            return -1; // Put items with no author last
-          } else if (a.author && !b.author) {
-            return 1; // Put items with no author last
-          }
-          return 0; // Both items have no author, consider them equal
-        });
-        break;
-      case 'time':
-        sorted = items.slice().sort((a, b) => {
-          const a_duration =
-            typeof a.duration === 'string'
-              ? utils.timeStringToSeconds(a.duration)
-              : a.duration ?? 0;
-          const b_duration =
-            typeof b.duration === 'string'
-              ? utils.timeStringToSeconds(b.duration)
-              : b.duration ?? 0;
-          if (a_duration < b_duration) {
-            return -1;
-          } else if (a_duration > b_duration) {
-            return 1;
-          }
-          return 0;
-        });
-        break;
-      default:
-        sorted = items.slice();
-        break;
-    }
-
-    const result = sortOptions?.order === 'ascending' ? sorted : sorted.reverse();
-    setPlaylist((prev) => {
-      if (!prev || !prev.playlist) {
-        return prev;
-      }
-      return {
-        ...prev,
-        playlist: {
-          ...prev.playlist,
-          items: result,
-        },
-      };
-    });
-    return result;
-  };
-
   const handleItemSelect = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    if (!playlist) return;
     const { checked } = event.target;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_itemId, index] = event.target.getAttribute('data-item-selector')!.split(':');
-    // Create a new array with the modified item
-    setPlaylist((prev) => {
-      if (!prev || !prev.playlist) {
-        return prev;
-      }
-      const items: IPlaylist['items'] = [
-        ...prev.playlist.items.slice(0, parseInt(index, 10)), // Copy items before the modified item
-        { ...prev.playlist.items[parseInt(index, 10)], selected: checked }, // Copy the modified item with the new name
-        ...prev.playlist.items.slice(parseInt(index, 10) + 1), // Copy items after the modified item
-      ];
-      return {
-        ...prev,
-        playlist: {
-          ...prev.playlist,
-          items,
-        },
-      };
-    });
+    const [id] = event.target.getAttribute('data-item-selector')!.split(':');
+    const selected = playlist.items.map((item) =>
+      item.id === id ? checked : item.selected ?? false,
+    );
+    setSelectedItems(selected);
   };
 
-  useEffect(() => {
-    sort(playlist?.items);
-  }, [sortOptions]);
-
-  const getItems = (items: IPlaylist['items'] = []): JSX.Element[] => {
-    const maxHours = Math.max(
-      ...items.map(({ duration }) =>
-        Math.floor(
-          typeof duration === 'string' ? utils.timeStringToSeconds(duration) : duration ?? 0 / 3600,
-        ),
-      ),
-    );
-
+  const getItems = (items: IPlaylistItem[] = []): JSX.Element[] => {
     return items.map((item, index) => {
       const songIndex = padZeroes(index + 1, items.length.toString().split('').length);
       const duration =
@@ -360,7 +225,6 @@ const List = (_props: IListProps): JSX.Element | null => {
             <input
               type="checkbox"
               id={`${item.id}:${index}`}
-              defaultChecked={item.selected}
               data-item-selector={`${item.id}:${index}`}
               checked={item.selected}
               onChange={handleItemSelect}
@@ -409,7 +273,7 @@ const List = (_props: IListProps): JSX.Element | null => {
           </span>
         </ListBack>
       </ListHeader>
-      {getItems(playlist.items)}
+      {getItems(sortPlaylist(playlist.items, sortOptions))}
     </ListWrapper>
   ) : null;
 };

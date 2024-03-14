@@ -320,6 +320,23 @@ export const contextMenu = async (
       label: 'Sort Options',
       submenu: [
         {
+          label: 'Playlist Order',
+          type: 'radio',
+          checked: sortOptions.criteria === 'default',
+          id: 'contextmenu.playlist-sort.criteria-default',
+          click: async ({ id, checked, type }: Electron.MenuItem) =>
+            window?.webContents.send('context-menu-click', {
+              id,
+              checked,
+              type,
+              ...options,
+              sortOptions: {
+                ...sortOptions,
+                criteria: 'default',
+              },
+            }),
+        },
+        {
           label: 'Title',
           type: 'radio',
           checked: sortOptions.criteria === 'title',

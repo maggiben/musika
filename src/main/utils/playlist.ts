@@ -12,12 +12,15 @@ export async function loadPlaylist(location: string): Promise<IPlaylist | undefi
     const items = playlist.medias.map((media, index) => ({
       url: media.location,
       title: media.name ?? '',
-      duration: media.duration ?? '0',
+      duration: media.duration ?? 0,
       id: media.attributes['tvg-id'] ?? media.name + ':' + index,
       thumbnail: media.attributes['tvg-logo'] ?? '',
       author: {
         name: media.artist ?? '',
       },
+      selected: media.attributes['selected'] === 'true' ? true : false,
+      favorite: media.attributes['favorite'] === 'true' ? true : false,
+      dislike: media.attributes['dislike'] === 'true' ? true : false,
     }));
     return {
       id: playlist.attributes['tvg-id'] ?? '',
@@ -59,6 +62,8 @@ export async function savePlaylist(playlist: IPlaylist, location: string): Promi
         'tvg-id': item.id,
         'tvg-logo': item.thumbnail,
         favorite: item.favorite ? 'true' : 'false',
+        selected: item.selected ? 'true' : 'false',
+        dislike: item.selected ? 'true' : 'false',
       };
       media.duration = item.duration ? timeStringToSeconds(item.duration.toString()) : 0;
       media.name = item.title;

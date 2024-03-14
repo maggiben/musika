@@ -149,6 +149,7 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
     [
       'contextmenu.playlist-sort.filter-all',
       'contextmenu.playlist-sort.filter-favorites',
+      'contextmenu.playlist-sort.criteria-default',
       'contextmenu.playlist-sort.criteria-title',
       'contextmenu.playlist-sort.criteria-genere',
       'contextmenu.playlist-sort.criteria-author',

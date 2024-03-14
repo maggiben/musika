@@ -92,7 +92,7 @@ export interface IPlaylist
 
 export interface IPlaylistSortOptions {
   filter: 'all' | 'favorites';
-  criteria: 'title' | 'genere' | 'year' | 'author' | 'time';
+  criteria: 'title' | 'genere' | 'year' | 'author' | 'time' | 'default';
   order: 'ascending' | 'descending';
   seach?: string;
 }
