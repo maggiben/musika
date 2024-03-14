@@ -1,4 +1,4 @@
-import { useEffect, useRef, useLayoutEffect } from 'react';
+import { useRef } from 'react';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';

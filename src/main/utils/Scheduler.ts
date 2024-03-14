@@ -89,18 +89,18 @@ export interface ISchedulerMessage {
 }
 
 export interface ISchedulerRetryItems {
-  item: ytpl.result['items'][0];
+  item: IPlaylistItem[][number];
   left: number;
 }
 
 export interface ISchedulerResult {
-  item: ytpl.result['items'][0];
+  item: IPlaylistItem[][number];
   code: number | boolean;
   error?: Error | string;
 }
 
 export interface ISchedulerWorkerOptions extends WorkerOptions {
-  item: ytpl.result['items'][0];
+  item: IPlaylistItem[][number];
   output: string;
   timeout: number;
 }
@@ -140,7 +140,7 @@ export class Scheduler extends EventEmitter {
     if (this.playlistId) {
       const playlist = await ytpl(this.playlistId, this.playlistOptions);
       this.emit('playlistItems', { source: playlist, details: { playlistItems: playlist.items } });
-      return this.scheduler(playlist.items);
+      return this.scheduler(playlist.items as IPlaylistItem[]);
     } else if (this.playlistItems) {
       this.emit('playlistItems', {
         source: this.playlistItems,
@@ -157,9 +157,7 @@ export class Scheduler extends EventEmitter {
   }
   */
 
-  private async scheduler(
-    items: ytpl.result['items'],
-  ): Promise<Array<ISchedulerResult | undefined>> {
+  private async scheduler(items: IPlaylistItem[]): Promise<Array<ISchedulerResult | undefined>> {
     const workers: Array<ISchedulerResult | undefined> = [];
     for await (const result of this.runTasks<ISchedulerResult>(
       this.maxconnections,
@@ -174,7 +172,7 @@ export class Scheduler extends EventEmitter {
     from: https://stackoverflow.com/questions/40639432/what-is-the-best-way-to-limit-concurrency-when-using-es6s-promise-all
   */
   private tasks<T extends ISchedulerResult>(
-    items: ytpl.result['items'],
+    items: IPlaylistItem[],
   ): IterableIterator<() => Promise<T>> {
     const tasks = [] as Array<() => Promise<T>>;
     for (const item of items) {
@@ -250,12 +248,12 @@ export class Scheduler extends EventEmitter {
    * @name retryDownloadWorker
    * @memberOf Scheduler:retryDownloadWorker
    * @category Control Flow
-   * @param {ytpl.result['items'][0]} item the playlist item
+   * @param {IPlaylistItem[][number]} item the playlist item
    * @param {Worker} worker the worker currently executing
    * @returns {boolean} returns false if exceeded the maximum allowed retries otherwise returns true
    */
   private async retryDownloadWorker<T extends ISchedulerResult>(
-    item: ytpl.result['items'][0],
+    item: IPlaylistItem[][number],
   ): Promise<T> {
     if (!this.retryItems.has(item.id)) {
       this.retryItems.set(item.id, {
@@ -282,7 +280,7 @@ export class Scheduler extends EventEmitter {
     throw new Error(`Could not retry id: ${item.id} retries left: ${retryItem && retryItem.left}`);
   }
 
-  private async terminateDownloadWorker(item: ytpl.result['items'][0]): Promise<void> {
+  private async terminateDownloadWorker(item: IPlaylistItem[][number]): Promise<void> {
     const worker = this.workers.get(item.id);
     const code = worker && (await worker.terminate());
     this.workers.delete(item.id);
@@ -295,7 +293,7 @@ export class Scheduler extends EventEmitter {
   }
 
   private async downloadWorkers<T extends ISchedulerResult>(
-    item: ytpl.result['items'][0],
+    item: IPlaylistItem[][number],
   ): Promise<T> {
     const workerData: ISchedulerWorkerOptions = {
       item,
@@ -315,7 +313,7 @@ export class Scheduler extends EventEmitter {
 
   private handleWorkerEvents<T extends ISchedulerResult>(
     worker: Worker,
-    item: ytpl.result['items'][0],
+    item: IPlaylistItem[][number],
     resolve: (value: T) => void,
     reject: (reason?: Error | number | unknown) => void,
   ): void {

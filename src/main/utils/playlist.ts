@@ -28,7 +28,7 @@ export async function loadPlaylist(location: string): Promise<IPlaylist | undefi
       total_items: items.length,
       visibility: playlist.attributes['visibility'] as 'link only' | 'everyone',
       description: playlist.attributes['description'],
-      url: playlist.attributes['url'],
+      url: playlist.attributes['url'] ?? '',
       author: {
         id: playlist.attributes['author-id'] ?? '',
         name: playlist.attributes['author-name'] ?? '',

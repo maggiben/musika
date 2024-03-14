@@ -72,6 +72,7 @@ const darwinColorsKeys = [
   'window-frame-text', // The text in the window's titlebar area.
 ] as const;
 
+/*
 const windowsColorKeys = [
   '3d-dark-shadow', // Dark shadow for three-dimensional display elements.
   '3d-face', // Face color for three-dimensional display elements and for dialog box backgrounds.
@@ -104,6 +105,7 @@ const windowsColorKeys = [
   'window-frame', // Window frame.
   'window-text', // Text in windows.
 ] as const;
+*/
 
 const getDefaultPreferences = (): IPreferences => {
   const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';

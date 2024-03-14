@@ -1,9 +1,5 @@
 import { useRef, useLayoutEffect } from 'react';
 
-const getSize = (element: HTMLElement): [number, number] => {
-  return [element.offsetWidth, element.offsetHeight];
-};
-
 const useModalResize = (formRef: React.RefObject<HTMLElement>): void => {
   const innerHeightRef = useRef<number | undefined>(undefined);
 

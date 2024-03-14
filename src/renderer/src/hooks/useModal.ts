@@ -3,16 +3,17 @@ import { useEffect, DependencyList } from 'react';
 
 const useModal = <T>(
   callback: (type: string, message: T) => void,
-  deps: DependencyList,
+  channels: string[] | string,
+  deps?: DependencyList,
 ): T | undefined | void => {
-  const handleCloseModal = async (
-    _event: IpcRendererEvent,
-    type: string,
-    message: Record<string, unknown>,
-  ): Promise<void | boolean> => {
-    return deps.includes(type) && callback(type, message as T);
-  };
   useEffect(() => {
+    const handleCloseModal = async (
+      _event: IpcRendererEvent,
+      type: string,
+      message: Record<string, unknown>,
+    ): Promise<void | boolean> => {
+      return channels.includes(type) && callback(type, message as T);
+    };
     const removeCloseModalListener = window.electron.ipcRenderer.on(
       'close-modal',
       handleCloseModal,
@@ -20,7 +21,7 @@ const useModal = <T>(
     return () => {
       removeCloseModalListener();
     };
-  }, []);
+  }, [deps]);
 
   return;
 };

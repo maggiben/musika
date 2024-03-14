@@ -117,31 +117,41 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     ['open-url'],
   );
 
-  useMainMenu<{ filePath: string }>(async ({ filePath }) => {
-    try {
-      await window.playlist.savePlaylist(playlist, filePath);
-      const newPreferences = playlist && {
-        ...preferences,
-        playlists: [
-          ...preferences.playlists,
-          {
-            filePath,
-            id: playlist.id,
-            url: playlist.url,
-            title: playlist.title,
-            description: playlist.description,
-            thumbnail: playlist.thumbnail,
-          },
-        ],
-      };
-      if (newPreferences) {
-        await window.preferences.savePreferences(newPreferences);
-        setPreferences(newPreferences);
+  useMainMenu<{ filePath: string }>(
+    async ({ filePath }) => {
+      if (!playlist) {
+        return;
       }
-    } catch (error) {
-      console.error(error);
-    }
-  }, 'menu.app.file.save-as');
+      try {
+        await window.playlist.savePlaylist(playlist, filePath);
+        const newPreferences = {
+          ...preferences,
+          playlists: [
+            ...preferences.playlists,
+            {
+              filePath,
+              id: playlist.id,
+              url: playlist.url,
+              title: playlist.title,
+              description: playlist.description,
+              thumbnail: playlist.thumbnail,
+            },
+          ],
+        };
+        await window.preferences.savePreferences(newPreferences);
+        setPreferences((prev) => {
+          if (!prev || !prev.playlists) {
+            return prev;
+          }
+          return newPreferences;
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    'menu.app.file.save-as',
+    [playlist],
+  );
 
   useEffect(() => {
     // Add event listener for menu bar clicks

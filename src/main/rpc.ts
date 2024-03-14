@@ -15,7 +15,7 @@ import modal from './utils/modal';
 import { savePreferences, loadPreferences } from './utils/preferences';
 import { loadPlaylist, savePlaylist } from './utils/playlist';
 
-export const setRpcHandlers = (mainWindow?: BrowserWindow | null): void => {
+export const setRpcHandlers = (mainWindow: BrowserWindow): void => {
   const focusedWindow = BrowserWindow.getFocusedWindow();
   const window = mainWindow === mainWindow ? mainWindow : focusedWindow;
   ipcMain.handle('dialogs', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>

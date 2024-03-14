@@ -174,7 +174,7 @@ interface SelectAllCheckboxProps {
 
 const SelectAllCheckbox: React.FC<SelectAllCheckboxProps> = ({ indeterminate }) => {
   const items = useRecoilValue(selectedItems);
-  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
+  const [, setPlaylist] = useRecoilState(playlistState);
   const checkboxRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

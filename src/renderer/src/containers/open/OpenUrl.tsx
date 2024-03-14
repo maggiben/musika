@@ -36,7 +36,7 @@ const OpenUrl = (): JSX.Element => {
   const { t } = useTranslation();
   const [url, setUrl] = useState<string>('');
 
-  const handleOnChage = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleOnChage = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setUrl(event.target.value);
   };
 

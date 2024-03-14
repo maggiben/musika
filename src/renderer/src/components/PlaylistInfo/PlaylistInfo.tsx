@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import type ytpl from '@distube/ytpl';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { playlistState } from '@renderer/states/atoms';
@@ -9,7 +8,7 @@ import { FaPlay, FaCloudDownloadAlt, FaPencilAlt } from 'react-icons/fa';
 import { BsShuffle, BsThreeDots, BsFilter, BsChevronDown } from 'react-icons/bs';
 import { SpaceRight } from '../Spacing/Spacing';
 import { DarwinButton, CircularButton, DarwinInputSearch, ContextMenuButton } from '../Form/Form';
-import { IPlaylistSortOptions } from 'types/types';
+import { IPlaylistItem, IPlaylistSortOptions } from 'types/types';
 
 const PlaylistInfoContainer = styled.div`
   --thumbnail-height: 120px;
@@ -102,14 +101,14 @@ const RightActions = styled.div`
 
 interface IPlaylistInfoProps {
   thumbnail?: {
-    height: number;
-    width: number;
+    height?: number;
+    width?: number;
     url: string;
   };
   title: string;
   views?: number | string;
   totalItems: number;
-  items: ytpl.result['items'];
+  items: IPlaylistItem[];
 }
 
 interface ISortOrderContextMenuMessage {
@@ -118,7 +117,7 @@ interface ISortOrderContextMenuMessage {
   sortOptions: IPlaylistSortOptions;
 }
 
-const calcTotalPlayTime = (items: ytpl.result['items']): number => {
+const calcTotalPlayTime = (items: IPlaylistItem[]): number => {
   return items
     .map((item) => (item.duration ? timeStringToSeconds(item.duration) : 0))
     .reduce((acc, curr) => acc + curr, 0);

@@ -16,7 +16,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { IconContext } from 'react-icons';
 import { LuInspect } from 'react-icons/lu';
 import i18n from './utils/i18n';
-import { IPlaylistItem } from 'types/types';
+import { IPlaylistItem, IPlaylistSortOptions } from 'types/types';
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 
@@ -272,7 +272,7 @@ export const contextMenu = async (
     },
   ];
 
-  const playlistSort = (sortOptions: ISortOptions): IMenuItem[] => [
+  const playlistSort = (sortOptions: IPlaylistSortOptions): IMenuItem[] => [
     {
       label: 'All Media',
       type: 'radio',
@@ -437,7 +437,7 @@ export const contextMenu = async (
 
   options?.item && menus.set('playlist-item', playlistItem(options.item as IPlaylistItem));
   options?.sortOptions &&
-    menus.set('playlist-sort', playlistSort(options.sortOptions as ISortOptions));
+    menus.set('playlist-sort', playlistSort(options.sortOptions as IPlaylistSortOptions));
 
   let template: IMenuItem[] | undefined = menus.get(type);
 

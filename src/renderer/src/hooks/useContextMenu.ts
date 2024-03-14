@@ -3,13 +3,14 @@ import { useEffect, DependencyList } from 'react';
 
 const useContextMenu = <T>(
   callback: (message: T) => void,
-  deps: DependencyList | string,
+  channels: string[] | string,
+  deps?: DependencyList,
 ): T | undefined | void => {
   const handleContextMenuClick = async (
     _event: IpcRendererEvent,
     message: { id: string },
   ): Promise<void | boolean> => {
-    return deps.includes(message.id) && callback(message as T);
+    return channels.includes(message.id) && callback(message as T);
   };
   useEffect(() => {
     const removeListener = window.electron.ipcRenderer.on(
@@ -19,7 +20,7 @@ const useContextMenu = <T>(
     return () => {
       removeListener();
     };
-  }, []);
+  }, [deps]);
 
   return;
 };

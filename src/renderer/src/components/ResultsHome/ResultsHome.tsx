@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { SpaceRight } from '@components/Spacing/Spacing';
 
 const ResultsHomeContainer = styled.div`
   width: 100%;

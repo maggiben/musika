@@ -59,7 +59,7 @@ export type EncodeOptions = { [key in keyof typeof Options]: string | number };
 
 export default async function download(
   source: string | IPlaylistItem[],
-  mainWindow: BrowserWindow | null,
+  mainWindow?: BrowserWindow | null,
   options?: IDownloadOptions,
 ): Promise<Record<string, unknown>> {
   const playlistId =
