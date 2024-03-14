@@ -113,7 +113,7 @@ interface ISideBarItem {
 
 const SideBar = (): JSX.Element => {
   const { t } = useTranslation();
-  const [{ playlist }, setPlaylist] = useRecoilState(playlistState);
+  const [, setPlaylist] = useRecoilState(playlistState);
   const preferences = useRecoilValue(preferencesState);
 
   const mainSidePanel: ISideBarItem[] = [
@@ -177,13 +177,16 @@ const SideBar = (): JSX.Element => {
             console.log('menu 1', event);
           },
         },
-        ...preferences.playlists.map((playlist) => {
+        ...preferences.playlists.map((savedPlaylist) => {
           return {
             icon: <TbPlaylist />,
-            id: playlist.id,
-            title: playlist.title,
-            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-              console.log('mine', event);
+            id: savedPlaylist.id,
+            title: savedPlaylist.title,
+            onChange: async (event: React.ChangeEvent<HTMLInputElement>) => {
+              if (!event.target.checked) return;
+              const playlist = await window.playlist.loadPlaylist(savedPlaylist.filePath);
+              console.log('loaded', playlist);
+              setPlaylist((prev) => ({ ...prev, playlist }));
             },
           };
         }),

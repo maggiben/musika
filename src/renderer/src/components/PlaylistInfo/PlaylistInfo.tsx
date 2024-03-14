@@ -119,7 +119,7 @@ interface ISortOrderContextMenuMessage {
 
 const calcTotalPlayTime = (items: IPlaylistItem[]): number => {
   return items
-    .map((item) => (item.duration ? timeStringToSeconds(item.duration) : 0))
+    .map((item) => (typeof item?.duration === 'string' ? timeStringToSeconds(item.duration) : 0))
     .reduce((acc, curr) => acc + curr, 0);
 };
 

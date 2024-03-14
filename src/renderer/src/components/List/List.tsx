@@ -257,8 +257,14 @@ const List = (_props: IListProps): JSX.Element | null => {
         break;
       case 'time':
         sorted = items.slice().sort((a, b) => {
-          const a_duration = utils.timeStringToSeconds(a.duration ?? '0');
-          const b_duration = utils.timeStringToSeconds(b.duration ?? '0');
+          const a_duration =
+            typeof a.duration === 'string'
+              ? utils.timeStringToSeconds(a.duration)
+              : a.duration ?? 0;
+          const b_duration =
+            typeof b.duration === 'string'
+              ? utils.timeStringToSeconds(b.duration)
+              : b.duration ?? 0;
           if (a_duration < b_duration) {
             return -1;
           } else if (a_duration > b_duration) {
@@ -318,11 +324,19 @@ const List = (_props: IListProps): JSX.Element | null => {
 
   const getItems = (items: IPlaylist['items'] = []): JSX.Element[] => {
     const maxHours = Math.max(
-      ...items.map(({ duration }) => Math.floor(utils.timeStringToSeconds(duration ?? '0') / 3600)),
+      ...items.map(({ duration }) =>
+        Math.floor(
+          typeof duration === 'string' ? utils.timeStringToSeconds(duration) : duration ?? 0 / 3600,
+        ),
+      ),
     );
 
     return items.map((item, index) => {
       const songIndex = padZeroes(index + 1, items.length.toString().split('').length);
+      const duration =
+        typeof item.duration === 'string'
+          ? utils.timeStringToSeconds(item.duration)
+          : item.duration ?? 0;
       return (
         <ListItemWrapper key={`${item.id}:${index}`} $progress={progress?.[item.id]}>
           <ListBack data-testid="list-item-back">
@@ -333,9 +347,7 @@ const List = (_props: IListProps): JSX.Element | null => {
               <SongName>{item.title}</SongName>
             </span>
             <Stars stars={3} />
-            <SongDuration>
-              {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
-            </SongDuration>
+            <SongDuration>{utils.toHumanTime(duration)}</SongDuration>
             <span>
               <ClearButton>
                 <BsThreeDots />
@@ -357,9 +369,7 @@ const List = (_props: IListProps): JSX.Element | null => {
               <SongName>{item.title}</SongName>
             </span>
             <Stars stars={3} />
-            <SongDuration>
-              {utils.toHumanTime(utils.timeStringToSeconds(item.duration ?? '0'), true, maxHours)}
-            </SongDuration>
+            <SongDuration>{utils.toHumanTime(duration)}</SongDuration>
             <span>
               <ClearButton
                 onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
