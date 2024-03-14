@@ -1,6 +1,6 @@
 import { useRef, useLayoutEffect } from 'react';
 
-const useModalResize = (formRef: React.RefObject<HTMLElement>): void => {
+const useModalResize = (formRef: React.RefObject<HTMLElement>, deps?: DependencyList): void => {
   const innerHeightRef = useRef<number | undefined>(undefined);
 
   useLayoutEffect(() => {
@@ -30,7 +30,8 @@ const useModalResize = (formRef: React.RefObject<HTMLElement>): void => {
       };
       window.electron.ipcRenderer.send('resize-modal', newSize);
     }
-  }, [formRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deps]);
 
   return;
 };

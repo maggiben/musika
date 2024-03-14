@@ -153,7 +153,7 @@ const getDefaultPreferences = (): IPreferences => {
       savePath: app.getPath('downloads'),
       maxconnections: 5,
       retries: 3,
-      timeout: 120 * 1000, // 120 seconds,
+      timeout: 120 * 1000, // 120 seconds
       quality: 'highest',
       filter: 'audioandvideo',
       fileNameTmpl: '{videoDetails.title}',

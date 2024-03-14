@@ -21,6 +21,7 @@ const useModal = <T>(
     return () => {
       removeCloseModalListener();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deps]);
 
   return;

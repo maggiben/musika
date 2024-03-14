@@ -67,10 +67,11 @@ const PlaylistTitle = styled.h1`
   color: ${({ theme }) => theme.colors.white};
 `;
 
-const PlaylistSubTitle = styled.p`
+const PlaylistSubTitle = styled.div`
   margin: 0;
   padding: 0%;
   font-size: 0.85rem;
+  white-space: nowrap;
   color: ${({ theme }) => theme.colors.lightGray};
   & > span.value {
     font-weight: bold;

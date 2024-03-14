@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';
 import { BsFillFolderFill } from 'react-icons/bs';
@@ -31,17 +31,10 @@ const DownloadOptions = (): JSX.Element => {
     });
     if (!result.canceled) {
       const savePath = result.filePaths[0];
-      console.log('savePath:', savePath);
-      // setPreferences({ ...preferences, downloads: { savePath } });
-      setPreferences((prev) => {
-        return (
-          prev &&
-          structuredClone({ ...preferences, downloads: { ...preferences?.downloads, savePath } })
-        );
-      });
+      setPreferences({ ...preferences, downloads: { ...preferences?.downloads, savePath } });
     }
   };
-  console.log('savePath:', preferences?.downloads?.savePath);
+
   return (
     <StyledDFieldset>
       <legend>{t('downloads')}</legend>
@@ -132,7 +125,7 @@ const DownloadOptions = (): JSX.Element => {
 
 const QualityOptions = (): JSX.Element => {
   const { t } = useTranslation();
-  const [preferences] = useRecoilState(preferencesState);
+  const preferences = useRecoilValue(preferencesState);
 
   return (
     <StyledDFieldset>
@@ -142,7 +135,7 @@ const QualityOptions = (): JSX.Element => {
           <StyledLabel htmlFor="quality">{t('quality')}</StyledLabel>
           <DarwinSelect
             className="form-select"
-            defaultValue={preferences?.downloads?.quality}
+            defaultValue={preferences?.downloads.quality}
             style={{ flexBasis: '100%' }}
           >
             {[
@@ -163,7 +156,7 @@ const QualityOptions = (): JSX.Element => {
           <StyledLabel htmlFor="filter">{t('filter')}</StyledLabel>
           <DarwinSelect
             className="form-select"
-            defaultValue={preferences?.downloads?.filter}
+            defaultValue={preferences?.downloads.filter}
             style={{ flexBasis: '100%' }}
           >
             {!preferences?.downloads?.filter && <option value=""></option>}
@@ -182,22 +175,11 @@ const QualityOptions = (): JSX.Element => {
 };
 
 const DownloadPreferences = (): JSX.Element => {
-  const formRef = useRef<HTMLFormElement>(null);
-  useModalResize(formRef);
-
   return (
     <>
-      <PreferencesForm
-        ref={formRef}
-        data-testid="download-preferences-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-      >
-        <DownloadOptions />
-        <SpaceBottom size="s" />
-        <QualityOptions />
-      </PreferencesForm>
+      <DownloadOptions />
+      <SpaceBottom size="s" />
+      <QualityOptions />
     </>
   );
 };

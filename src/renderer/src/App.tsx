@@ -12,10 +12,8 @@ import {
 } from 'recoil';
 import { preferencesState, playlistState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
-import Playlist from '@containers/playlist/Playlist';
 import SideBar from '@renderer/components/SideBar/SideBar';
 import Download from '@containers/download/Download';
-// import Preferences from '@renderer/containers/preferences/Preferences';
 import { defaultTheme } from '@assets/themes';
 import Loading from './containers/loading/Loading';
 import type ytdl from 'ytdl-core';
@@ -55,11 +53,12 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         console.log('menu.app.preferences');
         await window.commands.modal('preferences', { width: 520, height: 480 });
         window.electron.ipcRenderer.once('sync-preferences', async () => {
-          const newPreferences = await window.preferences.loadPreferences();
-          // Update Language
-          preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
-            i18n.changeLanguage(newPreferences?.behaviour?.language);
-          setPreferences(structuredClone(newPreferences));
+          console.log('sync pref');
+          // const newPreferences = await window.preferences.loadPreferences();
+          // // Update Language
+          // preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
+          //   i18n.changeLanguage(newPreferences?.behaviour?.language);
+          // setPreferences(structuredClone(newPreferences));
         });
         break;
       case 'menu.file.new.playlist':
@@ -97,16 +96,19 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
 
   useModal<Record<string, unknown>>(
     async (type, message): Promise<void> => {
+      console.log('modal', type, message);
       switch (type) {
         case 'new-playlist':
           console.log('new-playlist');
           break;
-        case 'preferences':
-          console.log('preferences');
+        case 'preferences': {
+          const newPreferences = await window.preferences.loadPreferences();
+          // Update Language
+          preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
+            i18n.changeLanguage(newPreferences?.behaviour?.language);
+          setPreferences(structuredClone(newPreferences));
           break;
-        case 'media-info':
-          console.log('media-info');
-          break;
+        }
         case 'open-url':
           message.url && (await asyncSearch(message.url as string));
           break;
@@ -114,7 +116,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
           break;
       }
     },
-    ['open-url'],
+    ['open-url', 'preferences', 'new-playlist'],
   );
 
   useMainMenu<{ filePath: string }>(
@@ -160,6 +162,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     return () => {
       removeMenuClickListener();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const currentTheme = {
     ...defaultTheme,

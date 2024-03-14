@@ -49,6 +49,7 @@ const ModalContainer = ({
     },
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const ModalContent = useMemo(() => modal in modals && modals[modal], [modal]);
 
   return (
@@ -67,9 +68,7 @@ const Modal = (): JSX.Element => {
   return (
     <RecoilRoot>
       <I18nextProvider i18n={i18n}>
-        <Suspense fallback={<Loading />}>
-          {modal && modal.type && <ModalContainer modal={modal.type} options={modal?.options} />}
-        </Suspense>
+        {modal && modal.type && <ModalContainer modal={modal.type} options={modal?.options} />}
       </I18nextProvider>
     </RecoilRoot>
   );

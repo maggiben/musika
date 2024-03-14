@@ -1,12 +1,14 @@
-import { Suspense, useState } from 'react';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { BsGear, BsCloudDownloadFill } from 'react-icons/bs';
+import { StyledForm } from '@components/Form/Form';
 import DownloadPreferences from './DownloadPreferences';
 import BehaviourPreferences from './BehaviourPreferences';
 import NavBar from './NavBar';
 import ActionButtons from './ActionButtons';
+import useModalResize from '@hooks/useModalResize';
 
 const PreferencesContainer = styled.div`
   width: 100%;
@@ -45,6 +47,10 @@ const MainPannelContainer = styled.div`
   color: ${({ theme }) => theme.colors.midGray};
 `;
 
+export const PreferencesForm = styled(StyledForm)`
+  padding: ${({ theme }) => theme.spacing.s};
+`;
+
 const Preferences = (): JSX.Element => {
   const pannels = {
     behaviour: {
@@ -71,23 +77,28 @@ const Preferences = (): JSX.Element => {
     firstPreference,
   );
   const onSelectPreference = (id: string): void => setSelectedPreferenceGroup(id);
+  const formRef = useRef<HTMLFormElement>(null);
+  useModalResize(formRef, [selectedPreferenceGroup]);
 
   return (
     <PreferencesContainer>
       <NavBarContainer data-testid="nav-bar-container">
-        <Suspense fallback={<div>Loading...</div>}>
-          <NavBar
-            preferences={preferences}
-            pannels={pannels}
-            onChange={onSelectPreference}
-            defaultSelected={selectedPreferenceGroup}
-          />
-        </Suspense>
+        <NavBar
+          preferences={preferences}
+          pannels={pannels}
+          onChange={onSelectPreference}
+          defaultSelected={selectedPreferenceGroup}
+        />
       </NavBarContainer>
       <MainPannelContainer data-testid="main-pannel-container">
-        <Suspense fallback={<div>Loading...</div>}>
-          <>{selectedPreferenceGroup && pannels[selectedPreferenceGroup].node}</>
-        </Suspense>
+        <PreferencesForm
+          ref={formRef}
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
+          {selectedPreferenceGroup && pannels[selectedPreferenceGroup].node}
+        </PreferencesForm>
       </MainPannelContainer>
       <ActionButtons data-testid="action-buttons" />
     </PreferencesContainer>

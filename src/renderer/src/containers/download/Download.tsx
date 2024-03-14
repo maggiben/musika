@@ -52,7 +52,7 @@ const Download = (): JSX.Element => {
             totalItems={playlist.total_items}
             items={playlist.items}
           />
-          <List items={playlist.items} />
+          <List />
         </>
       ) : (
         <ResultsHome />

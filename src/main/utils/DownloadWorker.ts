@@ -42,7 +42,6 @@ import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import ProgressStream from 'progress-stream';
 import * as utils from '@shared/lib/utils';
-import getDownloadOptions from '@shared/lib/getDownloadOptions';
 import { AsyncCreatable } from '@shared/lib/AsyncCreatable';
 import TimeoutStream from './TimeoutStream';
 
@@ -52,18 +51,21 @@ export interface IDownloadWorkerOptions {
    */
   item: ytpl.result['items'][0];
   /**
-   * Output file name.
+   * Output file name
    */
   output?: string;
+  /**
+   * Output destination
+   */
+  savePath: string;
   /**
    * Timeout value prevents network operations from blocking indefinitely.
    */
   timeout?: number;
   /**
-   * Flags
+   * Download Options
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  flags?: any;
+  downloadOptions?: ytdl.downloadOptions;
   /**
    * Media encoder options
    */
@@ -86,10 +88,9 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private parentPort: MessagePort;
   private item: ytpl.result['items'][0];
   private output!: string;
+  private savePath: string;
   private timeout: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private flags?: any;
-  private downloadOptions?: ytdl.downloadOptions;
+  private downloadOptions: ytdl.downloadOptions;
   private videoInfo!: ytdl.videoInfo;
   private videoFormat!: ytdl.videoFormat;
   private timeoutStream!: TimeoutStream;
@@ -100,10 +101,13 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     super(options);
     this.item = options.item;
     this.parentPort = options.parentPort;
-    this.timeout = options.timeout ?? 120 * 1000;
+    this.timeout = options.timeout ?? 120 * 1000; // 120 seconds
     this.output = options.output ?? '{videoDetails.title}';
-    this.flags = options.flags;
-    this.downloadOptions = this.flags && getDownloadOptions(this.flags);
+    this.savePath = options.savePath ?? '';
+    this.downloadOptions = options.downloadOptions ?? {
+      quality: 'highest',
+      filter: 'audioandvideo',
+    };
   }
 
   /**
@@ -228,8 +232,11 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     } else {
       return new Promise((resolve, reject) => {
         this.downloadStream.once('response', (response) => {
-          if (response['headers.content-length']) {
-            const size = parseInt(response['headers.content-length'], 10);
+          if (this.downloadStream.destroyed) {
+            return;
+          }
+          if (response.headers['content-length']) {
+            const size = parseInt(response.headers['content-length'], 10);
             return resolve(size);
           } else {
             return resolve(undefined);
@@ -312,7 +319,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       output: this.output,
       videoInfo: this.videoInfo,
       videoFormat: this.videoFormat,
-      format: this.videoFormat.container,
+      format: this.videoFormat?.container,
     },
   ): string {
     const {
@@ -321,14 +328,11 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       videoFormat = this.videoFormat,
       format,
     } = options;
-    const name = utils.tmpl(output, { ...videoInfo, ...videoFormat });
-    console.log('output', output);
-    console.log('name', name);
-    console.log('name', JSON.stringify({ ...videoInfo, ...videoFormat }, null, 2));
-    return path.format({
+    const filename = path.format({
       name: utils.tmpl(output, { ...videoInfo, ...videoFormat }),
       ext: `.${format}`,
     });
+    return path.join(this.savePath, filename);
   }
 
   /**

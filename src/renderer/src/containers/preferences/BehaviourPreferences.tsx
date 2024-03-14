@@ -17,7 +17,6 @@ import {
   DarwinButton,
 } from '@renderer/components/Form/Form';
 import { SpaceBottom, SpaceRight } from '@components/Spacing/Spacing';
-import useModalResize from '@renderer/hooks/useModalResize';
 
 export const PreferencesForm = styled(StyledForm)`
   padding: ${({ theme }) => theme.spacing.s};
@@ -26,8 +25,6 @@ export const PreferencesForm = styled(StyledForm)`
 const BehaviourPreferences = (): JSX.Element => {
   const { t, i18n } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const formRef = useRef<HTMLFormElement>(null);
-  useModalResize(formRef);
 
   const handleChangeLanguage = async (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -113,161 +110,153 @@ const BehaviourPreferences = (): JSX.Element => {
 
   return (
     <>
-      <PreferencesForm
-        ref={formRef}
-        data-testid="behaviour-preferences-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-      >
-        <StyledDFieldset>
-          <legend>{t('interface')}</legend>
-          <i>{t('restart required message')}</i>
-          <div>
-            <InputPairContainer>
-              <StyledLabel htmlFor="language">{t('language')}</StyledLabel>
-              <DarwinSelect
-                className="form-select"
-                id="language"
-                defaultValue={preferences?.behaviour?.language}
-                onChange={handleChangeLanguage}
-                style={{ flexBasis: '100%' }}
-              >
-                {supportedLangs.map((language) => (
-                  <option key={language.code} value={language.code}>
-                    {language.english}
-                  </option>
-                ))}
-              </DarwinSelect>
-            </InputPairContainer>
-          </div>
-        </StyledDFieldset>
-        <SpaceBottom size="s" />
-        <StyledDFieldset>
-          <legend>{t('desktop')}</legend>
-          <div>
-            <InputPairContainer>
-              <StyledLabel htmlFor="language">{t('ui theme')}</StyledLabel>
-              <DarwinSelect
-                className="form-select"
-                id="language"
-                defaultValue={preferences?.behaviour?.language}
-                onChange={handleChangeLanguage}
-                style={{ flexBasis: '100%' }}
-              >
-                {['light', 'dark'].map((name, index) => (
-                  <option key={index} value={name}>
-                    {name}
-                  </option>
-                ))}
-              </DarwinSelect>
-            </InputPairContainer>
-            <InputPairContainer>
-              <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
-              <ToggleSwitch
-                id="auto-update"
-                checked={preferences.advanced?.update?.automatic}
-                onChange={handleAutomatedUpdate}
-              />
-            </InputPairContainer>
-            <InputPairContainer>
-              <StyledLabel htmlFor="notifications">{t('enable notifications')}</StyledLabel>
-              <ToggleSwitch
-                id="notifications"
-                name="notifications"
-                defaultChecked={preferences.behaviour?.notifications?.enabled}
-              />
-            </InputPairContainer>
-          </div>
-        </StyledDFieldset>
-        <SpaceBottom size="s" />
-        <StyledDFieldset>
-          <legend>{t('search options')}</legend>
-          <div>
-            <InputPairContainer>
-              <StyledLabel htmlFor="default-search">{t('default search')}</StyledLabel>
+      <StyledDFieldset>
+        <legend>{t('interface')}</legend>
+        <i>{t('restart required message')}</i>
+        <div>
+          <InputPairContainer>
+            <StyledLabel htmlFor="language">{t('language')}</StyledLabel>
+            <DarwinSelect
+              className="form-select"
+              id="language"
+              defaultValue={preferences?.behaviour?.language}
+              onChange={handleChangeLanguage}
+              style={{ flexBasis: '100%' }}
+            >
+              {supportedLangs.map((language) => (
+                <option key={language.code} value={language.code}>
+                  {language.english}
+                </option>
+              ))}
+            </DarwinSelect>
+          </InputPairContainer>
+        </div>
+      </StyledDFieldset>
+      <SpaceBottom size="s" />
+      <StyledDFieldset>
+        <legend>{t('desktop')}</legend>
+        <div>
+          <InputPairContainer>
+            <StyledLabel htmlFor="language">{t('ui theme')}</StyledLabel>
+            <DarwinSelect
+              className="form-select"
+              id="language"
+              defaultValue={preferences?.behaviour?.language}
+              onChange={handleChangeLanguage}
+              style={{ flexBasis: '100%' }}
+            >
+              {['light', 'dark'].map((name, index) => (
+                <option key={index} value={name}>
+                  {name}
+                </option>
+              ))}
+            </DarwinSelect>
+          </InputPairContainer>
+          <InputPairContainer>
+            <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
+            <ToggleSwitch
+              id="auto-update"
+              checked={preferences.advanced?.update?.automatic}
+              onChange={handleAutomatedUpdate}
+            />
+          </InputPairContainer>
+          <InputPairContainer>
+            <StyledLabel htmlFor="notifications">{t('enable notifications')}</StyledLabel>
+            <ToggleSwitch
+              id="notifications"
+              name="notifications"
+              defaultChecked={preferences.behaviour?.notifications?.enabled}
+            />
+          </InputPairContainer>
+        </div>
+      </StyledDFieldset>
+      <SpaceBottom size="s" />
+      <StyledDFieldset>
+        <legend>{t('search options')}</legend>
+        <div>
+          <InputPairContainer>
+            <StyledLabel htmlFor="default-search">{t('default search')}</StyledLabel>
+            <DarwinInput
+              type="text"
+              id="default-search"
+              name="default-search"
+              defaultValue={preferences.behaviour?.search?.defaultSearch}
+              placeholder={t('save files to')}
+              style={{ flexBasis: '100%' }}
+            />
+          </InputPairContainer>
+          <InputPairContainer>
+            <StyledLabel htmlFor="safe-search">{t('safe search')}</StyledLabel>
+            <ToggleSwitch
+              id="safe-search"
+              name="safe-search"
+              defaultChecked={preferences.behaviour?.search?.safeSearch}
+            />
+          </InputPairContainer>
+          <InputPairContainer>
+            <StyledLabel htmlFor="search-limit">{t('limit')}</StyledLabel>
+            <DarwinInput
+              type="number"
+              id="search-limit"
+              name="search-limit"
+              min="1"
+              max={Infinity}
+              defaultValue={preferences.behaviour?.search?.limit}
+              placeholder={t('limits the pulled items')}
+              style={{ flexBasis: '100%' }}
+            />
+          </InputPairContainer>
+          <InputPairContainer>
+            <StyledLabel htmlFor="filter-search">
+              {t('filter for a specific type of item')}
+            </StyledLabel>
+            <DarwinSelect
+              id="filter-search"
+              className="form-select"
+              defaultValue={preferences?.behaviour?.search?.type}
+              style={{ flexBasis: '100%' }}
+            >
+              {['video', 'playlist'].map((options, index) => (
+                <option key={index} value={options}>
+                  {options}
+                </option>
+              ))}
+            </DarwinSelect>
+          </InputPairContainer>
+        </div>
+      </StyledDFieldset>
+      <SpaceBottom size="s" />
+      <StyledDFieldset disabled={!preferences?.advanced?.logs?.enabled}>
+        <legend style={{ display: 'flex' }}>
+          <input
+            type="checkbox"
+            id="enable-logs"
+            defaultChecked={Boolean(preferences?.advanced?.logs?.savePath)}
+            onChange={handleEnableLogs}
+          ></input>
+          <SpaceRight size="xs" />
+          <label htmlFor="enable-logs">{t('log file')}</label>
+        </legend>
+        <div>
+          <InputPairContainer>
+            <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
+            <InputGroup>
               <DarwinInput
                 type="text"
-                id="default-search"
-                name="default-search"
-                defaultValue={preferences.behaviour?.search?.defaultSearch}
+                id="savePath"
+                name="savePath"
+                defaultValue={preferences?.advanced?.logs?.savePath}
                 placeholder={t('save files to')}
-                style={{ flexBasis: '100%' }}
+                style={{ flex: 1 }}
               />
-            </InputPairContainer>
-            <InputPairContainer>
-              <StyledLabel htmlFor="safe-search">{t('safe search')}</StyledLabel>
-              <ToggleSwitch
-                id="safe-search"
-                name="safe-search"
-                defaultChecked={preferences.behaviour?.search?.safeSearch}
-              />
-            </InputPairContainer>
-            <InputPairContainer>
-              <StyledLabel htmlFor="search-limit">{t('limit')}</StyledLabel>
-              <DarwinInput
-                type="number"
-                id="search-limit"
-                name="search-limit"
-                min="1"
-                max={Infinity}
-                defaultValue={preferences.behaviour?.search?.limit}
-                placeholder={t('limits the pulled items')}
-                style={{ flexBasis: '100%' }}
-              />
-            </InputPairContainer>
-            <InputPairContainer>
-              <StyledLabel htmlFor="filter-search">
-                {t('filter for a specific type of item')}
-              </StyledLabel>
-              <DarwinSelect
-                id="filter-search"
-                className="form-select"
-                defaultValue={preferences?.behaviour?.search?.type}
-                style={{ flexBasis: '100%' }}
-              >
-                {['video', 'playlist'].map((options, index) => (
-                  <option key={index} value={options}>
-                    {options}
-                  </option>
-                ))}
-              </DarwinSelect>
-            </InputPairContainer>
-          </div>
-        </StyledDFieldset>
-        <SpaceBottom size="s" />
-        <StyledDFieldset disabled={!preferences?.advanced?.logs?.enabled}>
-          <legend style={{ display: 'flex' }}>
-            <input
-              type="checkbox"
-              id="enable-logs"
-              defaultChecked={Boolean(preferences?.advanced?.logs?.savePath)}
-              onChange={handleEnableLogs}
-            ></input>
-            <SpaceRight size="xs" />
-            <label htmlFor="enable-logs">{t('log file')}</label>
-          </legend>
-          <div>
-            <InputPairContainer>
-              <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
-              <InputGroup>
-                <DarwinInput
-                  type="text"
-                  id="savePath"
-                  name="savePath"
-                  defaultValue={preferences?.advanced?.logs?.savePath}
-                  placeholder={t('save files to')}
-                  style={{ flex: 1 }}
-                />
-                <SpaceRight size="s" />
-                <DarwinButton type="button" id="button" onClick={openFolderDialog}>
-                  <BsFillFolderFill />
-                </DarwinButton>
-              </InputGroup>
-            </InputPairContainer>
-          </div>
-        </StyledDFieldset>
-      </PreferencesForm>
+              <SpaceRight size="s" />
+              <DarwinButton type="button" id="button" onClick={openFolderDialog}>
+                <BsFillFolderFill />
+              </DarwinButton>
+            </InputGroup>
+          </InputPairContainer>
+        </div>
+      </StyledDFieldset>
     </>
   );
 };
