@@ -38,17 +38,14 @@ const Left = styled.div`
 `;
 
 interface IActionButtonsProps {
-  'data-testid'?: string;
+  formRef: React.RefObject<HTMLFormElement>;
 }
 
-const ActionButtons = (props: IActionButtonsProps): JSX.Element => {
+const ActionButtons = ({ formRef }: IActionButtonsProps): JSX.Element => {
   const { t } = useTranslation();
-  const preferences = useRecoilValue(preferencesState);
   const handleOkClick = async (): Promise<void> => {
-    await window.preferences.savePreferences(preferences);
-    window.electron.ipcRenderer.send('close-modal', {
-      sync: true,
-    });
+    if (!formRef.current) return;
+    formRef.current.requestSubmit();
   };
 
   const handleCancelClick = async (): Promise<void> => {
@@ -58,7 +55,7 @@ const ActionButtons = (props: IActionButtonsProps): JSX.Element => {
   };
 
   return (
-    <ActionButtonsContainer data-testid={props['data-testid']}>
+    <ActionButtonsContainer data-testid="action-buttons">
       <ActionButtonsGroup>
         <Left>
           <DarwinButton onClick={handleOkClick} disabled>

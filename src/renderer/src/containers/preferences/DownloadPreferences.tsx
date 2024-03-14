@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +14,6 @@ import {
   DarwinSelect,
 } from '@components/Form/Form';
 import { SpaceBottom, SpaceRight } from '@components/Spacing/Spacing';
-import useModalResize from '@renderer/hooks/useModalResize';
 
 export const PreferencesForm = styled(StyledForm)`
   padding: ${({ theme }) => theme.spacing.s};
@@ -40,14 +38,13 @@ const DownloadOptions = (): JSX.Element => {
       <legend>{t('downloads')}</legend>
       <div>
         <InputPairContainer>
-          <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.savePath">{t('save files to')}</StyledLabel>
           <InputGroup>
             <DarwinInput
               type="text"
-              id="savePath"
-              name="savePath"
-              disabled={true}
-              value={preferences?.downloads?.savePath}
+              id="downloads.savePath"
+              name="downloads.savePath"
+              defaultValue={preferences?.downloads?.savePath}
               placeholder={t('save files to')}
               style={{ flex: 1 }}
             />
@@ -58,12 +55,12 @@ const DownloadOptions = (): JSX.Element => {
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
-          <StyledLabel htmlFor="fileNameTmpl">{t('file name template')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.fileNameTmpl">{t('file name template')}</StyledLabel>
           <InputGroup>
             <DarwinInput
               type="text"
-              id="fileNameTmpl"
-              name="fileNameTmpl"
+              id="downloads.fileNameTmpl"
+              name="downloads.fileNameTmpl"
               defaultValue={preferences?.downloads?.fileNameTmpl}
               placeholder={t('file name template')}
               style={{ flex: 1 }}
@@ -71,15 +68,14 @@ const DownloadOptions = (): JSX.Element => {
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
-          <StyledLabel htmlFor="maxconnections">{t('max connections')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.maxconnections">{t('max connections')}</StyledLabel>
           <InputGroup>
             <DarwinInput
               type="number"
-              id="maxconnections"
-              name="maxconnections"
+              id="downloads.maxconnections"
+              name="downloads.maxconnections"
               min="1"
               max="100"
-              className="form-control"
               defaultValue={preferences?.downloads?.maxconnections}
               placeholder={t('max connections')}
               style={{ flex: 1 }}
@@ -87,15 +83,14 @@ const DownloadOptions = (): JSX.Element => {
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
-          <StyledLabel htmlFor="retries">{t('retries')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.retries">{t('retries')}</StyledLabel>
           <InputGroup>
             <DarwinInput
               type="number"
-              id="retries"
-              name="retries"
+              id="downloads.retries"
+              name="downloads.retries"
               min="1"
               max="100"
-              className="form-control"
               defaultValue={preferences?.downloads?.retries}
               placeholder={t('retries')}
               style={{ flex: 1 }}
@@ -103,15 +98,14 @@ const DownloadOptions = (): JSX.Element => {
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
-          <StyledLabel htmlFor="timeout">{t('timeout')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.timeout">{t('timeout')}</StyledLabel>
           <InputGroup>
             <DarwinInput
               type="number"
-              id="timeout"
-              name="timeout"
+              id="downloads.timeout"
+              name="downloads.timeout"
               min="10000"
               max="600000"
-              className="form-control"
               defaultValue={preferences?.downloads?.timeout}
               placeholder={t('timeout')}
               style={{ flex: 1 }}
@@ -132,9 +126,10 @@ const QualityOptions = (): JSX.Element => {
       <legend>{t('media format')}</legend>
       <div>
         <InputPairContainer>
-          <StyledLabel htmlFor="quality">{t('quality')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.quality">{t('quality')}</StyledLabel>
           <DarwinSelect
-            className="form-select"
+            id="download.quality"
+            name="download.quality"
             defaultValue={preferences?.downloads.quality}
             style={{ flexBasis: '100%' }}
           >
@@ -153,13 +148,13 @@ const QualityOptions = (): JSX.Element => {
           </DarwinSelect>
         </InputPairContainer>
         <InputPairContainer>
-          <StyledLabel htmlFor="filter">{t('filter')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.filter">{t('filter')}</StyledLabel>
           <DarwinSelect
-            className="form-select"
+            id="downloads.filter"
+            name="downloads.filter"
             defaultValue={preferences?.downloads.filter}
             style={{ flexBasis: '100%' }}
           >
-            {!preferences?.downloads?.filter && <option value=""></option>}
             {['audioandvideo', 'videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map(
               (options, index) => (
                 <option key={index} value={options}>

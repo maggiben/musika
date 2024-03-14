@@ -80,6 +80,22 @@ const Preferences = (): JSX.Element => {
   const formRef = useRef<HTMLFormElement>(null);
   useModalResize(formRef, [selectedPreferenceGroup]);
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    if (!formRef.current) return;
+    // Process the form data here, e.g., send it to a server
+    const formData = new FormData(formRef.current);
+    console.log(formData);
+    for (const [key, value] of formData) {
+      console.log('form key', key, 'value', value);
+    }
+
+    // await window.preferences.savePreferences(preferences);
+    // window.electron.ipcRenderer.send('close-modal', {
+    //   sync: true,
+    // });
+  };
+
   return (
     <PreferencesContainer>
       <NavBarContainer data-testid="nav-bar-container">
@@ -93,14 +109,13 @@ const Preferences = (): JSX.Element => {
       <MainPannelContainer data-testid="main-pannel-container">
         <PreferencesForm
           ref={formRef}
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
+          onSubmit={handleSubmit}
+          data-current-form={selectedPreferenceGroup}
         >
           {selectedPreferenceGroup && pannels[selectedPreferenceGroup].node}
         </PreferencesForm>
       </MainPannelContainer>
-      <ActionButtons data-testid="action-buttons" />
+      <ActionButtons formRef={formRef} />
     </PreferencesContainer>
   );
 };

@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
@@ -68,46 +67,6 @@ const BehaviourPreferences = (): JSX.Element => {
     return supportedLngs && Array.isArray(supportedLngs) && supportedLngs.includes(language.code);
   });
 
-  const handleEnableLogs = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const { checked } = event.target;
-    try {
-      const newPreferences = {
-        ...preferences,
-        advanced: {
-          ...preferences?.advanced,
-          logs: {
-            ...preferences?.advanced?.logs,
-            enabled: checked,
-          },
-        },
-      };
-      setPreferences(newPreferences);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleAutomatedUpdate = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ): Promise<void> => {
-    const { checked } = event.target;
-    try {
-      const newPreferences = {
-        ...preferences,
-        advanced: {
-          ...preferences?.advanced,
-          update: {
-            ...preferences?.advanced?.update,
-            automatic: checked,
-          },
-        },
-      };
-      setPreferences(newPreferences);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <>
       <StyledDFieldset>
@@ -119,6 +78,7 @@ const BehaviourPreferences = (): JSX.Element => {
             <DarwinSelect
               className="form-select"
               id="language"
+              name="language"
               defaultValue={preferences?.behaviour?.language}
               onChange={handleChangeLanguage}
               style={{ flexBasis: '100%' }}
@@ -137,12 +97,12 @@ const BehaviourPreferences = (): JSX.Element => {
         <legend>{t('desktop')}</legend>
         <div>
           <InputPairContainer>
-            <StyledLabel htmlFor="language">{t('ui theme')}</StyledLabel>
+            <StyledLabel htmlFor="ui-theme">{t('ui theme')}</StyledLabel>
             <DarwinSelect
               className="form-select"
-              id="language"
+              id="ui-theme"
+              name="ui-theme"
               defaultValue={preferences?.behaviour?.language}
-              onChange={handleChangeLanguage}
               style={{ flexBasis: '100%' }}
             >
               {['light', 'dark'].map((name, index) => (
@@ -156,8 +116,8 @@ const BehaviourPreferences = (): JSX.Element => {
             <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
             <ToggleSwitch
               id="auto-update"
-              checked={preferences.advanced?.update?.automatic}
-              onChange={handleAutomatedUpdate}
+              name="auto-update"
+              defaultChecked={preferences.advanced?.update?.automatic}
             />
           </InputPairContainer>
           <InputPairContainer>
@@ -212,6 +172,7 @@ const BehaviourPreferences = (): JSX.Element => {
             </StyledLabel>
             <DarwinSelect
               id="filter-search"
+              name="filter-search"
               className="form-select"
               defaultValue={preferences?.behaviour?.search?.type}
               style={{ flexBasis: '100%' }}
@@ -231,8 +192,8 @@ const BehaviourPreferences = (): JSX.Element => {
           <input
             type="checkbox"
             id="enable-logs"
-            defaultChecked={Boolean(preferences?.advanced?.logs?.savePath)}
-            onChange={handleEnableLogs}
+            name="enable-logs"
+            defaultChecked={preferences?.advanced?.logs.enabled}
           ></input>
           <SpaceRight size="xs" />
           <label htmlFor="enable-logs">{t('log file')}</label>
