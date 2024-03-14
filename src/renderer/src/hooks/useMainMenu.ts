@@ -3,7 +3,7 @@ import { useEffect, DependencyList } from 'react';
 
 const useMainMenu = <T>(
   callback: (message: T) => void,
-  deps: DependencyList,
+  deps: DependencyList | string,
 ): T | undefined | void => {
   const handleContextMenuClick = async (
     _event: IpcRendererEvent,

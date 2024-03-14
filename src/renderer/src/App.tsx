@@ -3,7 +3,13 @@ import { useEffect, Suspense } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
-import { RecoilRoot, useRecoilState, useRecoilCallback, useResetRecoilState } from 'recoil';
+import {
+  RecoilRoot,
+  useRecoilState,
+  useRecoilCallback,
+  useResetRecoilState,
+  useRecoilValue,
+} from 'recoil';
 import { preferencesState, playlistState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
 import Playlist from '@containers/playlist/Playlist';
@@ -15,7 +21,8 @@ import Loading from './containers/loading/Loading';
 import type ytdl from 'ytdl-core';
 import type ytsr from '@distube/ytsr';
 import type { IPlaylist } from 'types/types';
-import useModal from './hooks/useModal';
+import useModal from '@hooks/useModal';
+import useMainMenu from '@hooks/useMainMenu';
 
 // Global style to set the background color of the body
 const GlobalStyle = createGlobalStyle`
@@ -36,6 +43,7 @@ const Container = styled.div`
 const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   const { i18n } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const { playlist } = useRecoilValue(playlistState);
   const resetPlaylistState = useResetRecoilState(playlistState);
   const handleMenuClick = async (
     _event: IpcRendererEvent,
@@ -58,8 +66,8 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         console.log('menu.file.new.playlist');
         await window.commands.modal('new-playlist', { width: 420, height: 580 });
         break;
-      case 'menu.file.open-url':
-        console.log('menu.file.open-url', message);
+      case 'menu.app.file.open-url':
+        console.log('menu.app.file.open-url', message);
         await window.commands.modal('open-url', { width: 480, height: 240, ...message.options });
         break;
       default:
@@ -107,6 +115,11 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
       }
     },
     ['open-url'],
+  );
+
+  useMainMenu<{ filePath: string }>(
+    async ({ filePath }) => window.playlist.savePlaylist(playlist, filePath),
+    'menu.app.file.save-as',
   );
 
   useEffect(() => {

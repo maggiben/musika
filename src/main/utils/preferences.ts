@@ -155,6 +155,7 @@ const getDefaultPreferences = (): IPreferences => {
       quality: 'lowest',
       fileNameTmpl: '{videoDetails.title}',
     },
+    playlists: [],
     advanced: {
       isDev,
       preferencesPath,

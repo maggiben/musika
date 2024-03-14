@@ -144,6 +144,18 @@ export interface IPreferences {
       };
     };
   };
+  playlists: {
+    id: string;
+    title: string;
+    description?: string;
+    filePath: string;
+    url: string;
+    thumbnail?: {
+      height?: number;
+      width?: number;
+      url: string;
+    };
+  }[];
   downloads: {
     savePath: string;
     maxconnections: number;

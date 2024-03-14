@@ -145,12 +145,26 @@ export const tmpl = (
   return sanitizeName(result, { replacement });
 };
 
+/**
+ * Convert a number to string and padd n zeroes
+ *
+ * @param {number} number number to convert and padd
+ * @param {number} maxLength the amount of zeroes to padd
+ * @return {string} the converted and zero padded number
+ */
 export const padZeroes = (number: number, maxLength: number): string => {
   const numberString = number.toString();
   const numZeroes = Math.max(0, maxLength - numberString.length);
   return '0'.repeat(numZeroes) + numberString;
 };
 
+/**
+ * Replaces characters in str1 starting from the rightmost position with characters from str2
+ *
+ * @param {string} str1 original string
+ * @param {string} str2 replacement
+ * @return {string} the replaced string
+ */
 export const replaceFromRight = (str1: string, str2: string): string => {
   const reversedStr1 = str1.split('').reverse();
   const reversedStr2 = str2.split('').reverse();
@@ -168,9 +182,47 @@ export const replaceFromRight = (str1: string, str2: string): string => {
   return reversedStr1.reverse().join('');
 };
 
+/**
+ * Returns tru if argument is array of arrays
+ *
+ * @param {T[]} arr the input array
+ * @return {boolean} true or false
+ */
+export const isArrayofArrays = <T>(array: T[]): boolean => {
+  return Array.isArray(array) && array.every((innerArr) => Array.isArray(innerArr));
+};
+
+/**
+ * Returns tru if argument is array of object
+ *
+ * @param {T[]} arr the input array
+ * @return {boolean} true or false
+ */
+export const isArrayofObjects = <T>(array: T[]): boolean => {
+  return (
+    Array.isArray(array) &&
+    array.every((obj) => typeof obj === 'object' && obj !== null && !Array.isArray(obj))
+  );
+};
+
+/**
+ * Deep compares two objects
+ *
+ * @param {T} firstVal input object
+ * @param {T} secondVal comparsion object
+ * @return {boolean} true or false
+ */
 export const isObjectEqual = <T>(firstVal: T | undefined, secondVal: T | undefined): boolean =>
   JSON.stringify(firstVal) === JSON.stringify(secondVal);
 
+/**
+ * Removes an object property from all objects inside the array
+ * works on root level properties only
+ *
+ * @param {T[]} array the input array of objects
+ * @param {K} property property to be removed from all objects
+ * @return {T[]} the mapped array without the property
+ */
 export const removeProperty = <T, K extends keyof T>(array: T[], property: K): T[] =>
   array.map((item) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

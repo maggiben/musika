@@ -1,5 +1,6 @@
 import {
   app,
+  dialog,
   nativeImage,
   clipboard,
   shell,
@@ -29,7 +30,7 @@ export interface IMenuClickMessage {
 }
 
 export const applicationMenu = (
-  mainWindow?: BrowserWindow,
+  mainWindow: BrowserWindow,
 ): (MenuItemConstructorOptions | IMenuItem)[] => {
   const template: IMenuItem[] = [
     {
@@ -40,6 +41,7 @@ export const applicationMenu = (
           submenu: [
             {
               label: 'Playlist',
+              id: 'menu.app.file.new.playlist',
               accelerator: 'CmdOrCtrl+N',
               click: async () => {
                 console.log('menu click !');
@@ -47,24 +49,59 @@ export const applicationMenu = (
                 return;
               },
             },
-            {
-              label: 'Playlist from YouTube',
-              accelerator: 'CmdOrCtrl+Shift+N',
-              click: async () =>
-                mainWindow?.webContents.send('menu-click', { id: 'menu.file.open-url' }),
-            },
           ],
         },
-        { label: 'Open File', accelerator: 'CmdOrCtrl+O' },
+        {
+          label: 'Open File',
+          id: 'menu.app.file.open-file',
+          accelerator: 'CmdOrCtrl+O',
+          click: async ({ id }: Electron.MenuItem) => {
+            const openResult = await dialog.showOpenDialog(mainWindow, {
+              title: 'Open File',
+              buttonLabel: 'Open',
+              filters: [
+                { name: 'Playlist Files', extensions: ['m3u'] },
+                { name: 'All Files', extensions: ['*'] },
+              ],
+              properties: ['openFile'],
+            });
+            if (!openResult.canceled) {
+              const { filePaths } = openResult;
+              mainWindow?.webContents.send('menu-click', { id, filePaths });
+            }
+          },
+        },
         {
           label: 'Open Url',
+          id: 'menu.app.file.open-url',
           accelerator: 'CmdOrCtrl+U',
-          click: async () =>
-            mainWindow?.webContents.send('menu-click', { id: 'menu.file.open-url' }),
+          click: async ({ id }: Electron.MenuItem) =>
+            mainWindow?.webContents.send('menu-click', { id }),
         },
         { type: 'separator' },
-        { label: 'Save', accelerator: 'CmdOrCtrl+S' },
-        { label: 'Save As', accelerator: 'CmdOrCtrl+Shift+S' },
+        {
+          label: 'Save',
+          id: 'menu.app.file.save',
+          accelerator: 'CmdOrCtrl+S',
+          click: async ({ id }: Electron.MenuItem) =>
+            mainWindow?.webContents.send('menu-click', { id }),
+        },
+        {
+          label: 'Save As',
+          id: 'menu.app.file.save-as',
+          accelerator: 'CmdOrCtrl+Shift+S',
+          click: async ({ id }: Electron.MenuItem) => {
+            const saveResult = await dialog.showSaveDialog(mainWindow, {
+              title: 'Save File',
+              buttonLabel: 'Save',
+              filters: [{ name: 'Playlist Files', extensions: ['m3u'] }],
+            });
+            if (!saveResult.canceled) {
+              const { filePath } = saveResult;
+              mainWindow?.webContents.send('menu-click', { id, filePath });
+            }
+          },
+        },
         { type: 'separator' },
         { label: i18n.t('menu.app.quit'), role: 'quit' },
       ],
