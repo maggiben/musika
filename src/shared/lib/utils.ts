@@ -73,7 +73,12 @@ export const toHumanTime = (
   let time = '';
 
   if (zeroPadding || h > 0 || maxHours > 9) {
-    time = `${String(h).padStart(String(maxHours).length, '0')}:`;
+    time =
+      seconds > 3600 && !zeroPadding ? `${String(h).padStart(String(maxHours).length, '0')}:` : '';
+    time =
+      seconds > 3600 && zeroPadding
+        ? `${String(h).padStart(Math.max(String(maxHours).length, String(h).length + 1), '0')}:`
+        : '';
     m = String(m).padStart(2, '0');
   } else {
     m = String(m);

@@ -47,15 +47,6 @@ const HeaderContainer = styled.div`
   box-sizing: border-box;
 `;
 
-const HeaderTitle = styled.h1`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.white};
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  white-space: break-spaces;
-`;
-
 const StyledImg = styled.img`
   width: auto;
   max-height: var(--thumbnail-height);

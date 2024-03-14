@@ -134,6 +134,8 @@ const ListItemWrapper = styled.li<{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  user-select: none;
+  cursor: default;
   &::before {
     content: '';
     position: absolute;
@@ -347,7 +349,7 @@ const List = (_props: IListProps): JSX.Element | null => {
               <SongName>{item.title}</SongName>
             </span>
             <Stars stars={3} />
-            <SongDuration>{utils.toHumanTime(duration)}</SongDuration>
+            <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
             <span>
               <ClearButton>
                 <BsThreeDots />
@@ -369,7 +371,7 @@ const List = (_props: IListProps): JSX.Element | null => {
               <SongName>{item.title}</SongName>
             </span>
             <Stars stars={3} />
-            <SongDuration>{utils.toHumanTime(duration)}</SongDuration>
+            <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
             <span>
               <ClearButton
                 onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {

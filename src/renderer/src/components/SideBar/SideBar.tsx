@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { playlistState, preferencesState } from '@renderer/states/atoms';
 import { TbPlaylist } from 'react-icons/tb';
 import { BsStar, BsPersonFill } from 'react-icons/bs';
+import { MdApps } from 'react-icons/md';
 import { SpaceBottom, SpaceRight } from '../Spacing/Spacing';
 import { DarwinInputSearch } from '../Form/Form';
 import ResizableContainer from './ResizableContainer';
@@ -23,6 +24,7 @@ const StyledNav = styled.div`
 
 const StyledNavHeading = styled.h1`
   text-transform: uppercase;
+  color: ${({ theme }) => theme.colors['label']};
   font-size: 60%;
 `;
 
@@ -170,7 +172,7 @@ const SideBar = (): JSX.Element => {
       id: 'playlists',
       items: [
         {
-          icon: <TbPlaylist style={{ color: 'red' }} />,
+          icon: <MdApps />,
           title: 'All Playlists',
           id: 'all-playlist',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {

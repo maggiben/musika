@@ -119,7 +119,9 @@ interface ISortOrderContextMenuMessage {
 
 const calcTotalPlayTime = (items: IPlaylistItem[]): number => {
   return items
-    .map((item) => (typeof item?.duration === 'string' ? timeStringToSeconds(item.duration) : 0))
+    .map((item) =>
+      typeof item?.duration === 'string' ? timeStringToSeconds(item.duration) : item?.duration ?? 0,
+    )
     .reduce((acc, curr) => acc + curr, 0);
 };
 
@@ -173,7 +175,7 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
             <PlaylistSubTitle>
               <span className="value">{props.totalItems}</span>
               <span>&nbsp;MUSIC VIDEOS · TOTAL DURATION:&nbsp;</span>
-              <span className="value">{toHumanTime(totalDuration)}</span>
+              <span className="value">{toHumanTime(totalDuration, true)}</span>
             </PlaylistSubTitle>
           </hgroup>
           <RightActions>
