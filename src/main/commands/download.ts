@@ -33,40 +33,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as ytpl from '@distube/ytpl';
-import * as ytdl from 'ytdl-core';
+import ytpl from '@distube/ytpl';
+import ytdl from 'ytdl-core';
 import { BrowserWindow } from 'electron';
 import { Scheduler } from '../utils/Scheduler';
+import { loadPreferences } from '../utils/preferences';
 import type { IDownloadWorkerMessage } from '../utils/DownloadWorker';
 import type { IPlaylistItem } from 'types/types';
-
-interface IDownloadOptions {
-  output: string;
-  maxconnections?: number;
-  retries?: number;
-  flags: Record<string, unknown>;
-}
-
-enum Options {
-  format = 'format',
-  audioCodec = 'audioCodec',
-  videoCodec = 'videoCodec',
-  videoBitrate = 'videoBitrate',
-  audioBitrate = 'audioBitrate',
-}
-
-export type EncodeOptions = { [key in keyof typeof Options]: string | number };
 
 export default async function download(
   source: string | IPlaylistItem[],
   mainWindow?: BrowserWindow | null,
-  options?: IDownloadOptions,
 ): Promise<Record<string, unknown>> {
   const playlistId =
     typeof source === 'string' && ytpl.validateID(source) && (await ytpl.getPlaylistID(source));
   const videoId = typeof source === 'string' && ytdl.validateURL(source) && ytdl.getVideoID(source);
   const playlistItems = Array.isArray(source) && source.length && source;
   if (playlistId || playlistItems) {
+    const preferences = await loadPreferences(mainWindow);
     const scheduler = new Scheduler({
       ...(playlistId && { playlistId }),
       ...(playlistItems && { playlistItems }),
@@ -75,7 +59,14 @@ export default async function download(
         hl: 'en',
         limit: Infinity,
       },
-      ...options,
+      maxconnections: preferences.downloads.maxconnections,
+      retries: preferences.downloads.retries,
+      timeout: preferences.downloads.timeout,
+      savePath: preferences.downloads.savePath,
+      downloadOptions: {
+        quality: preferences.downloads.quality,
+        filter: preferences.downloads.filter as ytdl.Filter,
+      },
     });
     scheduler
       .once('playlistItems', (message: IDownloadWorkerMessage) => {

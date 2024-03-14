@@ -38,8 +38,9 @@ import { Worker, WorkerOptions } from 'worker_threads';
 import ytpl from '@distube/ytpl';
 // import { EncoderStream } from './EncoderStream';
 import type { IDownloadWorkerMessage } from './DownloadWorker';
-import creatWorker from '../workers/worker?nodeWorker';
+import createWorker from '../workers/worker?nodeWorker';
 import { IPlaylistItem } from 'types/types';
+import type ytdl from 'ytdl-core';
 
 export interface ISchedulerOptions {
   /**
@@ -51,7 +52,11 @@ export interface ISchedulerOptions {
    */
   playlistItems?: IPlaylistItem[];
   /**
-   * Output file name.
+   * Output destination
+   */
+  savePath: string;
+  /**
+   * Output file name
    */
   output?: string;
   /**
@@ -73,8 +78,7 @@ export interface ISchedulerOptions {
   /**
    * Flags
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  flags?: any;
+  downloadOptions?: ytdl.downloadOptions;
   /**
    * Media encoder options
    */
@@ -103,6 +107,8 @@ export interface ISchedulerWorkerOptions extends WorkerOptions {
   item: IPlaylistItem[][number];
   output: string;
   timeout: number;
+  savePath: string;
+  downloadOptions?: ytdl.downloadOptions;
 }
 
 /*
@@ -115,10 +121,12 @@ export class Scheduler extends EventEmitter {
   private playlistId?: string;
   private playlistItems?: IPlaylistItem[];
   private output: string;
+  private savePath: string;
   private maxconnections: number;
   private retries: number;
   private timeout: number;
   private playlistOptions?: ytpl.options;
+  private downloadOptions?: ytdl.downloadOptions;
   // private encoderOptions?: EncoderStream.EncodeOptions;
 
   public constructor(options: ISchedulerOptions) {
@@ -126,10 +134,12 @@ export class Scheduler extends EventEmitter {
     this.playlistId = options.playlistId;
     this.playlistItems = options.playlistItems;
     this.output = options.output ?? '{videoDetails.title}';
+    this.savePath = options.savePath;
     this.maxconnections = options.maxconnections ?? 5;
     this.retries = options.retries ?? 5;
     this.timeout = options.timeout ?? 120 * 1000; // 120 seconds
     this.playlistOptions = options.playlistOptions;
+    this.downloadOptions = options.downloadOptions;
   }
 
   /**
@@ -299,13 +309,15 @@ export class Scheduler extends EventEmitter {
       item,
       output: this.output,
       timeout: this.timeout,
+      savePath: this.savePath,
+      downloadOptions: this.downloadOptions,
     };
     if (this.workers.has(item.id)) {
       await this.terminateDownloadWorker(item);
     }
     return new Promise<T>((resolve, reject) => {
       // const worker = new Worker(path.join(__dirname, 'runner.js'), workerOptions);
-      const worker = creatWorker({ workerData });
+      const worker = createWorker({ workerData });
       this.workers.set(item.id, worker);
       return this.handleWorkerEvents<T>(worker, item, resolve, reject);
     });

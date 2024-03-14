@@ -162,7 +162,7 @@ export interface IPreferences {
     retries: number;
     timeout: number;
     quality: string;
-    filter?: string;
+    filter: string;
     fileNameTmpl: string;
   };
 }
