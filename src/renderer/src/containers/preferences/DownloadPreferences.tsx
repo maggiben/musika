@@ -2,9 +2,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';
 import { BsFillFolderFill } from 'react-icons/bs';
-import styled from 'styled-components';
 import {
-  StyledForm,
   StyledLabel,
   StyledDFieldset,
   InputGroup,
@@ -14,10 +12,6 @@ import {
   DarwinSelect,
 } from '@components/Form/Form';
 import { SpaceBottom, SpaceRight } from '@components/Spacing/Spacing';
-
-export const PreferencesForm = styled(StyledForm)`
-  padding: ${({ theme }) => theme.spacing.s};
-`;
 
 const DownloadOptions = (): JSX.Element => {
   const { t } = useTranslation();
@@ -45,6 +39,7 @@ const DownloadOptions = (): JSX.Element => {
               id="downloads.savePath"
               name="downloads.savePath"
               defaultValue={preferences?.downloads?.savePath}
+              readOnly={true}
               placeholder={t('save files to')}
               style={{ flex: 1 }}
             />
@@ -128,8 +123,8 @@ const QualityOptions = (): JSX.Element => {
         <InputPairContainer>
           <StyledLabel htmlFor="downloads.quality">{t('quality')}</StyledLabel>
           <DarwinSelect
-            id="download.quality"
-            name="download.quality"
+            id="downloads.quality"
+            name="downloads.quality"
             defaultValue={preferences?.downloads.quality}
             style={{ flexBasis: '100%' }}
           >

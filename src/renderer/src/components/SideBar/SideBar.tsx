@@ -135,18 +135,18 @@ const SideBar = (): JSX.Element => {
         },
         {
           icon: <BsPersonFill style={{ color: 'yellow' }} />,
-          title: 'Artist',
-          id: 'artist',
+          title: 'Channels',
+          id: 'Channels',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('Artist', event);
+            console.log('Channels', event);
           },
         },
         {
           icon: <BsStar />,
-          title: 'Albums',
-          id: 'albums',
+          title: 'Popular',
+          id: 'popular',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('Albums', event);
+            console.log('Popular', event);
           },
         },
         {

@@ -1,11 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
-import styled from 'styled-components';
 import { BsFillFolderFill } from 'react-icons/bs';
 import languages from '@locale/languages.json';
 import {
-  StyledForm,
   StyledLabel,
   StyledDFieldset,
   InputPairContainer,
@@ -16,10 +14,6 @@ import {
   DarwinButton,
 } from '@renderer/components/Form/Form';
 import { SpaceBottom, SpaceRight } from '@components/Spacing/Spacing';
-
-export const PreferencesForm = styled(StyledForm)`
-  padding: ${({ theme }) => theme.spacing.s};
-`;
 
 const BehaviourPreferences = (): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -74,11 +68,10 @@ const BehaviourPreferences = (): JSX.Element => {
         <i>{t('restart required message')}</i>
         <div>
           <InputPairContainer>
-            <StyledLabel htmlFor="language">{t('language')}</StyledLabel>
+            <StyledLabel htmlFor="behaviour.language">{t('language')}</StyledLabel>
             <DarwinSelect
-              className="form-select"
-              id="language"
-              name="language"
+              id="behaviour.language"
+              name="behaviour.language"
               defaultValue={preferences?.behaviour?.language}
               onChange={handleChangeLanguage}
               style={{ flexBasis: '100%' }}
@@ -97,34 +90,38 @@ const BehaviourPreferences = (): JSX.Element => {
         <legend>{t('desktop')}</legend>
         <div>
           <InputPairContainer>
-            <StyledLabel htmlFor="ui-theme">{t('ui theme')}</StyledLabel>
+            <StyledLabel htmlFor="behaviour.shouldUseDarkColors">{t('ui theme')}</StyledLabel>
             <DarwinSelect
-              className="form-select"
-              id="ui-theme"
-              name="ui-theme"
-              defaultValue={preferences?.behaviour?.language}
+              id="behaviour.shouldUseDarkColors"
+              name="behaviour.shouldUseDarkColors"
+              defaultValue={preferences?.behaviour.shouldUseDarkColors ? 'true' : 'false'}
               style={{ flexBasis: '100%' }}
             >
-              {['light', 'dark'].map((name, index) => (
-                <option key={index} value={name}>
-                  {name}
+              {[
+                { label: 'light', value: 'false' },
+                { label: 'dark', value: 'true' },
+              ].map(({ label, value }, index) => (
+                <option key={index} value={value}>
+                  {label}
                 </option>
               ))}
             </DarwinSelect>
           </InputPairContainer>
           <InputPairContainer>
-            <StyledLabel htmlFor="auto-update">{t('check for updates')}</StyledLabel>
+            <StyledLabel htmlFor="advanced.update.automatic">{t('check for updates')}</StyledLabel>
             <ToggleSwitch
-              id="auto-update"
-              name="auto-update"
+              id="advanced.update.automatic"
+              name="advanced.update.automatic"
               defaultChecked={preferences.advanced?.update?.automatic}
             />
           </InputPairContainer>
           <InputPairContainer>
-            <StyledLabel htmlFor="notifications">{t('enable notifications')}</StyledLabel>
+            <StyledLabel htmlFor="behaviour.notifications.enabled">
+              {t('enable notifications')}
+            </StyledLabel>
             <ToggleSwitch
-              id="notifications"
-              name="notifications"
+              id="behaviour.notifications.enabled"
+              name="behaviour.notifications.enabled"
               defaultChecked={preferences.behaviour?.notifications?.enabled}
             />
           </InputPairContainer>
@@ -135,30 +132,19 @@ const BehaviourPreferences = (): JSX.Element => {
         <legend>{t('search options')}</legend>
         <div>
           <InputPairContainer>
-            <StyledLabel htmlFor="default-search">{t('default search')}</StyledLabel>
-            <DarwinInput
-              type="text"
-              id="default-search"
-              name="default-search"
-              defaultValue={preferences.behaviour?.search?.defaultSearch}
-              placeholder={t('save files to')}
-              style={{ flexBasis: '100%' }}
-            />
-          </InputPairContainer>
-          <InputPairContainer>
-            <StyledLabel htmlFor="safe-search">{t('safe search')}</StyledLabel>
+            <StyledLabel htmlFor="behaviour.search.safeSearch">{t('safe search')}</StyledLabel>
             <ToggleSwitch
-              id="safe-search"
-              name="safe-search"
+              id="behaviour.search.safeSearch"
+              name="behaviour.search.safeSearch"
               defaultChecked={preferences.behaviour?.search?.safeSearch}
             />
           </InputPairContainer>
           <InputPairContainer>
-            <StyledLabel htmlFor="search-limit">{t('limit')}</StyledLabel>
+            <StyledLabel htmlFor="behaviour.search.limit">{t('limit')}</StyledLabel>
             <DarwinInput
               type="number"
-              id="search-limit"
-              name="search-limit"
+              id="behaviour.search.limit"
+              name="behaviour.search.limit"
               min="1"
               max={Infinity}
               defaultValue={preferences.behaviour?.search?.limit}
@@ -167,13 +153,12 @@ const BehaviourPreferences = (): JSX.Element => {
             />
           </InputPairContainer>
           <InputPairContainer>
-            <StyledLabel htmlFor="filter-search">
+            <StyledLabel htmlFor="behaviour.search.type">
               {t('filter for a specific type of item')}
             </StyledLabel>
             <DarwinSelect
-              id="filter-search"
-              name="filter-search"
-              className="form-select"
+              id="behaviour.search.type"
+              name="behaviour.search.type"
               defaultValue={preferences?.behaviour?.search?.type}
               style={{ flexBasis: '100%' }}
             >
@@ -187,26 +172,28 @@ const BehaviourPreferences = (): JSX.Element => {
         </div>
       </StyledDFieldset>
       <SpaceBottom size="s" />
-      <StyledDFieldset disabled={!preferences?.advanced?.logs?.enabled}>
+      <StyledDFieldset disabled>
         <legend style={{ display: 'flex' }}>
           <input
             type="checkbox"
-            id="enable-logs"
-            name="enable-logs"
+            id="advanced.logs.enabled"
+            name="advanced.logs.enabled"
             defaultChecked={preferences?.advanced?.logs.enabled}
+            onChange={() => {}}
           ></input>
           <SpaceRight size="xs" />
-          <label htmlFor="enable-logs">{t('log file')}</label>
+          <label htmlFor="advanced.logs.enabled">{t('log file')}</label>
         </legend>
         <div>
           <InputPairContainer>
-            <StyledLabel htmlFor="savePath">{t('save files to')}</StyledLabel>
+            <StyledLabel htmlFor="advanced.logs.savePath">{t('save files to')}</StyledLabel>
             <InputGroup>
               <DarwinInput
                 type="text"
-                id="savePath"
-                name="savePath"
+                id="advanced.logs.savePath"
+                name="advanced.logs.savePath"
                 defaultValue={preferences?.advanced?.logs?.savePath}
+                readOnly={true}
                 placeholder={t('save files to')}
                 style={{ flex: 1 }}
               />

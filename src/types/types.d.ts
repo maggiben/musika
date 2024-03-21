@@ -114,7 +114,6 @@ export interface IPreferences {
     theme: Record<string, unknown>;
     notifications: INotificationOptions;
     search: {
-      defaultSearch?: string;
       safeSearch?: boolean;
       limit?: number | Infinity;
       type?: 'video' | 'playlist';

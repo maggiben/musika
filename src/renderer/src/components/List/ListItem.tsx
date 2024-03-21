@@ -1,7 +1,7 @@
 import React from 'react';
 import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
-import { padZeroes } from '@utils/string';
+import { padZeroes } from '@shared/lib/utils';
 import * as utils from '@shared/lib/utils';
 import { BsThreeDots } from 'react-icons/bs';
 import { ClearButton } from '@components/Form/Form';

@@ -131,8 +131,6 @@ const getDefaultPreferences = (): IPreferences => {
         }, {}),
       },
       search: {
-        defaultSearch:
-          'https://youtube.com/watch?v=nRfDgXdInoM&list=PL_xObc8HwOwtwHHn7dZCsst07KMv6lzo9&index=2',
         safeSearch: false,
         limit: 100,
         type: 'playlist',

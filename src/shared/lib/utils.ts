@@ -134,7 +134,6 @@ export function fromHumanSize(size: string): number {
  * @param {Array.<Object>} objs
  * @return {string}
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const tmpl = (
   str: string,
   obj: Record<string, unknown>,
@@ -230,9 +229,8 @@ export const isObjectEqual = <T>(firstVal: T | undefined, secondVal: T | undefin
  */
 export const removeProperty = <T, K extends keyof T>(array: T[], property: K): T[] =>
   array.map((item) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [property]: removed, ...rest } = item;
-    return rest as T; // Explicit type cast to T
+    delete item[property];
+    return item as T; // Explicit type cast to T
   });
 
 export const splitIntoTuples = <T>(array: T[], size: number): T[][] => {
@@ -265,6 +263,34 @@ export const getNestedProperty = <T>(obj: T, path: string): unknown | undefined 
     }
     return value;
   }, obj);
+};
+
+export const setNestedProperty = <T>(obj: T, path: string, value: unknown): T => {
+  const pathParts = path.split('.');
+  const lastKey = pathParts.pop() as string;
+
+  const nestedObj = pathParts.reduce((acc, key) => {
+    if (!acc[key]) {
+      const [propertyName, index] = key.replace(/\]/g, '').split('[');
+      if (Array.isArray(acc[propertyName])) {
+        if (!acc[propertyName][index]) {
+          acc[propertyName][index] = {};
+        }
+        return acc[propertyName][index];
+      }
+      acc[key] = {};
+    }
+    return acc[key];
+  }, obj);
+
+  const [propertyName, index] = lastKey.replace(/\]/g, '').split('[');
+  if (Array.isArray(nestedObj[propertyName])) {
+    nestedObj[propertyName][index] = value;
+  } else {
+    nestedObj[lastKey] = value;
+  }
+
+  return { ...obj };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

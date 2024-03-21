@@ -1,9 +1,9 @@
+import React, { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useRecoilValue } from 'recoil';
-import { preferencesState } from '@states/atoms';
 import { DarwinButton } from '@renderer/components/Form/Form';
 import { SpaceRight } from '@renderer/components/Spacing/Spacing';
+import useForm from '@renderer/hooks/useForm';
 
 const ActionButtonsContainer = styled.div`
   width: 100%;
@@ -54,6 +54,8 @@ const ActionButtons = ({ formRef }: IActionButtonsProps): JSX.Element => {
     });
   };
 
+  const { isDirty } = useForm(formRef);
+
   return (
     <ActionButtonsContainer data-testid="action-buttons">
       <ActionButtonsGroup>
@@ -65,7 +67,9 @@ const ActionButtons = ({ formRef }: IActionButtonsProps): JSX.Element => {
         <Right>
           <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
           <SpaceRight size="s" />
-          <DarwinButton onClick={handleOkClick}>{t('ok')}</DarwinButton>
+          <DarwinButton onClick={handleOkClick} disabled={!isDirty}>
+            {t('ok')}
+          </DarwinButton>
         </Right>
       </ActionButtonsGroup>
     </ActionButtonsContainer>

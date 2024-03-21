@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRecoilValue } from 'recoil';
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import ytsr from '@distube/ytsr';
 import styled from 'styled-components';
-import { preferencesState } from '@states/atoms';
 
 const SearchBarContainer = styled.div`
   width: 100%;
@@ -63,10 +61,9 @@ interface ISearchBar {
   onSearch: (results) => void;
 }
 export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
-  const preferences = useRecoilValue(preferencesState);
   const { t } = useTranslation();
   const [searchLoadingClass, setSearchLoadingClass] = useState<string>('');
-  const [search, setSearch] = useState<string>(preferences.behaviour?.search?.defaultSearch ?? '');
+  const [search, setSearch] = useState<string>('');
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { value } = event.target;
@@ -86,8 +83,8 @@ export const SearchBar = ({ onSearch }: ISearchBar): JSX.Element => {
 
       console.log('search', searchResults);
       if (searchResults.playlistId) {
-        const download = await window.commands.download(search);
-        console.log('download', download);
+        // const download = await window.commands.download(search);
+        // console.log('download', download);
       }
       onSearch(searchResults);
       setSearchLoadingClass('');

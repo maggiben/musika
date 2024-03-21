@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, DependencyList } from 'react';
 
 const useModalResize = (formRef: React.RefObject<HTMLElement>, deps?: DependencyList): void => {
   const innerHeightRef = useRef<number | undefined>(undefined);
