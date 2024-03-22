@@ -179,7 +179,7 @@ const TranscodingOptions = (): JSX.Element => {
             style={{ flexBasis: '100%' }}
           >
             <option>{t('default')}</option>
-            {[8000, 16000, 22050, 44100, 48000, 96000, 192000].map((bitrate, index) => (
+            {['8000', '16000', '22050', '44100', '48000', '96000', '192000'].map((bitrate, index) => (
               <option key={index} value={bitrate}>
                 {bitrate}Hz
               </option>
