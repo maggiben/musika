@@ -19,7 +19,7 @@ const useDownload = (): IProgress => {
   useEffect(() => {
     const notify = async (
       title: string,
-      options?: NotificationOptions,
+      options: NotificationOptions,
     ): Promise<Notification | undefined> => {
       const { enabled, silent } = preferences.behaviour.notifications;
       if (!enabled || !('Notification' in window)) {
@@ -33,20 +33,25 @@ const useDownload = (): IProgress => {
         }
       }
 
-      const notification = new Notification(title, {
-        ...options,
+      const notificationOptions = {
+        body: options.body,
+        icon: options.icon,
+        image: options.image,
         silent,
         tag: 'musika',
-      });
-
-      notification.onclick = (event) => {
-        notification.close();
-        event.preventDefault();
-        window.focus();
       };
+
+      const notification = new Notification(title, notificationOptions);
+
+      // notification.onclick = (event) => {
+      //   notification.close();
+      //   event.preventDefault();
+      //   window.focus();
+      // };
 
       return notification;
     };
+
     const playlistItemsListener = (
       _event: IpcRendererEvent,
       message: IDownloadWorkerMessage,
@@ -82,12 +87,6 @@ const useDownload = (): IProgress => {
         const newState = { ...prevState };
         delete newState[message?.source?.id];
         return newState;
-      });
-
-      notify(t('download timeout'), {
-        body: `${message.source.title} timeout !`,
-        icon: message.source.thumbnail,
-        image: message.source.thumbnail,
       });
     };
 
