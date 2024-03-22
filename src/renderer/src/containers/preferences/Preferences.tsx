@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
@@ -11,7 +11,7 @@ import TranscodingPreferences from './TranscodingPreferences';
 import NavBar from './NavBar';
 import ActionButtons from './ActionButtons';
 import useModalResize from '@hooks/useModalResize';
-import { getNestedProperty, isObjectEqual, setNestedProperty } from '@shared/lib/utils';
+import { getNestedProperty, setNestedProperty } from '@shared/lib/utils';
 
 const PreferencesContainer = styled.div`
   width: 100%;
@@ -145,19 +145,13 @@ const Preferences = (): JSX.Element => {
       }
     }
 
-    if (!isObjectEqual(preferences, clonedPreferences)) {
-      setPreferences((prev) => {
-        if (!prev) {
-          return prev;
-        }
-        return { ...prev, ...clonedPreferences };
+    setPreferences((prev) => ({ ...prev, ...clonedPreferences }));
+
+    if (submitter) {
+      await window.preferences.savePreferences(clonedPreferences);
+      window.electron.ipcRenderer.send('close-modal', {
+        syncPreferences: true,
       });
-      if (submitter) {
-        await window.preferences.savePreferences(clonedPreferences);
-        window.electron.ipcRenderer.send('close-modal', {
-          syncPreferences: true,
-        });
-      }
     }
   };
 

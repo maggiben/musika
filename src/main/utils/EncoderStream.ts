@@ -69,15 +69,15 @@ export interface ITranscodingOptions {
   /**
    * Set audio bitrate
    */
-  videoBitrate?: number;
+  videoBitrate?: string;
   /**
    * Set audio bitrate
    */
-  audioBitrate?: number;
+  audioBitrate?: string;
   /**
    * Set audio frequency
    */
-  audioFrequency?: number;
+  audioFrequency?: string;
   /**
    * Set output format
    */
@@ -241,7 +241,7 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
 
   private encodeStream(): void {
     const { inputStream, outputStream, encodeOptions, metadata } = this.options;
-    console.log('encodeOptions', encodeOptions, 'native container', metadata.videoFormat);
+    console.log('encodeOptions', encodeOptions, 'native container', metadata.videoFormat.container);
     this.ffmpegCommand = Object.entries(encodeOptions).reduce((prev, [key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
         return prev[key](value);

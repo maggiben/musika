@@ -106,6 +106,7 @@ export interface IPlaylistProperties {
 
 export interface INotificationOptions {
   enabled: boolean;
+  silent?: boolean;
 }
 
 export interface IPreferences {

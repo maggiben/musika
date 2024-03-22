@@ -43,11 +43,8 @@ export const applicationMenu = (
               label: 'Playlist',
               id: 'menu.app.file.new.playlist',
               accelerator: 'CmdOrCtrl+N',
-              click: async () => {
-                console.log('menu click !');
-                mainWindow?.webContents.send('menu-click', { id: 'menu.file.new.playlist' });
-                return;
-              },
+              click: async ({ id }: Electron.MenuItem) =>
+                mainWindow?.webContents.send('menu-click', { id }),
             },
             {
               label: 'Playlist from Selection',

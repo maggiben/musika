@@ -1,17 +1,52 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type ytpl from '@distube/ytpl';
 import type { Progress } from 'progress-stream';
 import type { IDownloadWorkerMessage } from 'types/types';
 import type { IpcRendererEvent } from 'electron';
+import { useRecoilValue } from 'recoil';
+import { preferencesState } from '@renderer/states/atoms';
 
 export interface IProgress {
   [key: string]: number[];
 }
 
 const useDownload = (): IProgress => {
+  const { t } = useTranslation();
   const [progress, setProgress] = useState<IProgress>({});
+  const preferences = useRecoilValue(preferencesState);
 
   useEffect(() => {
+    const notify = async (
+      title: string,
+      options?: NotificationOptions,
+    ): Promise<Notification | undefined> => {
+      const { enabled, silent } = preferences.behaviour.notifications;
+      if (!enabled || !('Notification' in window)) {
+        return;
+      }
+
+      if (Notification?.permission !== 'granted') {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          return;
+        }
+      }
+
+      const notification = new Notification(title, {
+        ...options,
+        silent,
+        tag: 'musika',
+      });
+
+      notification.onclick = (event) => {
+        notification.close();
+        event.preventDefault();
+        window.focus();
+      };
+
+      return notification;
+    };
     const playlistItemsListener = (
       _event: IpcRendererEvent,
       message: IDownloadWorkerMessage,
@@ -34,6 +69,12 @@ const useDownload = (): IProgress => {
         delete newState[message?.source?.id];
         return newState;
       });
+
+      notify(t('download complete'), {
+        body: `${message.source.title} complete !`,
+        icon: message.source.thumbnail,
+        image: message.source.thumbnail,
+      });
     };
 
     const timeoutListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
@@ -41,6 +82,12 @@ const useDownload = (): IProgress => {
         const newState = { ...prevState };
         delete newState[message?.source?.id];
         return newState;
+      });
+
+      notify(t('download timeout'), {
+        body: `${message.source.title} timeout !`,
+        icon: message.source.thumbnail,
+        image: message.source.thumbnail,
       });
     };
 

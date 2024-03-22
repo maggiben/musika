@@ -123,11 +123,22 @@ const BehaviourPreferences = (): JSX.Element => {
             <StyledLabel htmlFor="behaviour.notifications.enabled">
               {t('enable notifications')}
             </StyledLabel>
-            <ToggleSwitch
-              id="behaviour.notifications.enabled"
-              name="behaviour.notifications.enabled"
-              defaultChecked={preferences.behaviour?.notifications?.enabled}
-            />
+            <InputGroup>
+              <ToggleSwitch
+                id="behaviour.notifications.enabled"
+                name="behaviour.notifications.enabled"
+                defaultChecked={preferences.behaviour?.notifications?.enabled}
+              />
+              <StyledLabel htmlFor="behaviour.notifications.silent">
+                {t('silent notifications')}
+              </StyledLabel>
+              <ToggleSwitch
+                id="behaviour.notifications.silent"
+                name="behaviour.notifications.silent"
+                disabled={!preferences.behaviour?.notifications?.enabled}
+                defaultChecked={preferences.behaviour?.notifications?.silent}
+              />
+            </InputGroup>
           </InputPairContainer>
         </div>
       </StyledFieldset>

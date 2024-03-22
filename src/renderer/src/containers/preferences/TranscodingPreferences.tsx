@@ -3,7 +3,7 @@ import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';
 import { BsFillFolderFill } from 'react-icons/bs';
 import {
-  ToggleSwitch,
+  DarwinRadio,
   StyledLabel,
   StyledFieldset,
   InputGroup,
@@ -29,27 +29,44 @@ const TranscodingOptions = (): JSX.Element => {
           onChange={() => {}}
         ></input>
         <SpaceRight size="xs" />
-        <label htmlFor="transcoding.enabled">{t('enable transcoding')}</label>
+        <label htmlFor="transcoding.enabled">{t('enable live transcoding')}</label>
       </legend>
       <div>
         <InputPairContainer>
-          <StyledLabel htmlFor="downloads.filter">{t('filter')}</StyledLabel>
+          <StyledLabel>{t('media content type')}</StyledLabel>
           <InputGroup>
-            <DarwinSelect
-              id="downloads.filter"
-              name="downloads.filter"
-              defaultValue={preferences?.downloads.filter}
-              style={{ flexBasis: '100%' }}
-            >
-              <option value="">{t('use default')}</option>
-              {['videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map(
-                (options, index) => (
-                  <option key={index} value={options}>
-                    {options}
-                  </option>
-                ),
-              )}
-            </DarwinSelect>
+            <StyledLabel htmlFor="output-filters-audio">
+              <DarwinRadio
+                id="output-filters-audio"
+                name="output-filters"
+                disabled
+                defaultChecked={['audio', 'audioonly'].includes(preferences?.downloads.filter)}
+              />
+              <SpaceRight size="s" />
+              {t('audio')}
+            </StyledLabel>
+            <StyledLabel htmlFor="output-filters-video">
+              <DarwinRadio
+                id="output-filters-video"
+                name="output-filters"
+                disabled
+                defaultChecked={['video', 'videoonly'].includes(preferences?.downloads.filter)}
+              />
+              <SpaceRight size="s" />
+              {t('video')}
+            </StyledLabel>
+            <StyledLabel htmlFor="output-filters-both">
+              <DarwinRadio
+                id="output-filters-both"
+                name="output-filters"
+                disabled
+                defaultChecked={['audioandvideo', 'videoandaudio'].includes(
+                  preferences?.downloads.filter,
+                )}
+              />
+              <SpaceRight size="s" />
+              {t('both')}
+            </StyledLabel>
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
@@ -59,6 +76,11 @@ const TranscodingOptions = (): JSX.Element => {
               id="transcoding.options.videoCodec"
               name="transcoding.options.videoCodec"
               defaultValue={preferences?.transcoding.options.videoCodec}
+              disabled={
+                !['video', 'videoonly', 'audioandvideo', 'videoandaudio'].includes(
+                  preferences?.downloads.filter,
+                )
+              }
               style={{ flexBasis: '100%' }}
             >
               <option value="">{t('use default')}</option>
@@ -79,6 +101,11 @@ const TranscodingOptions = (): JSX.Element => {
               id="transcoding.options.audioCodec"
               name="transcoding.options.audioCodec"
               defaultValue={preferences?.transcoding.options.audioCodec}
+              disabled={
+                !['audio', 'audioonly', 'audioandvideo', 'videoandaudio'].includes(
+                  preferences?.downloads.filter,
+                )
+              }
               style={{ flexBasis: '100%' }}
             >
               <option value="">{t('use default')}</option>
@@ -117,6 +144,11 @@ const TranscodingOptions = (): JSX.Element => {
               id="transcoding.options.size"
               name="transcoding.options.size"
               defaultValue={preferences?.transcoding.options.size}
+              disabled={
+                !['video', 'videoonly', 'audioandvideo', 'videoandaudio'].includes(
+                  preferences?.downloads.filter,
+                )
+              }
               style={{ flexBasis: '100%' }}
             >
               <option value="">{t('use default')}</option>
@@ -143,6 +175,11 @@ const TranscodingOptions = (): JSX.Element => {
               id="transcoding.options.videoBitrate"
               name="transcoding.options.videoBitrate"
               defaultValue={preferences?.transcoding.options.videoBitrate}
+              disabled={
+                !['video', 'videoonly', 'audioandvideo', 'videoandaudio'].includes(
+                  preferences?.downloads.filter,
+                )
+              }
               style={{ flexBasis: '100%' }}
             >
               <option value="">{t('use default')}</option>
@@ -187,6 +224,11 @@ const TranscodingOptions = (): JSX.Element => {
               id="transcoding.options.audioBitrate"
               name="transcoding.options.audioBitrate"
               defaultValue={preferences?.transcoding.options.audioBitrate}
+              disabled={
+                !['audio', 'audioonly', 'audioandvideo', 'videoandaudio'].includes(
+                  preferences?.downloads.filter,
+                )
+              }
               style={{ flexBasis: '100%' }}
             >
               <option value="">{t('use default')}</option>
@@ -207,6 +249,11 @@ const TranscodingOptions = (): JSX.Element => {
               id="transcoding.options.audioFrequency"
               name="transcoding.options.audioFrequency"
               defaultValue={preferences?.transcoding.options.audioFrequency}
+              disabled={
+                !['audio', 'audioonly', 'audioandvideo', 'videoandaudio'].includes(
+                  preferences?.downloads.filter,
+                )
+              }
               style={{ flexBasis: '100%' }}
             >
               <option value="">{t('use default')}</option>

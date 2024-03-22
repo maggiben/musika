@@ -9,6 +9,9 @@ export const StyledLabel = styled.label`
   display: block;
   white-space: nowrap;
   position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 export const InputPairContainer = styled.div`
@@ -36,6 +39,7 @@ export const StyledFieldset = styled.fieldset`
   margin: 0px;
   border-radius: ${({ theme }) => theme.borderRadius.xs};
   &:disabled button,
+  &:disabled select,
   &:disabled input {
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
   }
@@ -51,8 +55,8 @@ export const StyledFieldset = styled.fieldset`
 
 export const InputGroup = styled.div`
   display: flex;
-  align-items: stretch;
-  width: 100%;
+  justify-content: space-between;
+  align-items: center;
   flex-basis: 100%;
 `;
 
@@ -152,6 +156,16 @@ export const DarwinInput = styled.input`
   }
 `;
 
+export const DarwinRadio = styled(DarwinInput).attrs(() => ({
+  type: 'radio',
+}))`
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  width: auto;
+  box-shadow: none;
+`;
+
 // Styled textarea extending from BaseInput
 export const StyledTextarea = styled(DarwinInput).attrs({ as: 'textarea' })`
   min-height: 100px;
@@ -247,9 +261,7 @@ export const DarwinSelect = styled.select`
     outline: 0;
   }
   &[disabled] {
-    /* color: ${({ theme }) => theme.colors.lightGray}; */
-    color: ${({ theme }) => theme.colors.red};
-    background-color: ${({ theme }) => theme.colors.darkGray};
+    color: ${({ theme }) => theme.colors.lightGray};
     ${({ theme }) => selectChevron('field', theme.colors.darkGray)};
     box-shadow: none;
     cursor: inherit;

@@ -118,7 +118,12 @@ const QualityOptions = (): JSX.Element => {
 
   return (
     <StyledFieldset>
-      <legend>{t('media format')}</legend>
+      <legend>{t('media output format')}</legend>
+      <i>
+        {t(
+          'Use this options to change the download format, it also affects the transcoding results',
+        )}
+      </i>
       <div>
         <InputPairContainer>
           <StyledLabel htmlFor="downloads.quality">{t('quality')}</StyledLabel>
@@ -153,11 +158,13 @@ const QualityOptions = (): JSX.Element => {
               defaultValue={preferences?.downloads.filter}
               style={{ flexBasis: '100%' }}
             >
-              {['videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map((options, index) => (
-                <option key={index} value={options}>
-                  {options}
-                </option>
-              ))}
+              {['videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map(
+                (options, index) => (
+                  <option key={index} value={options}>
+                    {options}
+                  </option>
+                ),
+              )}
             </DarwinSelect>
           </InputGroup>
         </InputPairContainer>

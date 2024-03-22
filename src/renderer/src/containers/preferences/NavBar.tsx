@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { IPreferences } from 'types/types';
 import { StyledLabel } from '@components/Form/Form';
+import { SpaceBottom } from '@renderer/components/Spacing/Spacing';
 
 const StyledNav = styled.nav`
   width: 100%;
@@ -109,6 +110,7 @@ const NavBar = (props: INavBarProps): JSX.Element => {
                 <StyledListItemLabel htmlFor={key}>
                   <StyledLabelContent data-testid="my-span">
                     {value.icon}
+                    <SpaceBottom size="xxs" />
                     <span>{key}</span>
                   </StyledLabelContent>
                 </StyledListItemLabel>

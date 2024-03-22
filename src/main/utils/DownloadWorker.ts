@@ -49,7 +49,7 @@ export interface IDownloadWorkerOptions {
   /**
    * Playlist item.
    */
-  item: ytpl.result['items'][0];
+  item: ytpl.result['items'][number];
   /**
    * Output file name
    */
@@ -78,7 +78,7 @@ export interface IDownloadWorkerOptions {
 
 export interface IDownloadWorkerMessage {
   type: string;
-  source: ytpl.result['items'][0];
+  source: ytpl.result['items'][number];
   error: Error;
   details: Record<string, unknown>;
 }
@@ -86,7 +86,7 @@ export interface IDownloadWorkerMessage {
 export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private downloadStream!: Readable;
   private parentPort: MessagePort;
-  private item: ytpl.result['items'][0];
+  private item: ytpl.result['items'][number];
   private output!: string;
   private savePath: string;
   private timeout: number;
