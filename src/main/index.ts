@@ -95,11 +95,11 @@ app.whenReady().then(async () => {
 
   createWindow(preferences);
 
-  creatWorker({ workerData: 'worker' })
-    .on('message', (message) => {
-      console.log(`\nMessage from worker: ${message}`);
-    })
-    .postMessage('');
+  // creatWorker({ workerData: 'worker' })
+  //   .on('message', (message) => {
+  //     console.log(`\nMessage from worker: ${message}`);
+  //   })
+  //   .postMessage('');
 
   // callFork()
 

@@ -261,6 +261,7 @@ export const DarwinSelect = styled.select`
   position: relative;
   display: block;
   line-height: 1rem;
+  width: 100%;
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => selectChevron('field', theme.colors.accentColor)};
   border: 0px;
