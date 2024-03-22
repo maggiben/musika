@@ -11,7 +11,7 @@ import TranscodingPreferences from './TranscodingPreferences';
 import NavBar from './NavBar';
 import ActionButtons from './ActionButtons';
 import useModalResize from '@hooks/useModalResize';
-import { getNestedProperty, setNestedProperty } from '@shared/lib/utils';
+import { getNestedProperty, isObjectEqual, setNestedProperty } from '@shared/lib/utils';
 
 const PreferencesContainer = styled.div`
   width: 100%;
@@ -118,6 +118,8 @@ const Preferences = (): JSX.Element => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     if (!formRef.current) return;
+    // const { submitter } = event.nativeEvent as { submitter: HTMLInputElement };
+    const { submitter } = event['nativeEvent'] as unknown as { submitter: HTMLInputElement };
     // Process the form data here, e.g., send it to a server
     const formData = new FormData(formRef.current);
     const inputs = Array.from(formRef.current.querySelectorAll('input'));
@@ -137,16 +139,26 @@ const Preferences = (): JSX.Element => {
     for (const [key, value] of formData) {
       const newVal = hash.has(key) ? hash.get(key) : value;
       const orgVal = getNestedProperty(preferences, key);
-      console.log('newVal: ', key, value);
+      console.log(`key: ${key} newVal: "${newVal}" orgVal: "${orgVal}"`);
       if (newVal !== orgVal) {
         clonedPreferences = setNestedProperty(clonedPreferences, key, newVal);
       }
     }
 
-    // await window.preferences.savePreferences(clonedPreferences);
-    // window.electron.ipcRenderer.send('close-modal', {
-    //   syncPreferences: true,
-    // });
+    if (!isObjectEqual(preferences, clonedPreferences)) {
+      setPreferences((prev) => {
+        if (!prev) {
+          return prev;
+        }
+        return { ...prev, ...clonedPreferences };
+      });
+      if (submitter) {
+        await window.preferences.savePreferences(clonedPreferences);
+        window.electron.ipcRenderer.send('close-modal', {
+          syncPreferences: true,
+        });
+      }
+    }
   };
 
   return (
@@ -166,6 +178,7 @@ const Preferences = (): JSX.Element => {
           data-preferences-group={selectedPreferenceGroup}
         >
           {selectedPreferenceGroup && pannels[selectedPreferenceGroup].node}
+          <input type="submit" style={{ display: 'none' }} />
         </Form>
       </MainPannelContainer>
       <ActionButtons formRef={formRef} />

@@ -10,6 +10,7 @@ interface IFormHook {
 const useForm = (formRef: React.RefObject<HTMLFormElement>): IFormHook => {
   const preferences = useRecoilValue(preferencesState);
   const [isDirty, setIsDirty] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const findFormElements = (node: HTMLElement, elements: HTMLElement[] = []): HTMLElement[] => {
     if (node instanceof HTMLInputElement || node instanceof HTMLSelectElement) {
       elements.push({
@@ -45,22 +46,21 @@ const useForm = (formRef: React.RefObject<HTMLFormElement>): IFormHook => {
         default:
           newVal = target['value'];
       }
-      console.log('name', name, orgVal, newVal);
       if (orgVal !== newVal) {
         setIsDirty(true);
       } else {
         setIsDirty(false);
       }
     };
-    const formElements = findFormElements(formRef.current);
-    console.log('formElements', formElements);
+    // const formElements = findFormElements(formRef.current);
     const formElement = formRef.current;
+    setIsDirty(false);
     formElement.addEventListener('change', onChangeHandler);
     return () => {
       formElement.removeEventListener('change', onChangeHandler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formRef]);
+  }, [formRef, preferences]);
 
   return {
     isDirty,

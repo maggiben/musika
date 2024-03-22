@@ -102,11 +102,18 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
           console.log('new-playlist');
           break;
         case 'preferences': {
-          const newPreferences = await window.preferences.loadPreferences();
-          // Update Language
-          preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
-            i18n.changeLanguage(newPreferences?.behaviour?.language);
-          setPreferences(structuredClone(newPreferences));
+          if (message['syncPreferences']) {
+            const newPreferences = await window.preferences.loadPreferences();
+            // Update Language
+            preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
+              i18n.changeLanguage(newPreferences?.behaviour?.language);
+            setPreferences((prev) => {
+              if (!prev) {
+                return prev;
+              }
+              return { ...prev, ...newPreferences };
+            });
+          }
           break;
         }
         case 'open-url':

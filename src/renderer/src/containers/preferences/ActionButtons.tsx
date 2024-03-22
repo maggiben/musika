@@ -43,8 +43,16 @@ interface IActionButtonsProps {
 
 const ActionButtons = ({ formRef }: IActionButtonsProps): JSX.Element => {
   const { t } = useTranslation();
+  const [didApplyChanges, setDidApplyChanges] = useState(false);
   const handleOkClick = async (): Promise<void> => {
     if (!formRef.current) return;
+    const submitButton = formRef.current.querySelector('input[type="submit"]') as HTMLElement;
+    formRef.current.requestSubmit(submitButton);
+  };
+
+  const handleApplyClick = async (): Promise<void> => {
+    if (!formRef.current) return;
+    setDidApplyChanges(true);
     formRef.current.requestSubmit();
   };
 
@@ -60,14 +68,14 @@ const ActionButtons = ({ formRef }: IActionButtonsProps): JSX.Element => {
     <ActionButtonsContainer data-testid="action-buttons">
       <ActionButtonsGroup>
         <Left>
-          <DarwinButton onClick={handleOkClick} disabled>
+          <DarwinButton onClick={handleApplyClick} disabled={!isDirty}>
             {t('apply')}
           </DarwinButton>
         </Left>
         <Right>
           <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
           <SpaceRight size="s" />
-          <DarwinButton onClick={handleOkClick} disabled={!isDirty}>
+          <DarwinButton onClick={handleOkClick} disabled={didApplyChanges ? false : !isDirty}>
             {t('ok')}
           </DarwinButton>
         </Right>

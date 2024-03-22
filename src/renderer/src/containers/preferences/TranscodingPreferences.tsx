@@ -39,7 +39,7 @@ const TranscodingOptions = (): JSX.Element => {
             defaultValue={preferences?.transcoding.options.videoCodec}
             style={{ flexBasis: '100%' }}
           >
-            <option>{t('keep original')}</option>
+            <option value="">{t('keep original')}</option>
             {Object.entries(preferences.transcoding.codecs)
               .filter(([, { type, canEncode }]) => type === 'video' && canEncode)
               .map(([key, value], index) => (
@@ -57,7 +57,7 @@ const TranscodingOptions = (): JSX.Element => {
             defaultValue={preferences?.transcoding.options.audioCodec}
             style={{ flexBasis: '100%' }}
           >
-            <option>{t('keep original')}</option>
+            <option value="">{t('keep original')}</option>
             {Object.entries(preferences.transcoding.codecs)
               .filter(([, { type, canEncode }]) => type === 'audio' && canEncode)
               .map(([key, value], index) => (
@@ -88,10 +88,9 @@ const TranscodingOptions = (): JSX.Element => {
             id="transcoding.options.videoSize"
             name="transcoding.options.videoSize"
             defaultValue={preferences?.transcoding.options.videoSize}
-            disabled={!preferences?.transcoding.options.videoCodec}
             style={{ flexBasis: '100%' }}
           >
-            <option>{t('keep original')}</option>
+            <option value="">{t('keep original')}</option>
             {[
               { value: '640x360', label: '360p' },
               { value: '854x480', label: '480p' },
@@ -113,10 +112,9 @@ const TranscodingOptions = (): JSX.Element => {
             id="transcoding.options.videoBitrate"
             name="transcoding.options.videoBitrate"
             defaultValue={preferences?.transcoding.options.videoBitrate}
-            disabled={!preferences?.transcoding.options.videoCodec}
             style={{ flexBasis: '100%' }}
           >
-            <option>{t('default')}</option>
+            <option value="">{t('default')}</option>
             {[
               { value: '500', label: 'Very low-quality video' },
               {
@@ -156,10 +154,9 @@ const TranscodingOptions = (): JSX.Element => {
             id="transcoding.options.audioBitrate"
             name="transcoding.options.audioBitrate"
             defaultValue={preferences?.transcoding.options.audioBitrate}
-            disabled={!preferences?.transcoding.options.audioCodec}
             style={{ flexBasis: '100%' }}
           >
-            <option>{t('default')}</option>
+            <option value="">{t('default')}</option>
             {['32', '64', '96', '128', '192', '256', '320'].map((bitrate, index) => (
               <option key={index} value={bitrate}>
                 {bitrate}Kbs
@@ -175,15 +172,16 @@ const TranscodingOptions = (): JSX.Element => {
             id="transcoding.options.audioFrequency"
             name="transcoding.options.audioFrequency"
             defaultValue={preferences?.transcoding.options.audioFrequency}
-            disabled={!preferences?.transcoding.options.audioCodec}
             style={{ flexBasis: '100%' }}
           >
-            <option>{t('default')}</option>
-            {['8000', '16000', '22050', '44100', '48000', '96000', '192000'].map((bitrate, index) => (
-              <option key={index} value={bitrate}>
-                {bitrate}Hz
-              </option>
-            ))}
+            <option value="">{t('default')}</option>
+            {['8000', '16000', '22050', '44100', '48000', '96000', '192000'].map(
+              (bitrate, index) => (
+                <option key={index} value={bitrate}>
+                  {bitrate}Hz
+                </option>
+              ),
+            )}
           </DarwinSelect>
         </InputPairContainer>
       </div>
