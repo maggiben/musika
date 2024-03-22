@@ -449,13 +449,13 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
    */
   private endStreams(): void {
     if (this.downloadStream && this.outputStream) {
-      this.downloadStream.destroy();
       this.downloadStream.unpipe(this.outputStream);
-      // end the file stream
-      this.outputStream.end();
+      // destroy the download stream
+      this.downloadStream.destroy();
+      // destroy output stream
+      this.outputStream.destroy();
       // Remove ouput file
       if (fs.existsSync(this.outputStream.path.toString())) {
-        this.outputStream.destroy();
         fs.unlinkSync(this.outputStream.path.toString());
       }
     }
