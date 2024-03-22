@@ -3,13 +3,10 @@ export { default as ToggleSwitch } from './ToggleSwitch';
 
 export const StyledLabel = styled.label`
   flex-basis: auto;
-  align-items: center;
   padding: ${({ theme }) => theme.spacing.xs};
   font-size: ${({ theme }) => theme.fontSizes.s};
   color: ${({ theme }) => theme.colors['secondary-label']};
   display: block;
-  white-space: nowrap;
-  cursor: pointer;
   white-space: nowrap;
   position: relative;
 `;

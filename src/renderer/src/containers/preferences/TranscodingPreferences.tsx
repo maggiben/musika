@@ -3,6 +3,7 @@ import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';
 import { BsFillFolderFill } from 'react-icons/bs';
 import {
+  ToggleSwitch,
   StyledLabel,
   StyledFieldset,
   InputGroup,
@@ -18,7 +19,7 @@ const TranscodingOptions = (): JSX.Element => {
   const preferences = useRecoilValue(preferencesState);
 
   return (
-    <StyledFieldset disabled={preferences?.transcoding.enabled}>
+    <StyledFieldset disabled={!preferences?.transcoding.enabled}>
       <legend style={{ display: 'flex' }}>
         <input
           type="checkbox"
@@ -32,21 +33,23 @@ const TranscodingOptions = (): JSX.Element => {
       </legend>
       <div>
         <InputPairContainer>
-          <StyledLabel htmlFor="advanced.logs.savePath">{t('save files to')}</StyledLabel>
+          <StyledLabel htmlFor="downloads.filter">{t('filter')}</StyledLabel>
           <InputGroup>
-            <DarwinInput
-              type="text"
-              id="advanced.logs.savePath"
-              name="advanced.logs.savePath"
-              defaultValue={preferences?.advanced?.logs?.savePath}
-              readOnly={true}
-              placeholder={t('save files to')}
-              style={{ flex: 1 }}
-            />
-            <SpaceRight size="s" />
-            <DarwinButton type="button" id="button">
-              hello
-            </DarwinButton>
+            <DarwinSelect
+              id="downloads.filter"
+              name="downloads.filter"
+              defaultValue={preferences?.downloads.filter}
+              style={{ flexBasis: '100%' }}
+            >
+              <option value="">{t('use default')}</option>
+              {['videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map(
+                (options, index) => (
+                  <option key={index} value={options}>
+                    {options}
+                  </option>
+                ),
+              )}
+            </DarwinSelect>
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
@@ -58,7 +61,7 @@ const TranscodingOptions = (): JSX.Element => {
               defaultValue={preferences?.transcoding.options.videoCodec}
               style={{ flexBasis: '100%' }}
             >
-              <option value="">{t('keep original')}</option>
+              <option value="">{t('use default')}</option>
               {Object.entries(preferences.transcoding.codecs)
                 .filter(([, { type, canEncode }]) => type === 'video' && canEncode)
                 .map(([key, value], index) => (
@@ -78,7 +81,7 @@ const TranscodingOptions = (): JSX.Element => {
               defaultValue={preferences?.transcoding.options.audioCodec}
               style={{ flexBasis: '100%' }}
             >
-              <option value="">{t('keep original')}</option>
+              <option value="">{t('use default')}</option>
               {Object.entries(preferences.transcoding.codecs)
                 .filter(([, { type, canEncode }]) => type === 'audio' && canEncode)
                 .map(([key, value], index) => (
@@ -98,6 +101,7 @@ const TranscodingOptions = (): JSX.Element => {
               defaultValue={preferences?.transcoding.options.format}
               style={{ flexBasis: '100%' }}
             >
+              <option value="">{t('use default')}</option>
               {Object.entries(preferences.transcoding.formats).map(([key, value], index) => (
                 <option key={index} value={key}>
                   {value.description}
@@ -107,15 +111,15 @@ const TranscodingOptions = (): JSX.Element => {
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
-          <StyledLabel htmlFor="transcoding.options.videoSize">{t('video resolution')}</StyledLabel>
+          <StyledLabel htmlFor="transcoding.options.size">{t('video resolution')}</StyledLabel>
           <InputGroup>
             <DarwinSelect
-              id="transcoding.options.videoSize"
-              name="transcoding.options.videoSize"
-              defaultValue={preferences?.transcoding.options.videoSize}
+              id="transcoding.options.size"
+              name="transcoding.options.size"
+              defaultValue={preferences?.transcoding.options.size}
               style={{ flexBasis: '100%' }}
             >
-              <option value="">{t('keep original')}</option>
+              <option value="">{t('use default')}</option>
               {[
                 { value: '640x360', label: '360p' },
                 { value: '854x480', label: '480p' },
@@ -141,7 +145,7 @@ const TranscodingOptions = (): JSX.Element => {
               defaultValue={preferences?.transcoding.options.videoBitrate}
               style={{ flexBasis: '100%' }}
             >
-              <option value="">{t('default')}</option>
+              <option value="">{t('use default')}</option>
               {[
                 { value: '500', label: 'Very low-quality video' },
                 {
@@ -185,7 +189,7 @@ const TranscodingOptions = (): JSX.Element => {
               defaultValue={preferences?.transcoding.options.audioBitrate}
               style={{ flexBasis: '100%' }}
             >
-              <option value="">{t('default')}</option>
+              <option value="">{t('use default')}</option>
               {['32', '64', '96', '128', '192', '256', '320'].map((bitrate, index) => (
                 <option key={index} value={bitrate}>
                   {bitrate}Kbs
@@ -205,7 +209,7 @@ const TranscodingOptions = (): JSX.Element => {
               defaultValue={preferences?.transcoding.options.audioFrequency}
               style={{ flexBasis: '100%' }}
             >
-              <option value="">{t('default')}</option>
+              <option value="">{t('use default')}</option>
               {['8000', '16000', '22050', '44100', '48000', '96000', '192000'].map(
                 (bitrate, index) => (
                   <option key={index} value={bitrate}>

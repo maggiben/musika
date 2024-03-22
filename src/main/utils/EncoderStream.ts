@@ -33,6 +33,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import { spawn } from 'node:child_process';
 import { Readable, Writable } from 'node:stream';
 import ytdl from 'ytdl-core';
 import ffmpeg from 'fluent-ffmpeg';
@@ -64,7 +65,7 @@ export interface ITranscodingOptions {
   /**
    * Set video frame size
    */
-  videoSize?: string;
+  size?: string;
   /**
    * Set audio bitrate
    */
@@ -145,6 +146,63 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
     });
   }
 
+  public static async getFormatDefaultCodecs(format?: string): Promise<
+    | {
+        videoCodec: ffmpeg.Codec;
+        audioCodec: ffmpeg.Codec;
+      }
+    | undefined
+  > {
+    if (!format) return;
+    const outputBuffers: unknown[] = [];
+    const codecs = await this.getAvailableCodecs();
+    const ffmpegProcess = spawn(ffmpegStatic, ['-h', `muxer=${format}`], {
+      detached: false,
+      windowsHide: true,
+      stdio: 'pipe',
+    });
+
+    const defaultCodecsPromise = new Promise<{
+      defaultVideoCodec: string;
+      defaultAudioCodec: string;
+    }>((resolve, reject) => {
+      ffmpegProcess.stdout.on('data', (data: unknown): void => {
+        outputBuffers.push(data);
+      });
+
+      ffmpegProcess.on('error', (error): void => {
+        reject(error);
+      });
+
+      ffmpegProcess.on('exit', (code): void => {
+        if (code !== 0) {
+          const msg = `Failed with code = ${code}`;
+          reject(new Error(msg));
+        }
+        const defaultVideoCodecMatch = outputBuffers
+          .join('')
+          .match(/Default video codec: ([a-zA-Z0-9_-]+)/i);
+        const defaultAudioCodecMatch = outputBuffers
+          .join('')
+          .match(/Default audio codec: ([a-zA-Z0-9_-]+)/i);
+
+        const defaultVideoCodec = defaultVideoCodecMatch ? defaultVideoCodecMatch[1] : '';
+        const defaultAudioCodec = defaultAudioCodecMatch ? defaultAudioCodecMatch[1] : '';
+
+        resolve({
+          defaultVideoCodec,
+          defaultAudioCodec,
+        });
+      });
+    });
+
+    const defaultCodecs = await defaultCodecsPromise;
+    return {
+      videoCodec: codecs[defaultCodecs.defaultVideoCodec],
+      audioCodec: codecs[defaultCodecs.defaultAudioCodec],
+    };
+  }
+
   /* istanbul ignore next */
   public static command(input: Readable): ffmpeg.FfmpegCommand {
     return ffmpeg(input);
@@ -153,21 +211,17 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
   public static async validateEncoderOptions(encodeOptions: ITranscodingOptions): Promise<boolean> {
     const formats = await EncoderStream.getAvailableFormats();
     const codecs = await EncoderStream.getAvailableCodecs();
-    const format = Object.entries(formats).find(([name]) => name === encodeOptions.format);
-    const audioCodec =
-      encodeOptions.audioCodec &&
-      Object.entries(codecs).filter(([value]) => value === encodeOptions.audioCodec);
-    const videoCodec =
-      encodeOptions.videoCodec &&
-      Object.entries(codecs).filter(([value]) => value === encodeOptions.videoCodec);
-    const codec = [
-      encodeOptions.audioCodec && audioCodec,
-      encodeOptions.videoCodec && videoCodec,
-    ].filter(Boolean);
-    const canEncode = codec.every((value) =>
-      Boolean(value && value.length && value[0][1].canEncode),
-    );
-    const canMux = format && format[1].canMux;
+    const format = encodeOptions.format && formats[encodeOptions.format];
+    const videoCodec = encodeOptions.videoCodec && codecs[encodeOptions.videoCodec];
+    const audioCodec = encodeOptions.audioCodec && codecs[encodeOptions.audioCodec];
+    const codec = [audioCodec, videoCodec].filter(Boolean);
+    const canEncode =
+      codec.length > 0
+        ? codec.every((value) => {
+            return Boolean(value && value.canEncode);
+          })
+        : true;
+    const canMux = format && format.canMux;
     if (canMux && canEncode) {
       return true;
     }
@@ -187,9 +241,10 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
 
   private encodeStream(): void {
     const { inputStream, outputStream, encodeOptions, metadata } = this.options;
+    console.log('encodeOptions', encodeOptions, 'native container', metadata.videoFormat);
     this.ffmpegCommand = Object.entries(encodeOptions).reduce((prev, [key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
-        prev[key](value);
+        return prev[key](value);
       }
       return prev;
     }, EncoderStream.command(inputStream));

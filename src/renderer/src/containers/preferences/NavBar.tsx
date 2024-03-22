@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { IPreferences } from 'types/types';
+import { StyledLabel } from '@components/Form/Form';
 
 const StyledNav = styled.nav`
   width: 100%;
@@ -22,6 +23,7 @@ const StyledList = styled.ul`
   margin: 0px;
   overflow-y: scroll;
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -29,7 +31,6 @@ const StyledList = styled.ul`
 `;
 
 const StyledListItem = styled.li`
-  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -44,19 +45,16 @@ const StyledListItem = styled.li`
   }
 `;
 
-const StyledLabel = styled.label`
-  flex-basis: auto;
-  align-items: center;
+const StyledListItemLabel = styled(StyledLabel)`
   border-radius: ${({ theme }) => theme.borderRadius.xs};
-  white-space: nowrap;
   cursor: pointer;
-  white-space: nowrap;
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  transition: all 200ms ease-in-out;
-  color: ${({ theme }) => theme.colors.lightGray};
+  transition: all 150ms ease-in-out;
+  &:hover {
+    color: ${({ theme }) => theme.colors['label']};
+  }
 `;
 
 const StyledLabelContent = styled.span`
@@ -108,12 +106,12 @@ const NavBar = (props: INavBarProps): JSX.Element => {
                   onChange={onChangeHandler}
                   checked={checkedRadio === key}
                 />
-                <StyledLabel htmlFor={key}>
+                <StyledListItemLabel htmlFor={key}>
                   <StyledLabelContent data-testid="my-span">
                     {value.icon}
                     <span>{key}</span>
                   </StyledLabelContent>
-                </StyledLabel>
+                </StyledListItemLabel>
               </StyledListItem>
             );
           })}

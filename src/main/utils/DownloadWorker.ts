@@ -37,7 +37,6 @@ import { MessagePort } from 'node:worker_threads';
 import { Readable, Writable } from 'node:stream';
 import path from 'node:path';
 import fs from 'node:fs';
-
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import ProgressStream from 'progress-stream';
@@ -109,7 +108,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     this.encoderOptions = options.encoderOptions;
     this.downloadOptions = options.downloadOptions ?? {
       quality: 'highest',
-      filter: 'audioandvideo',
+      filter: 'videoandaudio',
     };
   }
 
@@ -204,9 +203,11 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
 
   private async onEnd(): Promise<void> {
     return new Promise((resolve, reject) => {
+      // when download has ended
       this.downloadStream.once('end', () => {
+        // And the output stream has been closed
         this.outputStream.once('close', () => {
-          console.log('write stream closed');
+          // Send the end event
           this.parentPort.postMessage({
             type: 'end',
             source: this.item,
@@ -227,6 +228,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private async downloadFromInfo(
     videoInfo: ytdl.videoInfo,
   ): Promise<{ videoInfo: ytdl.videoInfo; videoFormat: ytdl.videoFormat } | undefined> {
+    // const defaultEncoders = await EncoderStream.getFormatDefaultCodecs(this.encoderOptions?.format);
     this.downloadStream = ytdl.downloadFromInfo(videoInfo, this.downloadOptions);
     ({ videoInfo: this.videoInfo, videoFormat: this.videoFormat } =
       await this.setVideInfoAndVideoFormat());
