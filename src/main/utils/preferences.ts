@@ -1,5 +1,5 @@
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import {
   app,
   systemPreferences,
@@ -11,6 +11,7 @@ import {
 } from 'electron';
 import { is } from '@electron-toolkit/utils';
 import type { IPreferences } from 'types/types';
+import EncoderStream from './EncoderStream';
 
 const preferencesPath = path.join(app.getPath('userData'), 'config', 'preferences.json');
 
@@ -107,7 +108,7 @@ const windowsColorKeys = [
 ] as const;
 */
 
-const getDefaultPreferences = (): IPreferences => {
+export async function getDefaultPreferences(): Promise<IPreferences> {
   const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
   const preferredSystemLanguages = app.getPreferredSystemLanguages();
   return {
@@ -156,6 +157,23 @@ const getDefaultPreferences = (): IPreferences => {
       filter: 'audioandvideo',
       fileNameTmpl: '{videoDetails.title}',
     },
+    transcoding: {
+      ffmpegPath: require('ffmpeg-static'),
+      enabled: true,
+      options: {
+        format: 'mp3',
+        videoCodec: '',
+        audioCodec: 'libmp3lame',
+        videoSize: '',
+        videoBitrate: '',
+        audioFrequency: '',
+        audioBitrate: '192',
+      },
+      formats: await EncoderStream.getAvailableFormats(),
+      codecs: await EncoderStream.getAvailableCodecs(),
+      encoders: await EncoderStream.getAvailableEncoders(),
+      filters: await EncoderStream.getAvailableFilters(),
+    },
     playlists: [],
     advanced: {
       isDev,
@@ -177,7 +195,7 @@ const getDefaultPreferences = (): IPreferences => {
       },
     },
   };
-};
+}
 
 export function setPreferencesModal(mainWindow: BrowserWindow): BrowserWindow {
   const modal = new BrowserWindow({
@@ -219,7 +237,7 @@ export function setPreferencesModal(mainWindow: BrowserWindow): BrowserWindow {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function loadPreferences(mainWindow?: BrowserWindow | null): Promise<IPreferences> {
-  const defaultPreferences = getDefaultPreferences();
+  const defaultPreferences = await getDefaultPreferences();
   try {
     await fs.access(preferencesPath, fs.constants.R_OK);
     const savedPreferences = JSON.parse(await fs.readFile(preferencesPath, 'utf8'));
@@ -255,29 +273,6 @@ export async function loadPreferences(mainWindow?: BrowserWindow | null): Promis
   return defaultPreferences;
 }
 
-const checkDirectoryExists = async (directoryPath: string, create?: boolean): Promise<boolean> => {
-  try {
-    const stats = await fs.stat(directoryPath);
-    await fs.access(path.dirname(preferencesPath), fs.constants.W_OK);
-    if (stats.isDirectory()) {
-      return true;
-    } else if (stats.isFile()) {
-      return false;
-    } else if (create) {
-      await fs.mkdir(directoryPath, { recursive: true });
-      return true;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    if (error.code === 'ENOENT' && create) {
-      await fs.mkdir(directoryPath, { recursive: true });
-      return true;
-    }
-    return false;
-  }
-  return false;
-};
-
 export async function savePreferences(
   preferences: IPreferences,
   mainWindow?: BrowserWindow | null,
@@ -303,4 +298,30 @@ export async function savePreferences(
       });
     return false;
   }
+}
+
+export async function checkDirectoryExists(
+  directoryPath: string,
+  create?: boolean,
+): Promise<boolean> {
+  try {
+    const stats = await fs.stat(directoryPath);
+    await fs.access(path.dirname(preferencesPath), fs.constants.W_OK);
+    if (stats.isDirectory()) {
+      return true;
+    } else if (stats.isFile()) {
+      return false;
+    } else if (create) {
+      await fs.mkdir(directoryPath, { recursive: true });
+      return true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.code === 'ENOENT' && create) {
+      await fs.mkdir(directoryPath, { recursive: true });
+      return true;
+    }
+    return false;
+  }
+  return false;
 }

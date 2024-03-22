@@ -44,6 +44,7 @@ import ProgressStream from 'progress-stream';
 import * as utils from '@shared/lib/utils';
 import { AsyncCreatable } from '@shared/lib/AsyncCreatable';
 import TimeoutStream from './TimeoutStream';
+import EncoderStream, { EncoderStreamOptions, ITranscodingOptions } from './EncoderStream';
 
 export interface IDownloadWorkerOptions {
   /**
@@ -69,7 +70,7 @@ export interface IDownloadWorkerOptions {
   /**
    * Media encoder options
    */
-  // encoderOptions?: EncoderStream.EncodeOptions;
+  encoderOptions?: ITranscodingOptions;
   /**
    * This is a MessagePort allowing communication with the parent thread.
    */
@@ -91,6 +92,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private savePath: string;
   private timeout: number;
   private downloadOptions: ytdl.downloadOptions;
+  private encoderOptions?: ITranscodingOptions;
   private videoInfo!: ytdl.videoInfo;
   private videoFormat!: ytdl.videoFormat;
   private timeoutStream!: TimeoutStream;
@@ -104,6 +106,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     this.timeout = options.timeout ?? 120 * 1000; // 120 seconds
     this.output = options.output ?? '{videoDetails.title}';
     this.savePath = options.savePath ?? '';
+    this.encoderOptions = options.encoderOptions;
     this.downloadOptions = options.downloadOptions ?? {
       quality: 'highest',
       filter: 'audioandvideo',
@@ -117,12 +120,17 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     try {
       this.handleMessages();
       await this.downloadVideo();
+      // await this.downloadTest();
       return this.exit(0);
     } catch (error) {
       return this.error(error);
     }
   }
 
+  /**
+   * Handle messages from the parent process
+   * @return {void}
+   */
   private handleMessages(): void {
     this.parentPort.on('message', (base64Message: string) => {
       try {
@@ -143,6 +151,41 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   }
 
   /**
+   * Download tester
+   */
+  private async downloadTest(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      let percentage = 0;
+      const interval = setInterval(() => {
+        const increment = Math.floor(Math.random() * 10) + 1;
+        percentage += increment;
+        if (percentage >= 100) {
+          this.parentPort.postMessage({
+            type: 'progress',
+            source: this.item,
+            details: {
+              progress: {
+                percentage: 100,
+              },
+            },
+          });
+          clearInterval(interval);
+          resolve();
+        } else {
+          this.parentPort.postMessage({
+            type: 'progress',
+            source: this.item,
+            details: {
+              progress: {
+                percentage,
+              },
+            },
+          });
+        }
+      }, 250);
+    });
+  }
+  /**
    * Downloads a video
    */
   private async downloadVideo(): Promise<
@@ -162,15 +205,18 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private async onEnd(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.downloadStream.once('end', () => {
-        this.parentPort.postMessage({
-          type: 'end',
-          source: this.item,
-          details: {
-            videoInfo: this.videoInfo,
-            videoFormat: this.videoFormat,
-          },
+        this.outputStream.once('close', () => {
+          console.log('write stream closed');
+          this.parentPort.postMessage({
+            type: 'end',
+            source: this.item,
+            details: {
+              videoInfo: this.videoInfo,
+              videoFormat: this.videoFormat,
+            },
+          });
+          resolve();
         });
-        resolve();
       });
       this.outputStream.once('error', reject);
       this.downloadStream.once('error', reject);
@@ -208,6 +254,25 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private async setVideoOutput(): Promise<
     fs.WriteStream | NodeJS.WriteStream | Writable | undefined
   > {
+    /* transcode stream */
+    if (this.encoderOptions) {
+      const file = this.getOutputFile({
+        format: this.encoderOptions.format,
+      });
+      this.outputStream = fs.createWriteStream(file);
+      const encoderStreamOptions: EncoderStreamOptions = {
+        encodeOptions: this.encoderOptions,
+        metadata: {
+          videoInfo: this.videoInfo,
+          videoFormat: this.videoFormat,
+        },
+        inputStream: this.downloadStream,
+        outputStream: this.outputStream,
+      };
+      const { stream, ffmpegCommand } = await EncoderStream.create(encoderStreamOptions);
+      ffmpegCommand.once('error', this.error.bind(this));
+      return stream;
+    }
     /* stream to file in native format */
     this.outputStream = fs.createWriteStream(this.getOutputFile());
     return this.downloadStream.pipe(this.outputStream);
@@ -373,6 +438,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       source: this.item,
       error,
     });
+    console.error(error);
     this.exit(1);
   }
 

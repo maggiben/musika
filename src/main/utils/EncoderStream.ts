@@ -33,14 +33,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { Readable, Writable } from 'stream';
-import * as ytdl from 'ytdl-core';
-import * as ffmpegStatic from 'ffmpeg-static';
-import * as ffmpeg from 'fluent-ffmpeg';
-import { AsyncCreatable } from '@shared/AsyncCreatable';
+import { Readable, Writable } from 'node:stream';
+import ytdl from 'ytdl-core';
+import ffmpeg from 'fluent-ffmpeg';
+import { AsyncCreatable } from '@shared/lib/AsyncCreatable';
+const ffmpegStatic = require('ffmpeg-static');
+
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
-export interface EncoderStreamMetadata {
+export interface IEncoderStreamMetadata {
   /**
    * video info.
    */
@@ -51,7 +52,7 @@ export interface EncoderStreamMetadata {
   videoFormat: ytdl.videoFormat;
 }
 
-export interface EncoderStreamEncodeOptions {
+export interface ITranscodingOptions {
   /**
    * Set audio codec
    */
@@ -61,6 +62,10 @@ export interface EncoderStreamEncodeOptions {
    */
   videoCodec?: string;
   /**
+   * Set video frame size
+   */
+  videoSize?: string;
+  /**
    * Set audio bitrate
    */
   videoBitrate?: number;
@@ -68,6 +73,10 @@ export interface EncoderStreamEncodeOptions {
    * Set audio bitrate
    */
   audioBitrate?: number;
+  /**
+   * Set audio frequency
+   */
+  audioFrequency?: number;
   /**
    * Set output format
    */
@@ -89,14 +98,14 @@ export interface EncoderStreamOptions extends ffmpeg.FfmpegCommandOptions {
   /**
    * Media encoder options
    */
-  encodeOptions: EncoderStreamEncodeOptions;
+  encodeOptions: ITranscodingOptions;
   /**
    * Video metadata
    */
-  metadata: EncoderStreamMetadata;
+  metadata: IEncoderStreamMetadata;
 }
 
-export class EncoderStream extends AsyncCreatable<EncoderStreamOptions> {
+export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> {
   public stream!: Writable;
   public ffmpegCommand!: ffmpeg.FfmpegCommand;
 
@@ -120,14 +129,28 @@ export class EncoderStream extends AsyncCreatable<EncoderStreamOptions> {
     });
   }
 
-  /* istanbul ignore next */
-  public static command(): ffmpeg.FfmpegCommand {
-    return ffmpeg();
+  public static async getAvailableEncoders(): Promise<ffmpeg.Encoders> {
+    return new Promise((resolve, reject) => {
+      return ffmpeg.getAvailableEncoders((error, encoders) => {
+        return error || !encoders ? reject(error) : resolve(encoders);
+      });
+    });
   }
 
-  public static async validateEncoderOptions(
-    encodeOptions: EncoderStreamEncodeOptions,
-  ): Promise<boolean> {
+  public static async getAvailableFilters(): Promise<ffmpeg.Filters> {
+    return new Promise((resolve, reject) => {
+      return ffmpeg.getAvailableFilters((error, filters) => {
+        return error || !filters ? reject(error) : resolve(filters);
+      });
+    });
+  }
+
+  /* istanbul ignore next */
+  public static command(input: Readable): ffmpeg.FfmpegCommand {
+    return ffmpeg(input);
+  }
+
+  public static async validateEncoderOptions(encodeOptions: ITranscodingOptions): Promise<boolean> {
     const formats = await EncoderStream.getAvailableFormats();
     const codecs = await EncoderStream.getAvailableCodecs();
     const format = Object.entries(formats).find(([name]) => name === encodeOptions.format);
@@ -164,27 +187,19 @@ export class EncoderStream extends AsyncCreatable<EncoderStreamOptions> {
 
   private encodeStream(): void {
     const { inputStream, outputStream, encodeOptions, metadata } = this.options;
-    let encoder = EncoderStream.command().input(inputStream);
-    encoder = encodeOptions.videoCodec ? encoder.videoCodec(encodeOptions.videoCodec) : encoder;
-    encoder = encodeOptions.audioCodec ? encoder.audioCodec(encodeOptions.audioCodec) : encoder;
-    encoder = encodeOptions.audioBitrate
-      ? encoder.audioBitrate(encodeOptions.audioBitrate)
-      : metadata.videoFormat.audioBitrate
-        ? encoder.audioBitrate(metadata.videoFormat.audioBitrate)
-        : encoder;
-    encoder = encodeOptions.videoBitrate
-      ? encoder.videoBitrate(encodeOptions.videoBitrate)
-      : metadata.videoFormat.bitrate
-        ? encoder.videoBitrate(metadata.videoFormat.bitrate)
-        : encoder;
-    encoder = encoder.format(encodeOptions.format);
-    encoder = this.setMetadata(metadata, encoder);
-    this.ffmpegCommand = encoder;
-    this.stream = this.ffmpegCommand.pipe(outputStream, { end: true });
+    console.log('in EncodeStream encodeOptions', encodeOptions);
+    this.ffmpegCommand = Object.entries(encodeOptions).reduce((prev, [key, value]) => {
+      if (value !== null && value !== undefined && value !== '') {
+        prev[key](value);
+      }
+      return prev;
+    }, EncoderStream.command(inputStream));
+    this.setMetadata(metadata, this.ffmpegCommand);
+    this.stream = this.ffmpegCommand.pipe(outputStream, { end: true }); //end = true, close output stream after writing
   }
 
   private setMetadata(
-    metadata: EncoderStreamMetadata,
+    metadata: IEncoderStreamMetadata,
     encoder: ffmpeg.FfmpegCommand,
   ): ffmpeg.FfmpegCommand {
     const { videoId, title, author, shortDescription } =

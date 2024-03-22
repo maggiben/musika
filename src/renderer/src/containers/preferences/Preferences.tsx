@@ -3,9 +3,11 @@ import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { BsGear, BsCloudDownloadFill } from 'react-icons/bs';
+import { TbTransform } from 'react-icons/tb';
 import { StyledForm } from '@components/Form/Form';
 import DownloadPreferences from './DownloadPreferences';
 import BehaviourPreferences from './BehaviourPreferences';
+import TranscodingPreferences from './TranscodingPreferences';
 import NavBar from './NavBar';
 import ActionButtons from './ActionButtons';
 import useModalResize from '@hooks/useModalResize';
@@ -92,19 +94,15 @@ const Preferences = (): JSX.Element => {
   const pannels = {
     behaviour: {
       icon: <BsGear />,
-      node: (
-        <>
-          <BehaviourPreferences />
-        </>
-      ),
+      node: <BehaviourPreferences />,
     },
     downloads: {
       icon: <BsCloudDownloadFill />,
-      node: (
-        <>
-          <DownloadPreferences />
-        </>
-      ),
+      node: <DownloadPreferences />,
+    },
+    transcoding: {
+      icon: <TbTransform />,
+      node: <TranscodingPreferences />,
     },
   };
 

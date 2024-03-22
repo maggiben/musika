@@ -5,7 +5,7 @@ import { applicationMenu } from './menu';
 import { setRpcHandlers } from './rpc';
 import type { IPreferences } from 'types/types';
 import { loadPreferences } from './utils/preferences';
-import creatWorker from './workers/worker-simple?nodeWorker';
+// import creatWorker from './workers/worker-simple?nodeWorker';
 import pjson from '@pjson';
 // import checkAndInstall from './utils/checkAndInstall';
 // import callFork from './fork'

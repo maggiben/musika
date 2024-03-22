@@ -67,6 +67,7 @@ export default async function download(
         quality: preferences.downloads.quality,
         filter: preferences.downloads.filter as ytdl.Filter,
       },
+      encoderOptions: preferences.transcoding.enabled ? preferences.transcoding.options : undefined,
     });
     scheduler
       .once('playlistItems', (message: IDownloadWorkerMessage) => {
