@@ -187,7 +187,6 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
 
   private encodeStream(): void {
     const { inputStream, outputStream, encodeOptions, metadata } = this.options;
-    console.log('in EncodeStream encodeOptions', encodeOptions);
     this.ffmpegCommand = Object.entries(encodeOptions).reduce((prev, [key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
         prev[key](value);

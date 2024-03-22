@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { BsFillFolderFill } from 'react-icons/bs';
 import {
   StyledLabel,
-  StyledDFieldset,
+  StyledFieldset,
   InputGroup,
   InputPairContainer,
   DarwinButton,
@@ -28,7 +28,7 @@ const DownloadOptions = (): JSX.Element => {
   };
 
   return (
-    <StyledDFieldset>
+    <StyledFieldset>
       <legend>{t('downloads')}</legend>
       <div>
         <InputPairContainer>
@@ -108,7 +108,7 @@ const DownloadOptions = (): JSX.Element => {
           </InputGroup>
         </InputPairContainer>
       </div>
-    </StyledDFieldset>
+    </StyledFieldset>
   );
 };
 
@@ -117,50 +117,52 @@ const QualityOptions = (): JSX.Element => {
   const preferences = useRecoilValue(preferencesState);
 
   return (
-    <StyledDFieldset>
+    <StyledFieldset>
       <legend>{t('media format')}</legend>
       <div>
         <InputPairContainer>
           <StyledLabel htmlFor="downloads.quality">{t('quality')}</StyledLabel>
-          <DarwinSelect
-            id="downloads.quality"
-            name="downloads.quality"
-            defaultValue={preferences?.downloads.quality}
-            style={{ flexBasis: '100%' }}
-          >
-            {[
-              'highest',
-              'lowest',
-              'highestaudio',
-              'lowestaudio',
-              'highestvideo',
-              'lowestvideo',
-            ].map((options, index) => (
-              <option key={index} value={options}>
-                {options}
-              </option>
-            ))}
-          </DarwinSelect>
-        </InputPairContainer>
-        <InputPairContainer>
-          <StyledLabel htmlFor="downloads.filter">{t('filter')}</StyledLabel>
-          <DarwinSelect
-            id="downloads.filter"
-            name="downloads.filter"
-            defaultValue={preferences?.downloads.filter}
-            style={{ flexBasis: '100%' }}
-          >
-            {['audioandvideo', 'videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map(
-              (options, index) => (
+          <InputGroup>
+            <DarwinSelect
+              id="downloads.quality"
+              name="downloads.quality"
+              defaultValue={preferences?.downloads.quality}
+              style={{ flexBasis: '100%' }}
+            >
+              {[
+                'highest',
+                'lowest',
+                'highestaudio',
+                'lowestaudio',
+                'highestvideo',
+                'lowestvideo',
+              ].map((options, index) => (
                 <option key={index} value={options}>
                   {options}
                 </option>
-              ),
-            )}
-          </DarwinSelect>
+              ))}
+            </DarwinSelect>
+          </InputGroup>
+        </InputPairContainer>
+        <InputPairContainer>
+          <StyledLabel htmlFor="downloads.filter">{t('filter')}</StyledLabel>
+          <InputGroup>
+            <DarwinSelect
+              id="downloads.filter"
+              name="downloads.filter"
+              defaultValue={preferences?.downloads.filter}
+              style={{ flexBasis: '100%' }}
+            >
+              {['videoandaudio', 'video', 'videoonly', 'audio', 'audioonly'].map((options, index) => (
+                <option key={index} value={options}>
+                  {options}
+                </option>
+              ))}
+            </DarwinSelect>
+          </InputGroup>
         </InputPairContainer>
       </div>
-    </StyledDFieldset>
+    </StyledFieldset>
   );
 };
 

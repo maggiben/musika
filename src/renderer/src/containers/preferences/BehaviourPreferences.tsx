@@ -5,7 +5,7 @@ import { BsFillFolderFill } from 'react-icons/bs';
 import languages from '@locale/languages.json';
 import {
   StyledLabel,
-  StyledDFieldset,
+  StyledFieldset,
   InputPairContainer,
   InputGroup,
   ToggleSwitch,
@@ -63,49 +63,53 @@ const BehaviourPreferences = (): JSX.Element => {
 
   return (
     <>
-      <StyledDFieldset>
+      <StyledFieldset>
         <legend>{t('interface')}</legend>
         <i>{t('restart required message')}</i>
         <div>
           <InputPairContainer>
             <StyledLabel htmlFor="behaviour.language">{t('language')}</StyledLabel>
-            <DarwinSelect
-              id="behaviour.language"
-              name="behaviour.language"
-              defaultValue={preferences?.behaviour?.language}
-              onChange={handleChangeLanguage}
-              style={{ flexBasis: '100%' }}
-            >
-              {supportedLangs.map((language) => (
-                <option key={language.code} value={language.code}>
-                  {language.english}
-                </option>
-              ))}
-            </DarwinSelect>
+            <InputGroup>
+              <DarwinSelect
+                id="behaviour.language"
+                name="behaviour.language"
+                defaultValue={preferences?.behaviour?.language}
+                onChange={handleChangeLanguage}
+                style={{ flexBasis: '100%' }}
+              >
+                {supportedLangs.map((language) => (
+                  <option key={language.code} value={language.code}>
+                    {language.english}
+                  </option>
+                ))}
+              </DarwinSelect>
+            </InputGroup>
           </InputPairContainer>
         </div>
-      </StyledDFieldset>
+      </StyledFieldset>
       <SpaceBottom size="s" />
-      <StyledDFieldset>
+      <StyledFieldset>
         <legend>{t('desktop')}</legend>
         <div>
           <InputPairContainer>
             <StyledLabel htmlFor="behaviour.shouldUseDarkColors">{t('ui theme')}</StyledLabel>
-            <DarwinSelect
-              id="behaviour.shouldUseDarkColors"
-              name="behaviour.shouldUseDarkColors"
-              defaultValue={preferences?.behaviour.shouldUseDarkColors ? 'true' : 'false'}
-              style={{ flexBasis: '100%' }}
-            >
-              {[
-                { label: 'light', value: 'false' },
-                { label: 'dark', value: 'true' },
-              ].map(({ label, value }, index) => (
-                <option key={index} value={value}>
-                  {label}
-                </option>
-              ))}
-            </DarwinSelect>
+            <InputGroup>
+              <DarwinSelect
+                id="behaviour.shouldUseDarkColors"
+                name="behaviour.shouldUseDarkColors"
+                defaultValue={preferences?.behaviour.shouldUseDarkColors ? 'true' : 'false'}
+                style={{ flexBasis: '100%' }}
+              >
+                {[
+                  { label: 'light', value: 'false' },
+                  { label: 'dark', value: 'true' },
+                ].map(({ label, value }, index) => (
+                  <option key={index} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </DarwinSelect>
+            </InputGroup>
           </InputPairContainer>
           <InputPairContainer>
             <StyledLabel htmlFor="advanced.update.automatic">{t('check for updates')}</StyledLabel>
@@ -126,9 +130,9 @@ const BehaviourPreferences = (): JSX.Element => {
             />
           </InputPairContainer>
         </div>
-      </StyledDFieldset>
+      </StyledFieldset>
       <SpaceBottom size="s" />
-      <StyledDFieldset>
+      <StyledFieldset>
         <legend>{t('search options')}</legend>
         <div>
           <InputPairContainer>
@@ -141,38 +145,42 @@ const BehaviourPreferences = (): JSX.Element => {
           </InputPairContainer>
           <InputPairContainer>
             <StyledLabel htmlFor="behaviour.search.limit">{t('limit')}</StyledLabel>
-            <DarwinInput
-              type="number"
-              id="behaviour.search.limit"
-              name="behaviour.search.limit"
-              min="1"
-              max={Infinity}
-              defaultValue={preferences.behaviour?.search?.limit}
-              placeholder={t('limits the pulled items')}
-              style={{ flexBasis: '100%' }}
-            />
+            <InputGroup>
+              <DarwinInput
+                type="number"
+                id="behaviour.search.limit"
+                name="behaviour.search.limit"
+                min="1"
+                max={Infinity}
+                defaultValue={preferences.behaviour?.search?.limit}
+                placeholder={t('limits the pulled items')}
+                style={{ flexBasis: '100%' }}
+              />
+            </InputGroup>
           </InputPairContainer>
           <InputPairContainer>
             <StyledLabel htmlFor="behaviour.search.type">
               {t('filter for a specific type of item')}
             </StyledLabel>
-            <DarwinSelect
-              id="behaviour.search.type"
-              name="behaviour.search.type"
-              defaultValue={preferences?.behaviour?.search?.type}
-              style={{ flexBasis: '100%' }}
-            >
-              {['video', 'playlist'].map((options, index) => (
-                <option key={index} value={options}>
-                  {options}
-                </option>
-              ))}
-            </DarwinSelect>
+            <InputGroup>
+              <DarwinSelect
+                id="behaviour.search.type"
+                name="behaviour.search.type"
+                defaultValue={preferences?.behaviour?.search?.type}
+                style={{ flexBasis: '100%' }}
+              >
+                {['video', 'playlist'].map((options, index) => (
+                  <option key={index} value={options}>
+                    {options}
+                  </option>
+                ))}
+              </DarwinSelect>
+            </InputGroup>
           </InputPairContainer>
         </div>
-      </StyledDFieldset>
+      </StyledFieldset>
       <SpaceBottom size="s" />
-      <StyledDFieldset disabled>
+      <StyledFieldset disabled>
         <legend style={{ display: 'flex' }}>
           <input
             type="checkbox"
@@ -204,7 +212,7 @@ const BehaviourPreferences = (): JSX.Element => {
             </InputGroup>
           </InputPairContainer>
         </div>
-      </StyledDFieldset>
+      </StyledFieldset>
     </>
   );
 };
