@@ -1,6 +1,7 @@
 import 'styled-components';
 import type ytpl from '@distube/ytpl';
 import type ffmpeg from 'fluent-ffmpeg';
+export type { ISchedulerResult, ISchedulerMessage } from '@main/utils/Scheduler';
 export type { IDownloadWorkerMessage } from '@main/utils/DownloadWorker';
 import type { ITranscodingOptions } from '@main/utils/EncoderStream';
 export type { IMenuClickMessage } from '@main/menu';

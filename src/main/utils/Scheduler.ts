@@ -90,7 +90,7 @@ export interface ISchedulerMessage {
   type: string;
   source: ytpl.result;
   error?: Error;
-  details?: Record<string, unknown>;
+  details?: unknown;
 }
 
 export interface ISchedulerRetryItems {
@@ -189,7 +189,7 @@ export class Scheduler extends EventEmitter {
     }
     this.emit('finished', {
       type: 'finished',
-      results,
+      details: results,
     });
     return results;
   }

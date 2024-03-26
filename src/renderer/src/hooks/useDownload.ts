@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type ytpl from '@distube/ytpl';
 import type { Progress } from 'progress-stream';
-import type { IDownloadWorkerMessage } from 'types/types';
+import type { IDownloadWorkerMessage, ISchedulerMessage, ISchedulerResult } from 'types/types';
 import type { IpcRendererEvent } from 'electron';
 import { useRecoilValue } from 'recoil';
 import { preferencesState } from '@renderer/states/atoms';
@@ -73,9 +73,14 @@ const useDownload = (): IDownloadStatus => {
       console.log(`contentLength: ${contentLength}`);
     };
 
-    const finishedListener = (): void => {
-      notify(t('all downloads complete'), {
-        body: `All items done downloading`,
+    const finishedListener = (_event: IpcRendererEvent, message: ISchedulerMessage): void => {
+      const results = message.details as ISchedulerResult[];
+      const failed = results.filter(({ code }) => code !== 0);
+      const body = failed.length
+        ? t('all but items failed', { count: failed.length, total: failed.length })
+        : t('all items done');
+      notify(t('download complete'), {
+        body,
       });
       setFinished(true);
     };
