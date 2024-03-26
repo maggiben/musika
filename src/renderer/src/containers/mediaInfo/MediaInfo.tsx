@@ -116,7 +116,7 @@ const MediaInfo = (props: IMediInfoProps): JSX.Element => {
         <AsyncComponentWrapper item={item} />
       </Suspense>
       <ButtonsContainer>
-        <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
+        <DarwinButton onClick={handleCancelClick}>{t('close')}</DarwinButton>
       </ButtonsContainer>
     </MediaInfoContainer>
   );

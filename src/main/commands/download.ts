@@ -35,7 +35,7 @@
 
 import ytpl from '@distube/ytpl';
 import ytdl from 'ytdl-core';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { Scheduler } from '../utils/Scheduler';
 import { loadPreferences } from '../utils/preferences';
 import type { IDownloadWorkerMessage } from '../utils/DownloadWorker';
@@ -70,11 +70,17 @@ export default async function download(
       encoderOptions: preferences.transcoding.enabled ? preferences.transcoding.options : undefined,
     });
     scheduler
+      .on('online', (message: IDownloadWorkerMessage) => {
+        console.log('worker online:', message.source.id);
+      })
       .once('playlistItems', (message: IDownloadWorkerMessage) => {
         mainWindow?.webContents.send('playlistItems', message);
       })
       .on('contentLength', (message: IDownloadWorkerMessage) => {
         mainWindow?.webContents.send('contentLength', message);
+      })
+      .on('finished', (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send('finished', message);
       })
       .on('end', (message: IDownloadWorkerMessage) => {
         mainWindow?.webContents.send('end', message);
@@ -89,6 +95,10 @@ export default async function download(
         mainWindow?.webContents.send('progress', message);
       });
     scheduler.download();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ipcMain.once('stop-downloads', async (_event: IpcMainInvokeEvent, options) => {
+      scheduler.stop();
+    });
   }
   return {
     source,

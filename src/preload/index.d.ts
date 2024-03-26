@@ -17,7 +17,7 @@ export declare global {
       dialogs: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
       getVideoInfo: (url: string) => Promise<Record<string, unknown>>;
       search: (searchString: string) => Promise<Record<string, unknown>>;
-      download: (source: string | IPlaylistItem[]) => Promise<OpenDialogReturnValue>;
+      download: (source: string | IPlaylistItem[]) => Promise<Record<string, unknown>>;
       modal: (type: string, options?: Record<string, unknown>) => Promise<boolean>;
       contextMenu: (type: string, options?: Record<string, unknown>) => Promise<void | null>;
     };

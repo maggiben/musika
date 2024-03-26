@@ -149,12 +149,14 @@ export class Scheduler extends EventEmitter {
    * Initializes an instance of the Downloader class.
    */
   public async download(): Promise<Array<ISchedulerResult | undefined> | undefined> {
-    console.log('playlistId', this.playlistId, 'playlistItems', this.playlistItems);
     if (this.playlistId) {
       const playlist = await ytpl(this.playlistId, this.playlistOptions);
+      this.playlistItems = playlist.items as IPlaylistItem[];
+      console.log('items: ', this.playlistItems?.length);
       this.emit('playlistItems', { source: playlist, details: { playlistItems: playlist.items } });
-      return this.scheduler(playlist.items as IPlaylistItem[]);
+      return this.scheduler(this.playlistItems);
     } else if (this.playlistItems) {
+      console.log('items: ', this.playlistItems?.length);
       this.emit('playlistItems', {
         source: this.playlistItems,
         details: { playlistItems: this.playlistItems },
@@ -164,6 +166,13 @@ export class Scheduler extends EventEmitter {
     return undefined;
   }
 
+  /**
+   * Stops the task scheduler and any running taks.
+   */
+  public async stop(): Promise<void> {
+    this.emit('stop');
+  }
+
   /*
   public postWorkerMessage(worker: Worker, message: Scheduler.Message): void {
     return worker.postMessage(Buffer.from(JSON.stringify(message)).toString('base64'));
@@ -171,14 +180,18 @@ export class Scheduler extends EventEmitter {
   */
 
   private async scheduler(items: IPlaylistItem[]): Promise<Array<ISchedulerResult | undefined>> {
-    const workers: Array<ISchedulerResult | undefined> = [];
+    const results: Array<ISchedulerResult | undefined> = [];
     for await (const result of this.runTasks<ISchedulerResult>(
       this.maxconnections,
       this.tasks(items),
     )) {
-      workers.push(result);
+      results.push(result);
     }
-    return workers;
+    this.emit('finished', {
+      type: 'finished',
+      results,
+    });
+    return results;
   }
 
   /*
@@ -241,13 +254,16 @@ export class Scheduler extends EventEmitter {
     maxConcurrency: number,
     iterator: IterableIterator<() => Promise<T>>,
   ): AsyncGenerator<T | undefined, void, unknown> {
+    let stop = false;
     // Each worker is an async generator that polls for tasks
     // from the shared iterator.
     // Sharing the iterator ensures that each worker gets unique tasks.
+    this.once('stop', () => (stop = true));
     const workers = new Array(maxConcurrency) as Array<AsyncIterator<T>>;
     for (let i = 0; i < maxConcurrency; i++) {
       workers[i] = (async function* (): AsyncIterator<T, void, unknown> {
-        for (const task of iterator) {
+        loop: for (const task of iterator) {
+          if (stop) break loop;
           yield await task();
         }
       })();
@@ -295,7 +311,8 @@ export class Scheduler extends EventEmitter {
 
   private async terminateDownloadWorker(item: IPlaylistItem[][number]): Promise<void> {
     const worker = this.workers.get(item.id);
-    const code = worker && (await worker.terminate());
+    if (!worker) return;
+    const code = await worker.terminate();
     this.workers.delete(item.id);
     this.emit('workerTerminated', {
       source: item,
@@ -316,11 +333,11 @@ export class Scheduler extends EventEmitter {
       downloadOptions: this.downloadOptions,
       encoderOptions: this.encoderOptions,
     };
+    /* just in case terminate any duplicate worker */
     if (this.workers.has(item.id)) {
       await this.terminateDownloadWorker(item);
     }
     return new Promise<T>((resolve, reject) => {
-      // const worker = new Worker(path.join(__dirname, 'runner.js'), workerOptions);
       const worker = createWorker({ workerData });
       this.workers.set(item.id, worker);
       return this.handleWorkerEvents<T>(worker, item, resolve, reject);
@@ -333,13 +350,10 @@ export class Scheduler extends EventEmitter {
     resolve: (value: T) => void,
     reject: (reason?: Error | number | unknown) => void,
   ): void {
-    worker.on('message', (message: IDownloadWorkerMessage) => {
+    const onMessageHandler = (message: IDownloadWorkerMessage): void => {
       this.emit(message.type, message);
-    });
-    worker.once('online', () => {
-      return this.emit('online', { source: item });
-    });
-    const exit = (code: number): void => {
+    };
+    const onExit = (code: number): void => {
       this.emit('exit', { source: item, details: { code } });
       if (code !== 0) {
         this.retryDownloadWorker<T>(item)
@@ -353,13 +367,28 @@ export class Scheduler extends EventEmitter {
         resolve(result);
       }
     };
-    worker.once('exit', exit);
+    worker.on('message', onMessageHandler);
+    worker.once('online', () => this.emit('online', { source: item }));
+    worker.once('exit', onExit);
     worker.once('error', (error) => {
+      /* Remove listeners */
+      worker.off('message', onMessageHandler);
+      worker.off('exit', onExit);
       this.emit('error', { source: item, error });
-      worker.off('exit', exit);
+      /* retry if error */
       this.retryDownloadWorker<T>(item)
         .then(resolve)
         .catch(() => reject(error));
+    });
+    /* terminate this worker */
+    this.once('stop', () => {
+      worker.off('message', onMessageHandler);
+      worker.off('exit', onExit);
+      worker.terminate();
+      worker.once('exit', (code: number) => {
+        this.emit('exit', { source: item, details: { code } });
+        reject(new Error(`Worker id: ${item.id} exited with code ${code}`));
+      });
     });
   }
 }

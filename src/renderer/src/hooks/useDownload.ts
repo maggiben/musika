@@ -7,13 +7,18 @@ import type { IpcRendererEvent } from 'electron';
 import { useRecoilValue } from 'recoil';
 import { preferencesState } from '@renderer/states/atoms';
 
-export interface IProgress {
+interface IProgress {
   [key: string]: number[];
 }
+interface IDownloadStatus {
+  progress: IProgress;
+  finished: boolean;
+}
 
-const useDownload = (): IProgress => {
+const useDownload = (): IDownloadStatus => {
   const { t } = useTranslation();
   const [progress, setProgress] = useState<IProgress>({});
+  const [finished, setFinished] = useState(false);
   const preferences = useRecoilValue(preferencesState);
 
   useEffect(() => {
@@ -34,7 +39,7 @@ const useDownload = (): IProgress => {
       }
 
       const notificationOptions: NotificationOptions = {
-        ...options,
+        ...structuredClone(options) /* a copy of the object is needed */,
         silent,
         tag: 'musika',
       };
@@ -68,6 +73,13 @@ const useDownload = (): IProgress => {
       console.log(`contentLength: ${contentLength}`);
     };
 
+    const finishedListener = (): void => {
+      notify(t('all downloads complete'), {
+        body: `All items done downloading`,
+      });
+      setFinished(true);
+    };
+
     const endListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
       setProgress((prevState) => {
         const newState = { ...prevState };
@@ -75,10 +87,10 @@ const useDownload = (): IProgress => {
         return newState;
       });
 
-      notify(t('download complete'), {
-        body: `${message.source.title} complete !`,
-        icon: message.source.thumbnail,
-      });
+      // notify(t('download complete'), {
+      //   body: `${message.source.title} complete !`,
+      //   icon: message.source.thumbnail,
+      // });
     };
 
     const timeoutListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
@@ -111,6 +123,7 @@ const useDownload = (): IProgress => {
     const listeners = {
       playlistItems: window.electron.ipcRenderer.on('playlistItems', playlistItemsListener),
       contentLength: window.electron.ipcRenderer.on('contentLength', contentLengthListener),
+      finished: window.electron.ipcRenderer.on('finished', finishedListener),
       end: window.electron.ipcRenderer.on('end', endListener),
       timeout: window.electron.ipcRenderer.on('timeout', timeoutListener),
       exit: window.electron.ipcRenderer.on('exit', exitListener),
@@ -123,7 +136,7 @@ const useDownload = (): IProgress => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return progress;
+  return { progress, finished };
 };
 
 export default useDownload;

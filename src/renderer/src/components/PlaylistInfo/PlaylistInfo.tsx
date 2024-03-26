@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { playlistState } from '@renderer/states/atoms';
 import useContextMenu from '@hooks/useContextMenu';
 import { timeStringToSeconds, toHumanTime } from '@shared/lib/utils';
-import { FaPlay, FaCloudDownloadAlt, FaPencilAlt } from 'react-icons/fa';
+import { FaPlay, FaCloudDownloadAlt, FaPencilAlt, FaStop } from 'react-icons/fa';
 import { BsShuffle, BsThreeDots, BsFilter, BsChevronDown } from 'react-icons/bs';
 import { SpaceRight } from '../Spacing/Spacing';
 import { DarwinButton, CircularButton, DarwinInputSearch, ContextMenuButton } from '../Form/Form';
@@ -128,11 +129,21 @@ const calcTotalPlayTime = (items: IPlaylistItem[]): number => {
 
 const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   const { t } = useTranslation();
+  const [isDownloading, setIsDownloading] = useState(false);
   const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
   const totalDuration = calcTotalPlayTime(props.items);
   const downloadSelected = async (): Promise<void> => {
     const selectedItems = playlist?.items.filter(({ selected }) => Boolean(selected));
-    const download = selectedItems && (await window.commands.download(selectedItems));
+    if (selectedItems) {
+      setIsDownloading(true);
+      await window.commands.download(selectedItems);
+      window.electron.ipcRenderer.once('finished', () => setIsDownloading(false));
+    }
+  };
+
+  const stopDownloads = async (): Promise<void> => {
+    setIsDownloading(false);
+    window.electron.ipcRenderer.send('stop-downloads', {});
   };
 
   useContextMenu<ISortOrderContextMenuMessage>(
@@ -213,11 +224,19 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
               {t('shuffle')}
             </DarwinButton>
             <SpaceRight size="xs" />
-            <DarwinButton onClick={downloadSelected}>
-              <FaCloudDownloadAlt />
-              <SpaceRight size="xxs" />
-              {t('download selected')}
-            </DarwinButton>
+            {!isDownloading ? (
+              <DarwinButton onClick={downloadSelected}>
+                <FaCloudDownloadAlt />
+                <SpaceRight size="xxs" />
+                {t('download selected')}
+              </DarwinButton>
+            ) : (
+              <DarwinButton onClick={stopDownloads}>
+                <FaStop />
+                <SpaceRight size="xxs" />
+                {t('stop downloads')}
+              </DarwinButton>
+            )}
           </LeftActions>
           <RightActions>
             <CircularButton>
