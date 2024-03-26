@@ -139,14 +139,10 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
       notifications: {
         enabled: true,
       },
-      playlists: [
-        {
-          properties: {
-            savePath: undefined,
-            color: 'red',
-          },
-        },
-      ],
+      sideBar: {
+        visible: true,
+        resizable: true,
+      },
     },
     downloads: {
       savePath: app.getPath('downloads'),

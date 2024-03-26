@@ -73,7 +73,6 @@ const ActionButtons = ({ formRef }: IActionButtonsProps): JSX.Element => {
           </DarwinButton>
         </Left>
         <Right>
-          <DarwinButton onClick={() => {}}>{t('reset all')}</DarwinButton>
           <SpaceRight size="s" />
           <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
           <SpaceRight size="s" />

@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload';
-import type { IPreferences, IPlaylistItem } from 'types/types';
+import type { IPreferences, IPlaylistItem, IPlaylist } from 'types/types';
 import type { OpenDialogReturnValue, OpenDialogOptions } from 'electron';
 
 interface IExtendedElectronApi extends ElectronAPI {

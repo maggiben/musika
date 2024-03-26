@@ -7,6 +7,25 @@ export const preferencesSelector = selector({
   get: async (): Promise<IPreferences> => window.preferences.loadPreferences(),
 });
 
+export const playlistSelector = selector({
+  key: 'playlistSelector',
+  get: async ({ get }) => {
+    const preferences = get(preferencesSelector);
+    const selected = preferences.behaviour.sideBar.selected;
+    const list = preferences.playlists.find(({ id }) => id === selected);
+    const playlist = list && (await window.playlist.loadPlaylist(list.filePath));
+    return {
+      sortOptions: {
+        filter: 'all' as const,
+        order: 'ascending' as const,
+        criteria: 'default' as const,
+      },
+      properties: undefined,
+      playlist,
+    };
+  },
+});
+
 export const selectedItemsSelector = selector({
   key: 'selectedItems',
   get: ({ get }) => {

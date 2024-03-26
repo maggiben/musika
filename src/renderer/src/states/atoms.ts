@@ -5,7 +5,7 @@ import type {
   IPlaylistSortOptions,
   IPlaylistProperties,
 } from 'types/types';
-import { preferencesSelector } from './selectors';
+import { preferencesSelector, playlistSelector } from './selectors';
 
 /*
 gta: https://www.youtube.com/watch?v=Lfgf9HatIHI&list=PLJV9FvSQV-k5MsXAYXZiRlR2nGzO9_kAD
@@ -18,15 +18,7 @@ export const playlistState = atom<{
   properties?: IPlaylistProperties;
 }>({
   key: 'playlistState',
-  default: {
-    sortOptions: {
-      filter: 'all',
-      order: 'ascending',
-      criteria: 'default',
-    },
-    properties: undefined,
-    playlist: undefined,
-  },
+  default: playlistSelector,
 });
 
 export const preferencesState = atom<IPreferences>({

@@ -122,11 +122,11 @@ export interface IPreferences {
       limit?: number | Infinity;
       type?: 'video' | 'playlist';
     };
-    playlists: {
-      playlist?: IPlaylist;
-      properties?: IPlaylistProperties;
-      sortOptions?: IPlaylistSortOptions;
-    }[];
+    sideBar: {
+      visible: boolean;
+      resizable: boolean;
+      selected?: string;
+    };
   };
   advanced: {
     isDev?: boolean;

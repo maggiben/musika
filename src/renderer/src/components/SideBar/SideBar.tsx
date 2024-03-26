@@ -206,6 +206,7 @@ const SideBar = (): JSX.Element => {
                   <StyledListItem key={`${item.id}-${index}`}>
                     <StyledInputRadio
                       id={`item-${item.id}-${index}`}
+                      defaultChecked={preferences.behaviour.sideBar?.selected === item.id}
                       type="radio"
                       name={`sidebar-menu-item`}
                       onChange={item.onChange}
