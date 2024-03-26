@@ -1,13 +1,10 @@
-// import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { playlistState } from '@states/atoms';
-import SearchBar from '@components/SearchBar/SearchBar';
 import PlayerControls from '@components/PlayerControls/PlayerControls';
 import ResultsHome from '@components/ResultsHome/ResultsHome';
 import PlaylistInfo from '@components/PlaylistInfo/PlaylistInfo';
 import List from '@components/List/List';
-// background-color: ${({ theme }) => theme.colors.midGray};
 
 // --background-color-darker: hsl(from var(--background-color) h s calc(l - 5%));
 // --background-color-darkest: hsl(from var(--background-color) h s calc(l - 10%));
@@ -30,18 +27,10 @@ const DownloadContainer = styled.div`
 `;
 
 const Download = (): JSX.Element => {
-  // const resetPlaylist = useResetRecoilState(playlistState);
-  const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
-  const onSearch = ({ playlist }): void => {
-    setPlaylist({
-      playlist,
-      sortOptions,
-    });
-  };
+  const { playlist } = useRecoilValue(playlistState);
 
   return (
     <DownloadContainer>
-      {/* <SearchBar onSearch={onSearch} /> */}
       <PlayerControls />
       {playlist ? (
         <>

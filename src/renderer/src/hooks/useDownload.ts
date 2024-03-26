@@ -33,15 +33,15 @@ const useDownload = (): IProgress => {
         }
       }
 
-      const notificationOptions = {
-        body: options.body,
-        icon: options.icon,
-        image: options.image,
+      const notificationOptions: NotificationOptions = {
+        ...options,
         silent,
         tag: 'musika',
       };
 
       const notification = new Notification(title, notificationOptions);
+
+      /* if setting a listener causes notification to stay on */
 
       // notification.onclick = (event) => {
       //   notification.close();
@@ -78,7 +78,6 @@ const useDownload = (): IProgress => {
       notify(t('download complete'), {
         body: `${message.source.title} complete !`,
         icon: message.source.thumbnail,
-        image: message.source.thumbnail,
       });
     };
 
@@ -121,6 +120,7 @@ const useDownload = (): IProgress => {
     return () => {
       Object.values(listeners).forEach((listener) => listener());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return progress;

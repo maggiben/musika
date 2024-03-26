@@ -118,17 +118,17 @@ const MediaInfoContent = (props: IMediaInfoContentProps): JSX.Element => {
     <MediaInfoBody>
       <dl>
         {[
-          'title',
-          'description',
-          'viewCount',
-          'category',
-          'publishDate',
-          'lengthSeconds',
-          'isFamilySafe',
-          'author.user',
-          'author.user_url',
-          'author.thumbnails[0].url',
-          'keywords[0]',
+          { key: 'title', label: t('title') },
+          { key: 'description', label: t('description') },
+          { key: 'viewCount', label: t('view count') },
+          { key: 'category', label: t('category') },
+          { key: 'publishDate', label: t('publish date') },
+          { key: 'lengthSeconds', label: t('duration in seconds') },
+          { key: 'isFamilySafe', label: t('is family safe') },
+          { key: 'author.user', label: t('user') },
+          { key: 'author.user_url', label: t('user url') },
+          { key: 'author.thumbnails[0].url', label: t('author thumbnail') },
+          { key: 'keywords[0]', label: t('keywords') },
         ].map((property, index) => {
           const isHidden = isTruncated({
             ...heights[index],
@@ -136,8 +136,8 @@ const MediaInfoContent = (props: IMediaInfoContentProps): JSX.Element => {
             scrollWidth: 1,
           } as HTMLElement);
           return (
-            <React.Fragment key={property}>
-              <StyledTerm>{property}</StyledTerm>
+            <React.Fragment key={property.key}>
+              <StyledTerm>{property.label}</StyledTerm>
               <StyledDetail
                 $lineclamp={lineClamp}
                 $offsetheight={heights[index]?.offsetHeight}
@@ -157,7 +157,7 @@ const MediaInfoContent = (props: IMediaInfoContentProps): JSX.Element => {
                   data-detail-is-hidden={isHidden}
                   ref={addDescriptionRef}
                 >
-                  {getNestedProperty(moreVideoDetails, property) as string}
+                  {getNestedProperty(moreVideoDetails, property.key) as string}
                 </span>
                 {isHidden && (
                   <ReadMoreButton

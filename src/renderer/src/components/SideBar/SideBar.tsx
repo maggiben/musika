@@ -3,8 +3,9 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { playlistState, preferencesState } from '@renderer/states/atoms';
 import { TbPlaylist } from 'react-icons/tb';
-import { BsStar, BsPersonFill } from 'react-icons/bs';
+import { BsClock, BsHandThumbsUp } from 'react-icons/bs';
 import { MdApps } from 'react-icons/md';
+import { PiTelevisionDuotone } from 'react-icons/pi';
 import { SpaceBottom, SpaceRight } from '../Spacing/Spacing';
 import { DarwinInputSearch } from '../Form/Form';
 import ResizableContainer from './ResizableContainer';
@@ -120,60 +121,44 @@ const SideBar = (): JSX.Element => {
 
   const mainSidePanel: ISideBarItem[] = [
     {
-      title: 'Library',
+      title: t('library'),
       id: 'library',
       showSearch: true,
       onSearch: () => {},
       items: [
         {
-          icon: <TbPlaylist style={{ color: 'violet' }} />,
-          title: 'Recently Added',
+          icon: <BsClock />,
+          title: t('recently added'),
           id: 'recently-added',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             console.log('menu 1', event);
           },
         },
         {
-          icon: <BsPersonFill style={{ color: 'yellow' }} />,
-          title: 'Channels',
-          id: 'Channels',
+          icon: <PiTelevisionDuotone />,
+          title: t('channels'),
+          id: 'channels',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             console.log('Channels', event);
           },
         },
         {
-          icon: <BsStar />,
-          title: 'Popular',
+          icon: <BsHandThumbsUp />,
+          title: t('popular'),
           id: 'popular',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             console.log('Popular', event);
           },
         },
-        {
-          icon: <BsStar />,
-          title: 'Songs',
-          id: 'songs',
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('Songs', event);
-          },
-        },
-        {
-          icon: <BsStar />,
-          title: 'Music Music',
-          id: 'music-videos',
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('Music Videos', event);
-          },
-        },
       ],
     },
     {
-      title: 'Playlists',
+      title: t('playlists'),
       id: 'playlists',
       items: [
         {
           icon: <MdApps />,
-          title: 'All Playlists',
+          title: t('all playlists'),
           id: 'all-playlist',
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             console.log('menu 1', event);
@@ -209,7 +194,7 @@ const SideBar = (): JSX.Element => {
                     type="search"
                     id="global-search"
                     style={{ width: '100%' }}
-                    placeholder="Search"
+                    placeholder={t('search')}
                     onChange={group.onSearch}
                   />
                   <SpaceBottom size="m" />

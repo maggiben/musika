@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { DarwinButton } from '@renderer/components/Form/Form';
@@ -73,6 +73,8 @@ const ActionButtons = ({ formRef }: IActionButtonsProps): JSX.Element => {
           </DarwinButton>
         </Left>
         <Right>
+          <DarwinButton onClick={() => {}}>{t('reset all')}</DarwinButton>
+          <SpaceRight size="s" />
           <DarwinButton onClick={handleCancelClick}>{t('cancel')}</DarwinButton>
           <SpaceRight size="s" />
           <DarwinButton onClick={handleOkClick} disabled={didApplyChanges ? false : !isDirty}>
