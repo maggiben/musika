@@ -151,7 +151,7 @@ export interface IPreferences {
     id: string;
     title: string;
     description?: string | null;
-    filePath: string;
+    filePath?: string;
     url: string;
     thumbnail?: {
       height?: number;

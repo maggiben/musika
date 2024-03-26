@@ -76,9 +76,10 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
 
   const asyncSearch = useRecoilCallback(({ set, snapshot }) => async (url: string) => {
     try {
-      const oldState = await snapshot.getPromise(playlistState);
+      const oldPlaylistState = await snapshot.getPromise(playlistState);
+      const oldPreferencesState = await snapshot.getPromise(preferencesState);
       resetPlaylistState();
-      const { playlist } = (await window.commands.search(url)) as {
+      const { playlist, playlistId } = (await window.commands.search(url)) as {
         playlistId: string;
         videoId: string;
         videoInfo: ytdl.videoInfo;
@@ -86,8 +87,19 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         searchResults: ytsr.PlaylistResult;
       };
       set(playlistState, {
-        ...oldState,
+        ...oldPlaylistState,
         playlist,
+      });
+      set(preferencesState, {
+        ...oldPreferencesState,
+        behaviour: {
+          ...oldPreferencesState.behaviour,
+          sideBar: {
+            ...oldPreferencesState.behaviour.sideBar,
+            selected: playlistId,
+          },
+        },
+        playlists: [...oldPreferencesState.playlists, playlist],
       });
     } catch (error) {
       console.error(error);
@@ -135,25 +147,18 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         await window.playlist.savePlaylist(playlist, filePath);
         const newPreferences = {
           ...preferences,
-          playlists: [
-            ...preferences.playlists,
-            {
-              filePath,
-              id: playlist.id,
-              url: playlist.url,
-              title: playlist.title,
-              description: playlist.description,
-              thumbnail: playlist.thumbnail,
-            },
-          ],
+          playlists: preferences.playlists.map((item) => {
+            console.log('item', item);
+            const newItem = { ...item };
+            if (item.id === playlist.id) {
+              newItem.filePath = filePath;
+            }
+            return newItem;
+          }),
         };
+        console.log('newPreferences', newPreferences);
         await window.preferences.savePreferences(newPreferences);
-        setPreferences((prev) => {
-          if (!prev || !prev.playlists) {
-            return prev;
-          }
-          return newPreferences;
-        });
+        setPreferences(newPreferences);
       } catch (error) {
         console.error(error);
       }

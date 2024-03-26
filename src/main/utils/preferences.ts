@@ -108,6 +108,7 @@ const windowsColorKeys = [
 ] as const;
 */
 
+// Official Blender Open Movies: https://www.youtube.com/playlist?list=PL6B3937A5D230E335
 export async function getDefaultPreferences(): Promise<IPreferences> {
   const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
   const preferredSystemLanguages = app.getPreferredSystemLanguages();

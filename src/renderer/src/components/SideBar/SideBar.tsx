@@ -9,6 +9,7 @@ import { PiTelevisionDuotone } from 'react-icons/pi';
 import { SpaceBottom, SpaceRight } from '../Spacing/Spacing';
 import { DarwinInputSearch } from '../Form/Form';
 import ResizableContainer from './ResizableContainer';
+import type { IPlaylist } from 'types/types';
 
 const DraggableRegion = styled.div`
   width: 100%;
@@ -171,9 +172,13 @@ const SideBar = (): JSX.Element => {
             title: savedPlaylist.title,
             onChange: async (event: React.ChangeEvent<HTMLInputElement>) => {
               if (!event.target.checked) return;
-              const playlist = await window.playlist.loadPlaylist(savedPlaylist.filePath);
-              console.log('loaded', playlist);
-              setPlaylist((prev) => ({ ...prev, playlist }));
+              const { filePath } = savedPlaylist;
+              if (filePath) {
+                const playlist = await window.playlist.loadPlaylist(filePath);
+                setPlaylist((prev) => ({ ...prev, playlist }));
+              } else if (savedPlaylist.url) {
+                setPlaylist((prev) => ({ ...prev, playlist: savedPlaylist as IPlaylist }));
+              }
             },
           };
         }),
