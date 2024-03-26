@@ -40,7 +40,7 @@ export const StyledFieldset = styled.fieldset`
   border-radius: ${({ theme }) => theme.borderRadius.xs};
   &:disabled button,
   &:disabled select,
-  &:disabled input {
+  &:disabled input:not([type='checkbox']):not([type='radio']) {
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
   }
   & > legend {

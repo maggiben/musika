@@ -41,7 +41,7 @@ import type { IDownloadWorkerMessage } from './DownloadWorker';
 import createWorker from '../workers/worker?nodeWorker';
 import { IPlaylistItem } from 'types/types';
 import type ytdl from 'ytdl-core';
-import type { EncoderStreamOptions } from './EncoderStream';
+import type { ITranscodingOptions } from './EncoderStream';
 
 export interface ISchedulerOptions {
   /**
@@ -83,7 +83,11 @@ export interface ISchedulerOptions {
   /**
    * Media encoder options
    */
-  encoderOptions?: EncoderStreamOptions['encodeOptions'];
+  encode: {
+    enabled: boolean;
+    replace: boolean;
+    options: ITranscodingOptions;
+  };
 }
 
 export interface ISchedulerMessage {
@@ -110,7 +114,7 @@ export interface ISchedulerWorkerOptions extends WorkerOptions {
   timeout: number;
   savePath: string;
   downloadOptions?: ytdl.downloadOptions;
-  encoderOptions?: EncoderStreamOptions['encodeOptions'];
+  encode?: ISchedulerOptions['encode'];
 }
 
 /*
@@ -129,7 +133,7 @@ export class Scheduler extends EventEmitter {
   private timeout: number;
   private playlistOptions?: ytpl.options;
   private downloadOptions?: ytdl.downloadOptions;
-  private encoderOptions?: EncoderStreamOptions['encodeOptions'];
+  private encode?: ISchedulerOptions['encode'];
 
   public constructor(options: ISchedulerOptions) {
     super();
@@ -142,7 +146,7 @@ export class Scheduler extends EventEmitter {
     this.timeout = options.timeout ?? 120 * 1000; // 120 seconds
     this.playlistOptions = options.playlistOptions;
     this.downloadOptions = options.downloadOptions;
-    this.encoderOptions = options.encoderOptions;
+    this.encode = options.encode;
   }
 
   /**
@@ -331,7 +335,7 @@ export class Scheduler extends EventEmitter {
       timeout: this.timeout,
       savePath: this.savePath,
       downloadOptions: this.downloadOptions,
-      encoderOptions: this.encoderOptions,
+      encode: this.encode,
     };
     /* just in case terminate any duplicate worker */
     if (this.workers.has(item.id)) {

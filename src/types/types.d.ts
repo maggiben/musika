@@ -163,6 +163,7 @@ export interface IPreferences {
     options: ITranscodingOptions;
     ffmpegPath: string;
     enabled: boolean;
+    replace: boolean;
     formats: ffmpeg.Formats;
     codecs: ffmpeg.Codecs;
     encoders: ffmpeg.Encoders;

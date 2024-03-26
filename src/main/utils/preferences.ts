@@ -160,6 +160,7 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
     transcoding: {
       ffmpegPath: require('ffmpeg-static'),
       enabled: true,
+      replace: false,
       options: {
         format: 'mp3',
         videoCodec: '',

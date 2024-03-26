@@ -69,7 +69,11 @@ export interface IDownloadWorkerOptions {
   /**
    * Media encoder options
    */
-  encoderOptions?: ITranscodingOptions;
+  encode: {
+    enabled: boolean;
+    replace: boolean;
+    options: ITranscodingOptions;
+  };
   /**
    * This is a MessagePort allowing communication with the parent thread.
    */
@@ -91,7 +95,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private savePath: string;
   private timeout: number;
   private downloadOptions: ytdl.downloadOptions;
-  private encoderOptions?: ITranscodingOptions;
+  private encode?: IDownloadWorkerOptions['encode'];
   private videoInfo!: ytdl.videoInfo;
   private videoFormat!: ytdl.videoFormat;
   private timeoutStream!: TimeoutStream;
@@ -105,7 +109,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     this.timeout = options.timeout ?? 120 * 1000; // 120 seconds
     this.output = options.output ?? '{videoDetails.title}';
     this.savePath = options.savePath ?? '';
-    this.encoderOptions = options.encoderOptions;
+    this.encode = options.encode;
     this.downloadOptions = options.downloadOptions ?? {
       quality: 'highest',
       filter: 'videoandaudio',
@@ -118,8 +122,8 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   public async init(): Promise<void> {
     try {
       this.handleMessages();
-      await this.downloadVideo();
-      // await this.downloadTest();
+      // await this.downloadVideo();
+      await this.downloadTest(150);
       return this.exit(0);
     } catch (error) {
       return this.error(error);
@@ -150,9 +154,9 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   }
 
   /**
-   * Download tester
+   * Worker download simulator
    */
-  private async downloadTest(): Promise<void> {
+  private async downloadTest(delay: number = 250): Promise<void> {
     return new Promise<void>((resolve) => {
       let percentage = 0;
       const interval = setInterval(() => {
@@ -160,16 +164,14 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         percentage += increment;
         if (percentage >= 100) {
           this.parentPort.postMessage({
-            type: 'progress',
+            type: 'end',
             source: this.item,
-            details: {
-              progress: {
-                percentage: 100,
-              },
-            },
+            details: {},
           });
           clearInterval(interval);
           resolve();
+        } else if (percentage > 50 && ['8wswgaSrMJQ', 'nRfDgXdInoM'].includes(this.item.id)) {
+          throw new Error('caca');
         } else {
           this.parentPort.postMessage({
             type: 'progress',
@@ -181,9 +183,10 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
             },
           });
         }
-      }, 250);
+      }, delay);
     });
   }
+
   /**
    * Downloads a video
    */
@@ -228,7 +231,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private async downloadFromInfo(
     videoInfo: ytdl.videoInfo,
   ): Promise<{ videoInfo: ytdl.videoInfo; videoFormat: ytdl.videoFormat } | undefined> {
-    // const defaultEncoders = await EncoderStream.getFormatDefaultCodecs(this.encoderOptions?.format);
+    // const defaultEncoders = await EncoderStream.getFormatDefaultCodecs(this.encoder?.options.format);
     this.downloadStream = ytdl.downloadFromInfo(videoInfo, this.downloadOptions);
     ({ videoInfo: this.videoInfo, videoFormat: this.videoFormat } =
       await this.setVideInfoAndVideoFormat());
@@ -257,13 +260,13 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     fs.WriteStream | NodeJS.WriteStream | Writable | undefined
   > {
     /* transcode stream */
-    if (this.encoderOptions) {
+    if (this.encode?.enabled) {
       const file = this.getOutputFile({
-        format: this.encoderOptions.format,
+        format: this.encode.options.format,
       });
       this.outputStream = fs.createWriteStream(file);
       const encoderStreamOptions: EncoderStreamOptions = {
-        encodeOptions: this.encoderOptions,
+        encodeOptions: this.encode.options,
         metadata: {
           videoInfo: this.videoInfo,
           videoFormat: this.videoFormat,

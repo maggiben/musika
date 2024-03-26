@@ -3,6 +3,7 @@ import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';
 import { BsFillFolderFill } from 'react-icons/bs';
 import {
+  ToggleSwitch,
   DarwinRadio,
   StyledLabel,
   StyledFieldset,
@@ -68,6 +69,14 @@ const TranscodingOptions = (): JSX.Element => {
               {t('both')}
             </StyledLabel>
           </InputGroup>
+        </InputPairContainer>
+        <InputPairContainer>
+          <StyledLabel htmlFor="transcoding.replace">{t('keep original copy')}</StyledLabel>
+          <ToggleSwitch
+            id="transcoding.replace"
+            name="transcoding.replace"
+            defaultChecked={!preferences.transcoding.replace}
+          />
         </InputPairContainer>
         <InputPairContainer>
           <StyledLabel htmlFor="transcoding.options.videoCodec">{t('video codec')}</StyledLabel>

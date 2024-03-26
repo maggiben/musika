@@ -35,7 +35,7 @@
 
 import ytpl from '@distube/ytpl';
 import ytdl from 'ytdl-core';
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
+import { BrowserWindow, ipcMain } from 'electron';
 import { Scheduler } from '../utils/Scheduler';
 import { loadPreferences } from '../utils/preferences';
 import type { IDownloadWorkerMessage } from '../utils/DownloadWorker';
@@ -67,7 +67,11 @@ export default async function download(
         quality: preferences.downloads.quality,
         filter: preferences.downloads.filter as ytdl.Filter,
       },
-      encoderOptions: preferences.transcoding.enabled ? preferences.transcoding.options : undefined,
+      encode: {
+        enabled: preferences.transcoding.enabled,
+        replace: preferences.transcoding.replace,
+        options: preferences.transcoding.options,
+      },
     });
     scheduler
       .on('online', (message: IDownloadWorkerMessage) => {
@@ -95,10 +99,7 @@ export default async function download(
         mainWindow?.webContents.send('progress', message);
       });
     scheduler.download();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ipcMain.once('stop-downloads', async (_event: IpcMainInvokeEvent, options) => {
-      scheduler.stop();
-    });
+    ipcMain.once('stop-downloads', () => scheduler.stop());
   }
   return {
     source,
