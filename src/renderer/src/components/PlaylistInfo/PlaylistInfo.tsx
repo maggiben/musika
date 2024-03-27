@@ -71,7 +71,6 @@ const PlaylistTitle = styled.h1`
 const PlaylistSubTitle = styled.div`
   margin: 0;
   padding: 0%;
-  font-size: 0.85rem;
   white-space: nowrap;
   color: ${({ theme }) => theme.colors.lightGray};
   & > span.value {
@@ -101,18 +100,6 @@ const RightActions = styled.div`
   align-items: center;
 `;
 
-interface IPlaylistInfoProps {
-  thumbnail?: {
-    height?: number;
-    width?: number;
-    url: string;
-  };
-  title: string;
-  views?: number | string;
-  totalItems: number;
-  items: IPlaylistItem[];
-}
-
 interface ISortOrderContextMenuMessage {
   id: string;
   checked: boolean;
@@ -127,11 +114,11 @@ const calcTotalPlayTime = (items: IPlaylistItem[]): number => {
     .reduce((acc, curr) => acc + curr, 0);
 };
 
-const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
+const PlaylistInfo = (): JSX.Element => {
   const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
-  const totalDuration = calcTotalPlayTime(props.items);
+  const totalDuration = playlist ? calcTotalPlayTime(playlist.items) : 0;
   const downloadSelected = async (): Promise<void> => {
     const selectedItems = playlist?.items.filter(({ selected }) => Boolean(selected));
     if (selectedItems) {
@@ -173,21 +160,21 @@ const PlaylistInfo = (props: IPlaylistInfoProps): JSX.Element => {
   );
   return (
     <PlaylistInfoContainer data-testid="playlist-info">
-      {props.thumbnail && (
+      {playlist?.thumbnail && (
         <StyledImg
-          src={props.thumbnail.url}
-          width={props.thumbnail.width}
-          height={props.thumbnail.height}
+          src={playlist.thumbnail.url}
+          width={playlist.thumbnail.width}
+          height={playlist.thumbnail.height}
           alt={t('thumbnail')}
         />
       )}
       <InfoGroup>
         <InfoNav>
           <hgroup>
-            <PlaylistTitle>{props.title}</PlaylistTitle>
+            <PlaylistTitle>{playlist?.title}</PlaylistTitle>
             <PlaylistSubTitle>
-              <span className="value">{props.totalItems}</span>
-              <span>&nbsp;MUSIC VIDEOS · TOTAL DURATION:&nbsp;</span>
+              <span className="value">{playlist?.total_items}</span>
+              <span>&nbsp;{t('music videos · total duration')}:&nbsp;</span>
               <span className="value">{toHumanTime(totalDuration, true)}</span>
             </PlaylistSubTitle>
           </hgroup>

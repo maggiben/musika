@@ -12,10 +12,10 @@ import {
 } from 'recoil';
 import { preferencesState, playlistState } from '@states/atoms';
 import type { IpcRendererEvent } from 'electron';
-import SideBar from '@renderer/components/SideBar/SideBar';
-import Download from '@containers/download/Download';
+import SideBar from '@components/SideBar/SideBar';
+import Main from '@containers/main/Main';
 import { defaultTheme } from '@assets/themes';
-import Loading from './containers/loading/Loading';
+import Loading from '@containers/loading/Loading';
 import type ytdl from 'ytdl-core';
 import type ytsr from '@distube/ytsr';
 import type { IPlaylist } from 'types/types';
@@ -79,6 +79,16 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
       const oldPlaylistState = await snapshot.getPromise(playlistState);
       const oldPreferencesState = await snapshot.getPromise(preferencesState);
       resetPlaylistState();
+      setPreferences((prev) => ({
+        ...prev,
+        behaviour: {
+          ...prev.behaviour,
+          sideBar: {
+            ...prev.behaviour.sideBar,
+            selected: 'home',
+          },
+        },
+      }));
       const { playlist, playlistId } = (await window.commands.search(url)) as {
         playlistId: string;
         videoId: string;
@@ -148,7 +158,6 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         const newPreferences = {
           ...preferences,
           playlists: preferences.playlists.map((item) => {
-            console.log('item', item);
             const newItem = { ...item };
             if (item.id === playlist.id) {
               newItem.filePath = filePath;
@@ -156,7 +165,6 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
             return newItem;
           }),
         };
-        console.log('newPreferences', newPreferences);
         await window.preferences.savePreferences(newPreferences);
         setPreferences(newPreferences);
       } catch (error) {
@@ -176,6 +184,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const currentTheme = {
     ...defaultTheme,
     ...{
@@ -203,7 +212,7 @@ const App = (): JSX.Element => {
       <I18nextProvider i18n={i18n}>
         <Suspense fallback={<Loading />}>
           <AppContainer>
-            <Download />
+            <Main />
           </AppContainer>
         </Suspense>
       </I18nextProvider>

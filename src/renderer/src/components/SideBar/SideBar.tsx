@@ -118,7 +118,21 @@ interface ISideBarItem {
 const SideBar = (): JSX.Element => {
   const { t } = useTranslation();
   const [, setPlaylist] = useRecoilState(playlistState);
-  const preferences = useRecoilValue(preferencesState);
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
+
+  const setSelected = (id: string): void => {
+    const selected = id.split(':').slice(1, 2).pop();
+    setPreferences((prev) => ({
+      ...prev,
+      behaviour: {
+        ...prev.behaviour,
+        sideBar: {
+          ...prev.behaviour.sideBar,
+          selected,
+        },
+      },
+    }));
+  };
 
   const mainSidePanel: ISideBarItem[] = [
     {
@@ -131,25 +145,19 @@ const SideBar = (): JSX.Element => {
           icon: <BsClock />,
           title: t('recently added'),
           id: 'recently-added',
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('menu 1', event);
-          },
+          onChange: ({ target: { id } }: React.ChangeEvent<HTMLInputElement>) => setSelected(id),
         },
         {
           icon: <PiTelevisionDuotone />,
           title: t('channels'),
           id: 'channels',
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('Channels', event);
-          },
+          onChange: ({ target: { id } }: React.ChangeEvent<HTMLInputElement>) => setSelected(id),
         },
         {
           icon: <BsHandThumbsUp />,
           title: t('popular'),
           id: 'popular',
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('Popular', event);
-          },
+          onChange: ({ target: { id } }: React.ChangeEvent<HTMLInputElement>) => setSelected(id),
         },
       ],
     },
@@ -161,24 +169,24 @@ const SideBar = (): JSX.Element => {
           icon: <MdApps />,
           title: t('all playlists'),
           id: 'all-playlist',
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('menu 1', event);
-          },
+          onChange: ({ target: { id } }: React.ChangeEvent<HTMLInputElement>) => setSelected(id),
         },
-        ...preferences.playlists.map((savedPlaylist) => {
+        ...preferences.playlists.map((playlist) => {
           return {
             icon: <TbPlaylist />,
-            id: savedPlaylist.id,
-            title: savedPlaylist.title,
-            onChange: async (event: React.ChangeEvent<HTMLInputElement>) => {
-              if (!event.target.checked) return;
-              const { filePath } = savedPlaylist;
+            id: playlist.id,
+            title: playlist.title,
+            onChange: async ({ target: { id, checked } }: React.ChangeEvent<HTMLInputElement>) => {
+              console.log('playlist click', id, checked);
+              if (!checked) return;
+              const { filePath } = playlist;
               if (filePath) {
                 const playlist = await window.playlist.loadPlaylist(filePath);
                 setPlaylist((prev) => ({ ...prev, playlist }));
-              } else if (savedPlaylist.url) {
-                setPlaylist((prev) => ({ ...prev, playlist: savedPlaylist as IPlaylist }));
+              } else if (playlist.url) {
+                setPlaylist((prev) => ({ ...prev, playlist: playlist as IPlaylist }));
               }
+              setSelected(id);
             },
           };
         }),
@@ -210,13 +218,13 @@ const SideBar = (): JSX.Element => {
                 {group.items.map((item, index) => (
                   <StyledListItem key={`${item.id}-${index}`}>
                     <StyledInputRadio
-                      id={`item-${item.id}-${index}`}
-                      defaultChecked={preferences.behaviour.sideBar?.selected === item.id}
+                      id={`item:${item.id}:${index}`}
+                      checked={preferences.behaviour.sideBar?.selected === item.id}
                       type="radio"
                       name={`sidebar-menu-item`}
                       onChange={item.onChange}
                     />
-                    <StyledLabel htmlFor={`item-${item.id}-${index}`}>
+                    <StyledLabel htmlFor={`item:${item.id}:${index}`}>
                       {item.icon}
                       <SpaceRight size="xs" />
                       <span>{item.title}</span>

@@ -8,7 +8,7 @@ import { preferencesState } from '@states/atoms';
 
 import { defaultTheme } from '@assets/themes';
 import useShowModal from '@hooks/useShowModal';
-import Loading from './containers/loading/Loading';
+import Loading from '@containers/loading/Loading';
 
 // Global style to set the background color of the body
 const GlobalStyle = createGlobalStyle`

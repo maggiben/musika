@@ -41,7 +41,16 @@ export const StyledFieldset = styled.fieldset`
   &:disabled button,
   &:disabled select,
   &:disabled input:not([type='checkbox']):not([type='radio']) {
+    cursor: inherit;
+    color: ${({ theme }) => theme.colors.lightGray};
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.midGray};
+  }
+  &:disabled select {
+    ${({ theme }) => selectChevron('field', theme.colors.darkGray)};
+    box-shadow: none;
+  }
+  &:disabled label {
+    color: ${({ theme }) => theme.colors['disabled-control-text']};
   }
   & > legend {
     color: ${({ theme }) => theme.colors['label']};

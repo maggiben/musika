@@ -90,6 +90,7 @@ export interface IPlaylist
   url: ytpl.result['url'];
   author?: ytpl.result['author'];
   views?: string | number;
+  filePath?: string;
   items: IPlaylistItem[];
 }
 
@@ -147,18 +148,7 @@ export interface IPreferences {
       };
     };
   };
-  playlists: {
-    id: string;
-    title: string;
-    description?: string | null;
-    filePath?: string;
-    url: string;
-    thumbnail?: {
-      height?: number;
-      width?: number;
-      url: string;
-    };
-  }[];
+  playlists: IPlaylist[];
   transcoding: {
     options: ITranscodingOptions;
     ffmpegPath: string;
