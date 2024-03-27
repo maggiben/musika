@@ -33,11 +33,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import fs from 'node:fs';
+import os from 'node:os';
+import http from 'node:http';
+import https from 'node:https';
+import path from 'node:path';
+import sharp from 'sharp';
 import { spawn } from 'node:child_process';
 import { Readable, Writable } from 'node:stream';
 import ytdl from 'ytdl-core';
 import ffmpeg from 'fluent-ffmpeg';
-import { AsyncCreatable } from '@shared/lib/AsyncCreatable';
 const ffmpegStatic = require('ffmpeg-static');
 
 ffmpeg.setFfmpegPath(ffmpegStatic);
@@ -95,7 +100,7 @@ export interface EncoderStreamOptions extends ffmpeg.FfmpegCommandOptions {
   /**
    * Output stream
    */
-  outputStream: Writable;
+  outputStream: Writable & fs.WriteStream;
   /**
    * Media encoder options
    */
@@ -110,14 +115,51 @@ export interface EncoderStreamOptions extends ffmpeg.FfmpegCommandOptions {
   timeout?: number;
 }
 
-export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> {
-  public stream!: Writable;
-  public ffmpegCommand!: ffmpeg.FfmpegCommand;
-  private timeout: number;
+export const encodeStream = (inputStream: Readable, outputStream: Writable) => {
+  return ffmpeg(inputStream)
+    .format('mp3')
+    .audioBitrate(64)
+    .once('error', (error, stdout, stderr) => {
+      console.log('Cannot process video: ' + error.message, stdout, stderr);
+    })
+    .once('end', () => {
+      console.log('Processing finished !');
+    })
+    .pipe(outputStream, { end: true });
+};
+
+// Downloads an image from the internet returns the image Buffer
+export const downloadImage = (url: string): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https') ? https : http;
+    client
+      .get(url, (response) => {
+        if (response.statusCode !== 200) {
+          reject(new Error(`Failed to download image, status code: ${response.statusCode}`));
+          return;
+        }
+
+        const data = [];
+        response.on('data', (chunk: unknown) => {
+          data.push(chunk as never);
+        });
+
+        response.on('end', () => {
+          resolve(Buffer.concat(data));
+        });
+      })
+      .on('error', (err) => {
+        reject(err);
+      });
+  });
+};
+
+export default class EncoderStream {
+  public stream?: Writable;
+  public ffmpegCommand?: ffmpeg.FfmpegCommand;
 
   public constructor(private options: EncoderStreamOptions) {
-    super(options);
-    this.timeout = options.timeout ?? 30 * 1000; // 30 seconds
+    this.encodeStream();
   }
 
   public static async getAvailableFormats(): Promise<ffmpeg.Formats> {
@@ -209,9 +251,9 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
     };
   }
 
-  private command(input: Readable): ffmpeg.FfmpegCommand {
+  private command(input?: Readable | string): ffmpeg.FfmpegCommand {
     return ffmpeg(input, {
-      timeout: this.timeout,
+      timeout: this.options.timeout ?? 30 * 1000,
       logger: {
         debug: (arg) => {
           console.log('[DEBUG] ' + arg);
@@ -249,21 +291,45 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
     return false;
   }
 
-  /**
-   * Initializes an instance of the EncoderStream class.
-   */
-  public async init(): Promise<void> {
-    if (await EncoderStream.validateEncoderOptions(this.options.encodeOptions)) {
-      this.encodeStream();
-    } else {
-      throw new Error('Invalid encoding options');
+  public async setCoverArt(
+    image: string = '/Users/bmaggi/Downloads/cat.jpg',
+  ): Promise<ffmpeg.FfmpegCommand> {
+    const { outputStream } = this.options;
+    if (!fs.existsSync(outputStream.path.toString()) || !outputStream.closed) {
+      console.log('file unsaved or not closed');
     }
+    // Download raw image buffer
+    const rawBuffer = await downloadImage(image);
+    const pngPath = path.join(os.tmpdir(), path.basename(outputStream.path.toString()) + '.png');
+    // Convert image to compatibe format
+    await sharp(rawBuffer).png().toFile(pngPath);
+    const tmpFile = path.join(os.tmpdir(), path.basename(outputStream.path.toString()));
+    // Add metadata
+    const ffmpegCommand = this.command()
+      .input(outputStream.path.toString())
+      .addInput(pngPath)
+      .outputOption('-map', '0:0')
+      .outputOption('-map', '1:0')
+      .outputOption('-c', 'copy')
+      .outputOption('-id3v2_version', '3')
+      .outputOption('-metadata:s:v', 'title="Album cover"')
+      .outputOption('-metadata:s:v', 'comment="Cover (front)"')
+      .saveToFile(tmpFile);
+
+    // Remove temporal image
+    ffmpegCommand.once('end', () => {
+      fs.unlinkSync(pngPath);
+      fs.unlinkSync(outputStream.path.toString());
+      fs.renameSync(tmpFile, outputStream.path.toString());
+    });
+    return ffmpegCommand;
   }
 
   private encodeStream(): void {
     const { inputStream, outputStream, encodeOptions, metadata } = this.options;
     console.log('encodeOptions', encodeOptions);
     console.log('native container', metadata.videoFormat.container);
+    console.log('output file', outputStream.path.toString());
     this.ffmpegCommand = Object.entries(encodeOptions).reduce((prev, [key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
         return prev[key](value);
@@ -272,12 +338,49 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
     }, this.command(inputStream));
     this.setMetadata(metadata, this.ffmpegCommand);
     this.stream = this.ffmpegCommand.pipe(outputStream, { end: true }); //end = true, close output stream after writing
+    this.ffmpegCommand.once('end', () => {
+      if (!fs.existsSync(outputStream.path.toString()) && !outputStream.closed) {
+        console.log('file unsaved or not closed');
+      }
+      // const tmpFile = path.join(os.tmpdir(), path.basename(outputStream.path.toString()));
+      // const result = this.command()
+      //   .input(outputStream.path.toString())
+      //   .addInput('/Users/bmaggi/Downloads/cat.jpg')
+      //   .outputOptions('-map', '0:0')
+      //   .outputOptions('-map', '1:0')
+      //   .outputOptions('-c', 'copy')
+      //   .outputOptions('-id3v2_version', '3')
+      //   .outputOption('-metadata:s:v', 'title="Album cover"')
+      //   .outputOption('-metadata:s:v', 'comment="Cover (front)"')
+      //   .saveToFile('/Users/bmaggi/myprj/musika/pepe.mp3');
+
+      // try {
+      //   this.command()
+      //     .input('/Users/bmaggi/myprj/musika/test.mp3')
+      //     .addInput('/Users/bmaggi/Downloads/cat.jpg')
+      //     .outputOption('-map', '0:0')
+      //     .outputOption('-map', '1:0')
+      //     .outputOption('-c', 'copy')
+      //     .outputOption('-id3v2_version', '3')
+      //     .outputOption('-metadata:s:v', 'title="Album cover"')
+      //     .outputOption('-metadata:s:v', 'comment="Cover (front)"')
+      //     .saveToFile('/Users/bmaggi/myprj/musika/cover.mp3');
+      // } catch (error) {
+      //   console.error('COVER ERROR', error);
+      // }
+      // fs.unlinkSync(outputStream.path);
+      // fs.renameSync(tmpFile, outputStream.path.toString());
+    });
   }
 
   private setMetadata(
     metadata: IEncoderStreamMetadata,
     encoder: ffmpeg.FfmpegCommand,
   ): ffmpeg.FfmpegCommand {
+    // .addInput('/Users/bmaggi/Downloads/banana.jpg')
+    // .outputOptions('-map', '0:1')
+    // .outputOptions('-map', '1:0')
+    // .outputOptions('-c', 'copy')
     const { videoId, title, author, shortDescription } =
       metadata.videoInfo.player_response.videoDetails;
     return encoder

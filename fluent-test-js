@@ -1,16 +1,62 @@
 const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
-var outStream = fs.createWriteStream('test.mp3');
-ffmpeg('./test.mp4')
-  .format('mp3')
-  .audioBitrate(96)
-  .on('error', (error, stdout, stderr) => {
-    console.log('Cannot process video: ' + error.message, stdout, stderr);
-  })
-  .on('end', () => {
-    console.log('Processing finished !');
-  })
-  .on('data', (chunk) => {
-    console.log('ffmpeg just wrote ' + chunk.length + ' bytes');
-  })
-  .pipe(outStream, { end: true });
+const ffmpegStatic = require('ffmpeg-static');
+ffmpeg.setFfmpegPath(ffmpegStatic);
+// const inpStream = fs.createReadStream('./test.mp4');
+// const outStream = fs.createWriteStream('./test.mp3');
+// const albumCover = '/Users/bmaggi/Downloads/banana.jpg';
+// ffmpeg(inpStream)
+//   .format('mp3')
+//   .audioBitrate(64)
+//   .on('error', (error, stdout, stderr) => {
+//     console.log('Cannot process video: ' + error.message, stdout, stderr);
+//   })
+//   .on('end', () => {
+//     console.log('Processing finished !');
+//   })
+//   .pipe(outStream, { end: true });
+
+// .addOutputOptions(
+//   '-i',
+//   albumCover,
+//   '-map',
+//   '0:0',
+//   '-map',
+//   '1:0',
+//   '-c',
+//   'copy',
+//   '-id3v2_version',
+//   '3',
+// )
+
+ffmpeg()
+  .input('/Users/bmaggi/myprj/musika/test.mp3')
+  .addInput('/Users/bmaggi/Downloads/cat.jpg')
+  .outputOption('-map', '0:0')
+  .outputOption('-map', '1:0')
+  .outputOption('-c', 'copy')
+  .outputOption('-id3v2_version', '3')
+  .outputOption('-metadata:s:v', 'title="Album cover"')
+  .outputOption('-metadata:s:v', 'comment="Cover (front)"')
+  .saveToFile('/Users/bmaggi/myprj/musika/cat-song.mp3');
+
+// ffmpeg('./test.mp3')
+//   .addOutputOptions(
+//     '-i',
+//     '/Users/bmaggi/Downloads/banana.jpg',
+//     '-map',
+//     '0:0',
+//     '-map',
+//     '1:0',
+//     '-c',
+//     'copy',
+//     '-id3v2_version',
+//     '3',
+//     '-metadata:s:v',
+//     'title="Album cover"',
+//     '-metadata:s:v',
+//     'comment="Cover (front)"',
+//   )
+//   .save('caca.mp3');
+
+// ffmpeg -i test.mp3 -i /Users/bmaggi/Downloads/banana.jpg -map 0:0 -map 1:0 -codec copy -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" out.mp3

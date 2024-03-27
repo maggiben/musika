@@ -96,7 +96,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private timeout: number;
   private downloadOptions: ytdl.downloadOptions;
   private encode?: IDownloadWorkerOptions['encode'];
-  private ffmpegCommand?: EncoderStream['ffmpegCommand'];
+  private encoderStream?: EncoderStream;
   private videoInfo!: ytdl.videoInfo;
   private videoFormat!: ytdl.videoFormat;
   private timeoutStream!: TimeoutStream;
@@ -217,7 +217,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       let downloadEnded = false;
       let outputStreamClosed = false;
       let cloneStreamClosed = false;
-      const checkClose = (): void => {
+      const checkClose = async (): Promise<void> => {
         const shouldEnd =
           downloadEnded &&
           outputStreamClosed &&
@@ -233,28 +233,31 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
               videoFormat: this.videoFormat,
             },
           });
-          resolve();
+          const ffmpegCommand = await this.encoderStream?.setCoverArt(this.item.thumbnail);
+          ffmpegCommand?.once('end', () => {
+            resolve();
+          });
         }
       };
 
       // When download has ended
-      this.downloadStream.once('end', () => {
+      this.downloadStream.once('end', async () => {
         downloadEnded = true;
-        checkClose();
+        await checkClose();
       });
       // When the output stream has been closed
-      this.outputStream.once('close', () => {
+      this.outputStream.once('close', async () => {
         outputStreamClosed = true;
-        checkClose();
+        await checkClose();
       });
       // When the clone stream has been closed
-      this.cloneStream?.once('close', () => {
+      this.cloneStream?.once('close', async () => {
         cloneStreamClosed = true;
-        checkClose();
+        await checkClose();
       });
 
       /* Error Handling Block */
-      this.ffmpegCommand?.once('error', (error) => {
+      this.encoderStream?.ffmpegCommand?.once('error', (error) => {
         /* If not making a copy then just error */
         if (this.encode?.replace) {
           return this.error(error, 'encoding-error');
@@ -289,6 +292,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     this.onTimeout();
     await this.setVideoOutput();
     await this.onEnd();
+    console.info('download complete!');
     return {
       videoInfo: this.videoInfo,
       videoFormat: this.videoFormat,
@@ -306,6 +310,15 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   > {
     /* transcode stream */
     if (this.encode?.enabled) {
+      /* Keep a copy of the original download */
+      if (!this.encode.replace) {
+        this.cloneStream = fs.createWriteStream(
+          this.getOutputFile({
+            format: `org.${this.videoFormat?.container}`,
+          }),
+        );
+        this.downloadStream.pipe(this.cloneStream, { end: true });
+      }
       const file = this.getOutputFile({
         format: this.encode.options.format,
       });
@@ -319,22 +332,13 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         inputStream: this.downloadStream,
         outputStream: this.outputStream,
       };
-      const { stream, ffmpegCommand } = await EncoderStream.create(encoderStreamOptions);
-      this.ffmpegCommand = ffmpegCommand;
-      /* Keep a copy of the original download */
-      if (!this.encode.replace) {
-        this.cloneStream = fs.createWriteStream(
-          this.getOutputFile({
-            format: `org.${this.videoFormat?.container}`,
-          }),
-        );
-        this.downloadStream.pipe(this.cloneStream);
-      }
-      return stream;
+      this.encoderStream = new EncoderStream(encoderStreamOptions);
+
+      return;
     }
     /* stream to file in native format */
     this.outputStream = fs.createWriteStream(this.getOutputFile());
-    return this.downloadStream.pipe(this.outputStream);
+    return this.downloadStream.pipe(this.outputStream, { end: true });
   }
 
   /**
@@ -399,7 +403,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       time: 100,
       drain: true,
     });
-    this.downloadStream.pipe(progressStream);
+    this.downloadStream.pipe(progressStream, { end: true });
     progressStream.on('progress', (progress) => {
       this.parentPort.postMessage({
         type: 'progress',
@@ -413,7 +417,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
 
   private onTimeout(): void {
     this.timeoutStream = new TimeoutStream({ timeout: this.timeout });
-    this.downloadStream.pipe(this.timeoutStream);
+    this.downloadStream.pipe(this.timeoutStream, { end: true });
     this.timeoutStream.once('timeout', () => {
       this.downloadStream.unpipe(this.timeoutStream);
       this.error(
@@ -529,6 +533,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   }
 
   private exit(code: number): never {
+    console.info(`Exiting worker with code ${code}`);
     return process.exit(code);
   }
 
