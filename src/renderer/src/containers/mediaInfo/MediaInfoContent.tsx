@@ -146,9 +146,8 @@ const MediaInfoContent = (props: IMediaInfoContentProps): JSX.Element => {
               >
                 <input
                   type="checkbox"
-                  id={`${property}-read-more-button`}
+                  id={`${property.key}-read-more-button`}
                   data-detail-index={index}
-                  defaultChecked={false}
                 />
                 <span
                   className="read-more-details"
@@ -161,9 +160,9 @@ const MediaInfoContent = (props: IMediaInfoContentProps): JSX.Element => {
                 </span>
                 {isHidden && (
                   <ReadMoreButton
-                    data-detail-property={property}
+                    data-detail-property={property.key}
                     data-detail-index={index}
-                    htmlFor={`${property}-read-more-button`}
+                    htmlFor={`${property.key}-read-more-button`}
                   />
                 )}
               </StyledDetail>
