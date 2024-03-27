@@ -134,6 +134,21 @@ const SideBar = (): JSX.Element => {
     }));
   };
 
+  const onPlaylistSelect =
+    (playlist: IPlaylist) =>
+    async ({ target: { id, checked } }: React.ChangeEvent<HTMLInputElement>) => {
+      console.log('playlist click', id, checked);
+      if (!checked) return;
+      const { filePath } = playlist;
+      if (filePath) {
+        const playlist = await window.playlist.loadPlaylist(filePath);
+        setPlaylist((prev) => ({ ...prev, playlist }));
+      } else if (playlist.url) {
+        setPlaylist((prev) => ({ ...prev, playlist: playlist as IPlaylist }));
+      }
+      setSelected(id);
+    };
+
   const mainSidePanel: ISideBarItem[] = [
     {
       title: t('library'),
@@ -162,8 +177,8 @@ const SideBar = (): JSX.Element => {
       ],
     },
     {
-      title: t('playlists'),
-      id: 'playlists',
+      title: t('saved playlists'),
+      id: 'saved-playlists',
       items: [
         {
           icon: <MdApps />,
@@ -171,28 +186,38 @@ const SideBar = (): JSX.Element => {
           id: 'all-playlist',
           onChange: ({ target: { id } }: React.ChangeEvent<HTMLInputElement>) => setSelected(id),
         },
-        ...preferences.playlists.map((playlist) => {
-          return {
-            icon: <TbPlaylist />,
-            id: playlist.id,
-            title: playlist.title,
-            onChange: async ({ target: { id, checked } }: React.ChangeEvent<HTMLInputElement>) => {
-              console.log('playlist click', id, checked);
-              if (!checked) return;
-              const { filePath } = playlist;
-              if (filePath) {
-                const playlist = await window.playlist.loadPlaylist(filePath);
-                setPlaylist((prev) => ({ ...prev, playlist }));
-              } else if (playlist.url) {
-                setPlaylist((prev) => ({ ...prev, playlist: playlist as IPlaylist }));
-              }
-              setSelected(id);
-            },
-          };
-        }),
+        ...preferences.playlists
+          .filter(({ filePath }) => !!filePath)
+          .map((playlist) => {
+            return {
+              icon: <TbPlaylist />,
+              id: playlist.id,
+              title: playlist.title,
+              onChange: onPlaylistSelect(playlist),
+            };
+          }),
       ],
     },
   ];
+
+  if (preferences.playlists.some(({ filePath }) => !filePath)) {
+    mainSidePanel.push({
+      title: t('unsaved playlists'),
+      id: 'unsaved-playlists',
+      items: [
+        ...preferences.playlists
+          .filter(({ filePath }) => !filePath)
+          .map((playlist) => {
+            return {
+              icon: <TbPlaylist />,
+              id: playlist.id,
+              title: playlist.title,
+              onChange: onPlaylistSelect(playlist),
+            };
+          }),
+      ],
+    });
+  }
 
   return (
     <ResizableContainer>

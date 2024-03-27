@@ -23,6 +23,7 @@
   "playlist": "Playlist",
   "playlists": "Playlists",
   "all playlists": "All Alaylists",
+  "unsaved playlists": "Unsaved playlists",
   "download complete": "Download Complete",
   "all items done": "All items done",
   "all but items failed_one": "All but {{total}} item failed",
