@@ -237,6 +237,9 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
           ffmpegCommand?.once('end', () => {
             resolve();
           });
+          ffmpegCommand?.once('error', () => {
+            resolve();
+          });
         }
       };
 
