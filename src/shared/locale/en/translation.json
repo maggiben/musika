@@ -22,6 +22,8 @@
   "popular": "Popular",
   "playlist": "Playlist",
   "playlists": "Playlists",
+  "video count_one": "{{total}} video",
+  "video count_other": "{{total}} videos",
   "all playlists": "All Alaylists",
   "unsaved playlists": "Unsaved playlists",
   "download complete": "Download Complete",
@@ -57,7 +59,7 @@
   "shuffle": "Shuffle",
   "ui theme": "UI Theme",
   "enable notifications": "Enable Notifications",
-  "download selected": "Download Selected",
+  "download selected": "Download Selected ({{total}})",
   "menu.app.checkForUpdates": "Check for Updates...",
   "move to applications forlder?": "Move to Applications folder?",
   "must live in the applications folder to be able to run correctly": "must live in the Applications folder to be able to run correctly"

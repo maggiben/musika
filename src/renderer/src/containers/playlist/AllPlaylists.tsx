@@ -1,4 +1,4 @@
-import { useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CgPlayList } from 'react-icons/cg';
@@ -12,7 +12,7 @@ const PlaylistContainer = styled.div`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.s};
 `;
 
 const GridContainer = styled.ul`
@@ -24,12 +24,20 @@ const GridContainer = styled.ul`
   overflow-y: scroll;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  grid-gap: 1em;
+  grid-gap: ${({ theme }) => theme.spacing.s};
 `;
 
 const GridItem = styled.li`
-  padding: 0px;
+  box-sizing: border-box;
+  padding: ${({ theme }) => theme.spacing.xxs};
+  border-radius: ${({ theme }) => theme.borderRadius.xs};
+  color: ${({ theme }) => theme.colors.lightGray};
   margin: 0px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.softGray};
+    color: white;
+  }
 `;
 
 const GridThumbnail = styled.div`
@@ -59,11 +67,7 @@ const GridFigCaption = styled.figcaption`
   display: flex;
   flex-direction: row;
   margin-top: ${({ theme }) => theme.spacing.xs};
-  color: ${({ theme }) => theme.colors.lightGray};
-  & > span.value {
-    font-weight: bold;
-    color: ${({ theme }) => theme.colors.white};
-  }
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const GridThumbnailInfo = styled.span`
@@ -76,26 +80,41 @@ const GridThumbnailInfo = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing.xxs};
   color: ${({ theme }) => theme.colors.white};
+  padding: ${({ theme }) => theme.spacing.xxs};
 `;
 
 const AllPlaylists = (): JSX.Element => {
   const { t } = useTranslation();
-  const preferences = useRecoilValue(preferencesState);
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const setSelected = (selected: string): void => {
+    setPreferences((prev) => ({
+      ...prev,
+      behaviour: {
+        ...prev.behaviour,
+        sideBar: {
+          ...prev.behaviour.sideBar,
+          selected,
+        },
+      },
+    }));
+  };
   return (
     <PlaylistContainer>
       <GridContainer data-testid="list-container">
         {preferences.playlists.map((playlist) => {
           return (
-            <GridItem key={playlist.id}>
+            <GridItem key={playlist.id} onClick={() => setSelected(playlist.id)}>
               <GridFigure>
                 <GridThumbnail>
                   <img src={playlist.thumbnail?.url} />
                   <GridThumbnailInfo>
                     <CgPlayList />
                     <SpaceRight size="xxs" />
-                    {`${preferences.playlists.length.toString()} ${t('videos')}`}
+                    {t('video count', {
+                      count: playlist.items.length,
+                      total: playlist.items.length,
+                    })}
                   </GridThumbnailInfo>
                 </GridThumbnail>
                 <GridFigCaption>

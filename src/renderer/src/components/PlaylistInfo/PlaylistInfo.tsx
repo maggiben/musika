@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
-import { playlistState } from '@renderer/states/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { playlistState } from '@states/atoms';
+import { selectedItemsSelector } from '@states/selectors';
 import useContextMenu from '@hooks/useContextMenu';
 import { timeStringToSeconds, toHumanTime } from '@shared/lib/utils';
 import { FaPlay, FaCloudDownloadAlt, FaPencilAlt, FaStop } from 'react-icons/fa';
@@ -117,6 +118,7 @@ const calcTotalPlayTime = (items: IPlaylistItem[]): number => {
 const PlaylistInfo = (): JSX.Element => {
   const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
+  const selectedItems = useRecoilValue(selectedItemsSelector);
   const [{ playlist, sortOptions }, setPlaylist] = useRecoilState(playlistState);
   const totalDuration = playlist ? calcTotalPlayTime(playlist.items) : 0;
   const downloadSelected = async (): Promise<void> => {
@@ -212,10 +214,13 @@ const PlaylistInfo = (): JSX.Element => {
             </DarwinButton>
             <SpaceRight size="xs" />
             {!isDownloading ? (
-              <DarwinButton onClick={downloadSelected}>
+              <DarwinButton
+                onClick={downloadSelected}
+                disabled={!selectedItems.some((item) => item)}
+              >
                 <FaCloudDownloadAlt />
                 <SpaceRight size="xxs" />
-                {t('download selected')}
+                {t('download selected', { total: selectedItems.filter(Boolean).length })}
               </DarwinButton>
             ) : (
               <DarwinButton onClick={stopDownloads}>

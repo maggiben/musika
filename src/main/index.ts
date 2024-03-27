@@ -14,8 +14,8 @@ import pjson from '@pjson';
 function createWindow(_preferences: IPreferences): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 990,
+    height: 640,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',

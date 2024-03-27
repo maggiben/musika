@@ -177,8 +177,8 @@ const SideBar = (): JSX.Element => {
       ],
     },
     {
-      title: t('saved playlists'),
-      id: 'saved-playlists',
+      title: t('playlists'),
+      id: 'playlists',
       items: [
         {
           icon: <MdApps />,
