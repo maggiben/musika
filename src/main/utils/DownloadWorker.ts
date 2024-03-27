@@ -100,6 +100,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private videoFormat!: ytdl.videoFormat;
   private timeoutStream!: TimeoutStream;
   private outputStream!: fs.WriteStream;
+  private cloneStream?: fs.WriteStream;
   private contentLength?: number;
 
   public constructor(options: IDownloadWorkerOptions) {
@@ -114,6 +115,12 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       quality: 'highest',
       filter: 'videoandaudio',
     };
+    // this.downloadOptions.filter = (format) => {
+    //   // return format.container === 'mp4';
+    //   console.log('FORMAT', format);
+    //   console.log('found format ?', format.hasVideo && format.hasAudio);
+    //   return format.hasVideo && format.hasAudio;
+    // };
   }
 
   /**
@@ -122,8 +129,8 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   public async init(): Promise<void> {
     try {
       this.handleMessages();
-      // await this.downloadVideo();
-      await this.downloadTest(150);
+      await this.downloadVideo();
+      // await this.downloadTest(150);
       return this.exit(0);
     } catch (error) {
       return this.error(error);
@@ -205,11 +212,11 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   }
 
   private async onEnd(): Promise<void> {
+    let outputStreamClosed = false;
+    let cloneStreamClosed = false;
     return new Promise((resolve, reject) => {
-      // when download has ended
-      this.downloadStream.once('end', () => {
-        // And the output stream has been closed
-        this.outputStream.once('close', () => {
+      const checkClose = (): void => {
+        if (outputStreamClosed && (cloneStreamClosed || this.encode?.replace)) {
           // Send the end event
           this.parentPort.postMessage({
             type: 'end',
@@ -220,9 +227,22 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
             },
           });
           resolve();
+        }
+      };
+      // when download has ended
+      this.downloadStream.once('end', () => {
+        // And the output stream has been closed
+        this.outputStream.once('close', () => {
+          outputStreamClosed = true;
+          checkClose();
+        });
+        this.cloneStream?.once('close', () => {
+          cloneStreamClosed = true;
+          checkClose();
         });
       });
       this.outputStream.once('error', reject);
+      this.cloneStream?.once('error', reject);
       this.downloadStream.once('error', reject);
       this.timeoutStream.once('timeout', reject);
     });
@@ -275,7 +295,16 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         outputStream: this.outputStream,
       };
       const { stream, ffmpegCommand } = await EncoderStream.create(encoderStreamOptions);
-      ffmpegCommand.once('error', this.error.bind(this));
+      /* Keep a copy of the original download */
+      if (!this.encode.replace) {
+        this.cloneStream = fs.createWriteStream(
+          this.getOutputFile({
+            format: `org.${this.videoFormat?.container}`,
+          }),
+        );
+        this.downloadStream.pipe(this.cloneStream);
+      }
+      ffmpegCommand.once('error', (error) => this.error(error, 'encoding-error'));
       return stream;
     }
     /* stream to file in native format */
@@ -455,6 +484,10 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private endStreams(): void {
     if (this.downloadStream && this.outputStream) {
       this.downloadStream.unpipe(this.outputStream);
+      /* clean clone if any */
+      this.cloneStream &&
+        this.downloadStream.unpipe(this.cloneStream) &&
+        this.cloneStream.destroy();
       // destroy the download stream
       this.downloadStream.destroy();
       // destroy output stream
@@ -462,6 +495,10 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       // Remove ouput file
       if (fs.existsSync(this.outputStream.path.toString())) {
         fs.unlinkSync(this.outputStream.path.toString());
+      }
+      // Remove ouput copy
+      if (this.cloneStream && fs.existsSync(this.cloneStream.path.toString())) {
+        fs.unlinkSync(this.cloneStream.path.toString());
       }
     }
   }

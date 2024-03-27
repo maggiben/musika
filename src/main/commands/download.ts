@@ -92,6 +92,9 @@ export default async function download(
       .on('timeout', (message: IDownloadWorkerMessage) => {
         mainWindow?.webContents.send('timeout', message);
       })
+      .on('encoding-error', (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send('encoding-error', message);
+      })
       .on('exit', (message: IDownloadWorkerMessage) => {
         mainWindow?.webContents.send('exit', message);
       })
