@@ -114,6 +114,18 @@ const useDownload = (): IDownloadStatus => {
       });
     };
 
+    const encodingErrorListener = (
+      _event: IpcRendererEvent,
+      message: IDownloadWorkerMessage,
+    ): void => {
+      console.error(message.error);
+      setProgress((prevState) => {
+        const newState = { ...prevState };
+        delete newState[message?.source?.id];
+        return newState;
+      });
+    };
+
     const progressListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
       const { source } = message;
       const { percentage } = message?.details?.progress as Progress;
@@ -132,6 +144,7 @@ const useDownload = (): IDownloadStatus => {
       end: window.electron.ipcRenderer.on('end', endListener),
       timeout: window.electron.ipcRenderer.on('timeout', timeoutListener),
       exit: window.electron.ipcRenderer.on('exit', exitListener),
+      'encoding-error': window.electron.ipcRenderer.on('encoding-error', encodingErrorListener),
       progress: window.electron.ipcRenderer.on('progress', progressListener),
     };
 

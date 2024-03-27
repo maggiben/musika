@@ -104,14 +104,20 @@ export interface EncoderStreamOptions extends ffmpeg.FfmpegCommandOptions {
    * Video metadata
    */
   metadata: IEncoderStreamMetadata;
+  /**
+   * Timeout value prevents encoding operation from blocking indefinitely.
+   */
+  timeout?: number;
 }
 
 export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> {
   public stream!: Writable;
   public ffmpegCommand!: ffmpeg.FfmpegCommand;
+  private timeout: number;
 
   public constructor(private options: EncoderStreamOptions) {
     super(options);
+    this.timeout = options.timeout ?? 30 * 1000; // 30 seconds
   }
 
   public static async getAvailableFormats(): Promise<ffmpeg.Formats> {
@@ -203,9 +209,24 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
     };
   }
 
-  /* istanbul ignore next */
-  public static command(input: Readable): ffmpeg.FfmpegCommand {
-    return ffmpeg(input);
+  private command(input: Readable): ffmpeg.FfmpegCommand {
+    return ffmpeg(input, {
+      timeout: this.timeout,
+      logger: {
+        debug: (arg) => {
+          console.log('[DEBUG] ' + arg);
+        },
+        info: (arg) => {
+          console.log('[INFO] ' + arg);
+        },
+        warn: (arg) => {
+          console.log('[WARN] ' + arg);
+        },
+        error: (arg) => {
+          console.log('[ERROR] ' + arg);
+        },
+      },
+    });
   }
 
   public static async validateEncoderOptions(encodeOptions: ITranscodingOptions): Promise<boolean> {
@@ -248,7 +269,7 @@ export default class EncoderStream extends AsyncCreatable<EncoderStreamOptions> 
         return prev[key](value);
       }
       return prev;
-    }, EncoderStream.command(inputStream));
+    }, this.command(inputStream));
     this.setMetadata(metadata, this.ffmpegCommand);
     this.stream = this.ffmpegCommand.pipe(outputStream, { end: true }); //end = true, close output stream after writing
   }

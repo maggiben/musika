@@ -89,6 +89,14 @@ export default class TimeoutStream extends Writable {
   }
 
   private handleInputStreamEvents(): void {
+    this.inputStream.on('data', () => {
+      this.clearTimeout();
+      this.setTimeout();
+    });
+    this.inputStream.on('write', () => {
+      this.clearTimeout();
+      this.setTimeout();
+    });
     this.inputStream.once('end', () => {
       this.clearTimeout();
       this.emit('end');

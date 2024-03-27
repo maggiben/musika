@@ -1,0 +1,16 @@
+const fs = require('fs');
+const ffmpeg = require('fluent-ffmpeg');
+var outStream = fs.createWriteStream('test.mp3');
+ffmpeg('./test.mp4')
+  .format('mp3')
+  .audioBitrate(96)
+  .on('error', (error, stdout, stderr) => {
+    console.log('Cannot process video: ' + error.message, stdout, stderr);
+  })
+  .on('end', () => {
+    console.log('Processing finished !');
+  })
+  .on('data', (chunk) => {
+    console.log('ffmpeg just wrote ' + chunk.length + ' bytes');
+  })
+  .pipe(outStream, { end: true });

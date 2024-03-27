@@ -96,6 +96,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private timeout: number;
   private downloadOptions: ytdl.downloadOptions;
   private encode?: IDownloadWorkerOptions['encode'];
+  private ffmpegCommand?: EncoderStream['ffmpegCommand'];
   private videoInfo!: ytdl.videoInfo;
   private videoFormat!: ytdl.videoFormat;
   private timeoutStream!: TimeoutStream;
@@ -212,12 +213,18 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   }
 
   private async onEnd(): Promise<void> {
-    let outputStreamClosed = false;
-    let cloneStreamClosed = false;
     return new Promise((resolve, reject) => {
+      let downloadEnded = false;
+      let outputStreamClosed = false;
+      let cloneStreamClosed = false;
       const checkClose = (): void => {
-        if (outputStreamClosed && (cloneStreamClosed || this.encode?.replace)) {
-          // Send the end event
+        const shouldEnd =
+          downloadEnded &&
+          outputStreamClosed &&
+          (cloneStreamClosed || !this.encode?.enabled || this.encode?.replace);
+
+        // Send the end event
+        if (shouldEnd) {
           this.parentPort.postMessage({
             type: 'end',
             source: this.item,
@@ -229,16 +236,34 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
           resolve();
         }
       };
-      // when download has ended
+
+      // When download has ended
       this.downloadStream.once('end', () => {
-        // And the output stream has been closed
-        this.outputStream.once('close', () => {
-          outputStreamClosed = true;
-          checkClose();
-        });
-        this.cloneStream?.once('close', () => {
-          cloneStreamClosed = true;
-          checkClose();
+        downloadEnded = true;
+        checkClose();
+      });
+      // When the output stream has been closed
+      this.outputStream.once('close', () => {
+        outputStreamClosed = true;
+        checkClose();
+      });
+      // When the clone stream has been closed
+      this.cloneStream?.once('close', () => {
+        cloneStreamClosed = true;
+        checkClose();
+      });
+
+      /* Error Handling Block */
+      this.ffmpegCommand?.once('error', (error) => {
+        /* If not making a copy then just error */
+        if (this.encode?.replace) {
+          return this.error(error, 'encoding-error');
+        }
+        /* If making a copy then just emit error */
+        this.parentPort.postMessage({
+          type: 'encoding-error',
+          source: this.item,
+          error,
         });
       });
       this.outputStream.once('error', reject);
@@ -295,6 +320,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         outputStream: this.outputStream,
       };
       const { stream, ffmpegCommand } = await EncoderStream.create(encoderStreamOptions);
+      this.ffmpegCommand = ffmpegCommand;
       /* Keep a copy of the original download */
       if (!this.encode.replace) {
         this.cloneStream = fs.createWriteStream(
@@ -304,7 +330,6 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         );
         this.downloadStream.pipe(this.cloneStream);
       }
-      ffmpegCommand.once('error', (error) => this.error(error, 'encoding-error'));
       return stream;
     }
     /* stream to file in native format */
