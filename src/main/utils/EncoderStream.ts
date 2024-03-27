@@ -338,57 +338,18 @@ export default class EncoderStream {
     }, this.command(inputStream));
     this.setMetadata(metadata, this.ffmpegCommand);
     this.stream = this.ffmpegCommand.pipe(outputStream, { end: true }); //end = true, close output stream after writing
-    this.ffmpegCommand.once('end', () => {
-      if (!fs.existsSync(outputStream.path.toString()) && !outputStream.closed) {
-        console.log('file unsaved or not closed');
-      }
-      // const tmpFile = path.join(os.tmpdir(), path.basename(outputStream.path.toString()));
-      // const result = this.command()
-      //   .input(outputStream.path.toString())
-      //   .addInput('/Users/bmaggi/Downloads/cat.jpg')
-      //   .outputOptions('-map', '0:0')
-      //   .outputOptions('-map', '1:0')
-      //   .outputOptions('-c', 'copy')
-      //   .outputOptions('-id3v2_version', '3')
-      //   .outputOption('-metadata:s:v', 'title="Album cover"')
-      //   .outputOption('-metadata:s:v', 'comment="Cover (front)"')
-      //   .saveToFile('/Users/bmaggi/myprj/musika/pepe.mp3');
-
-      // try {
-      //   this.command()
-      //     .input('/Users/bmaggi/myprj/musika/test.mp3')
-      //     .addInput('/Users/bmaggi/Downloads/cat.jpg')
-      //     .outputOption('-map', '0:0')
-      //     .outputOption('-map', '1:0')
-      //     .outputOption('-c', 'copy')
-      //     .outputOption('-id3v2_version', '3')
-      //     .outputOption('-metadata:s:v', 'title="Album cover"')
-      //     .outputOption('-metadata:s:v', 'comment="Cover (front)"')
-      //     .saveToFile('/Users/bmaggi/myprj/musika/cover.mp3');
-      // } catch (error) {
-      //   console.error('COVER ERROR', error);
-      // }
-      // fs.unlinkSync(outputStream.path);
-      // fs.renameSync(tmpFile, outputStream.path.toString());
-    });
   }
 
   private setMetadata(
     metadata: IEncoderStreamMetadata,
     encoder: ffmpeg.FfmpegCommand,
   ): ffmpeg.FfmpegCommand {
-    // .addInput('/Users/bmaggi/Downloads/banana.jpg')
-    // .outputOptions('-map', '0:1')
-    // .outputOptions('-map', '1:0')
-    // .outputOptions('-c', 'copy')
-    const { videoId, title, author, shortDescription } =
-      metadata.videoInfo.player_response.videoDetails;
+    const { videoId, title, author, description } = metadata.videoInfo.videoDetails;
     return encoder
       .outputOptions('-metadata', `title=${title}`)
-      .outputOptions('-metadata', `author=${author}`)
-      .outputOptions('-metadata', `artist=${author}`)
-      .outputOptions('-metadata', `description=${shortDescription}`)
-      .outputOptions('-metadata', `comment=${shortDescription}`)
+      .outputOptions('-metadata', `author=${author.name}`)
+      .outputOptions('-metadata', `artist=${author.user}`)
+      .outputOptions('-metadata', `description=${description}`)
       .outputOptions('-metadata', `episode_id=${videoId}`)
       .outputOptions('-metadata', 'network=YouTube');
   }
