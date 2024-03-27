@@ -13,7 +13,6 @@ import { ListItem, ListHeader } from './ListItem';
 
 const ListWrapper = styled.ul`
   flex-grow: 1;
-  height: 100vh;
   max-height: 100vh;
   list-style: none;
   padding: 0px;
