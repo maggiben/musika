@@ -1,4 +1,3 @@
-import './Playlist.css';
 import styled from 'styled-components';
 import List from '@components/List/List';
 import PlayerControls from '@components/PlayerControls/PlayerControls';
@@ -14,7 +13,7 @@ const PlaylistContainer = styled.div`
 
 const ListContainer = styled.div`
   overflow: hidden;
-  overflow-y: scroll;
+  max-height: 100vh;
 `;
 
 const Playlist = (): JSX.Element => {

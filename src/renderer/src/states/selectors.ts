@@ -37,7 +37,7 @@ export const channelSelector = selector({
       const clone = structuredClone(authors);
       const get = debounce(async (channelId) => {
         return await window.youtube.call('getChannel', channelId, 'metadata');
-      }, 150);
+      }, 50);
 
       for (const key of Object.keys(clone)) {
         clone[key]['metadata'] = (await get(key)) as IChannel['metadata'];
@@ -47,7 +47,6 @@ export const channelSelector = selector({
     const authors = preferences.playlists
       .map((playlist) => playlist.items)
       .flat()
-      .slice(0, 18)
       .map((item) => item.author)
       .reduce((prev, curr) => {
         if (!prev[curr.channelID]) {

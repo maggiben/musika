@@ -61,8 +61,8 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
           // setPreferences(structuredClone(newPreferences));
         });
         break;
-      case 'menu.file.new.playlist':
-        console.log('menu.file.new.playlist');
+      case 'menu.app.file.new.playlist':
+        console.log('menu.app.file.new.playlist');
         await window.commands.modal('new-playlist', { width: 420, height: 580 });
         break;
       case 'menu.app.file.open-url':
