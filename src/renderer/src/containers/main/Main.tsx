@@ -38,10 +38,6 @@ const Main = (): JSX.Element => {
     playlist: lazy(() => import('@containers/playlist/Playlist')),
   };
 
-  useEffect(() => {
-    console.log('selected: ', selected);
-  }, [selected]);
-
   const MainContent = useMemo(
     () => {
       if (selected !== null && selected !== undefined && selected !== '') {

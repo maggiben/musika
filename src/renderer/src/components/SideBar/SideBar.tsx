@@ -137,7 +137,6 @@ const SideBar = (): JSX.Element => {
   const onPlaylistSelect =
     (playlist: IPlaylist) =>
     async ({ target: { id, checked } }: React.ChangeEvent<HTMLInputElement>) => {
-      console.log('playlist click', id, checked);
       if (!checked) return;
       const { filePath } = playlist;
       if (filePath) {
