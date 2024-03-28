@@ -300,13 +300,14 @@ export type ThrottledFunction<T extends (...args: any[]) => any> = (
 
 /**
  * Creates a throttled function that only invokes the provided function (`func`) at most once per within a given number of milliseconds
- * (`limit`)
+ * (`wait`)
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function throttle<T extends (...args: any) => any>(
   func: T,
-  limit: number,
+  wait: number,
 ): ThrottledFunction<T> {
+  throttle['cancel'] = false;
   let inThrottle: boolean;
   let lastResult: ReturnType<T>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -315,11 +316,55 @@ export function throttle<T extends (...args: any) => any>(
     const context = this;
     if (!inThrottle) {
       inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
+      throttle['cancel'] = setTimeout(() => (inThrottle = false), wait);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       lastResult = func.apply(context, args);
     }
     return lastResult;
+  };
+}
+
+/**
+ * Creates a debounced function that will not call the give function untill a wait delay has elapsed
+ * (`wait`)
+ */
+export function debounce<T extends unknown[], U>(
+  callback: (...args: T) => PromiseLike<U> | U,
+  wait: number,
+): (...args: T) => Promise<U> {
+  type IState =
+    | unknown
+    | undefined
+    | {
+        timeout: ReturnType<typeof setTimeout>;
+        promise: Promise<U>;
+        resolve: (value: U | PromiseLike<U>) => void;
+        reject: (value: unknown) => void;
+        latestArgs: T;
+      };
+  let state: IState = undefined;
+
+  return (...args: T): Promise<U> => {
+    if (!state) {
+      state = {};
+      state!['promise'] = new Promise((resolve, reject) => {
+        state!['resolve'] = resolve;
+        state!['reject'] = reject;
+      });
+    }
+    clearTimeout(state!['timeout']);
+    state!['latestArgs'] = args;
+    state!['timeout'] = setTimeout(() => {
+      const s = state!;
+      state = undefined;
+      try {
+        s['resolve'](callback(...s['latestArgs']));
+      } catch (e) {
+        s['reject'](e);
+      }
+    }, wait);
+
+    return state!['promise'];
   };
 }
 

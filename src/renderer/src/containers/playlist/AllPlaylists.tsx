@@ -5,7 +5,7 @@ import { CgPlayList } from 'react-icons/cg';
 import { preferencesState } from '@renderer/states/atoms';
 import { SpaceRight } from '@renderer/components/Spacing/Spacing';
 
-const PlaylistContainer = styled.div`
+const PlaylistsContainer = styled.div`
   max-height: 100vh;
   width: 100%;
   overflow: hidden;
@@ -100,7 +100,7 @@ const AllPlaylists = (): JSX.Element => {
     }));
   };
   return (
-    <PlaylistContainer>
+    <PlaylistsContainer>
       <GridContainer data-testid="list-container">
         {preferences.playlists.map((playlist) => {
           return (
@@ -125,7 +125,7 @@ const AllPlaylists = (): JSX.Element => {
           );
         })}
       </GridContainer>
-    </PlaylistContainer>
+    </PlaylistsContainer>
   );
 };
 

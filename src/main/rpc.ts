@@ -39,7 +39,7 @@ export const setRpcHandlers = (mainWindow: BrowserWindow): void => {
       if (command in youtube) {
         if (typeof youtube[command] === 'function') {
           const result = await youtube[command](options);
-          if (prop in result) {
+          if (prop in result && typeof result[prop] !== 'function') {
             return cloneJson(result[prop]);
           } else if (typeof result[prop] === 'function') {
             return cloneJson(await result[prop](...args));

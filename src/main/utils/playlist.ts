@@ -17,6 +17,8 @@ export async function loadPlaylist(location: string): Promise<IPlaylist | undefi
       thumbnail: media.attributes['tvg-logo'] ?? '',
       author: {
         name: media.artist ?? '',
+        channelID: media.attributes['channel-id'] ?? '',
+        url: media.attributes['channel-url'] ?? '',
       },
       selected: media.attributes['selected'] === 'true' ? true : false,
       favorite: media.attributes['favorite'] === 'true' ? true : false,
@@ -64,6 +66,8 @@ export async function savePlaylist(playlist: IPlaylist, location: string): Promi
         favorite: item.favorite ? 'true' : 'false',
         selected: item.selected ? 'true' : 'false',
         dislike: item.selected ? 'true' : 'false',
+        'channel-id': item.author.channelID,
+        'channel-url': item.author.url,
       };
       media.duration = item.duration ? timeStringToSeconds(item.duration.toString()) : 0;
       media.name = item.title;

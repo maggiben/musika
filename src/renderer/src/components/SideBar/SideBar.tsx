@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { playlistState, preferencesState } from '@renderer/states/atoms';
 import { TbPlaylist } from 'react-icons/tb';

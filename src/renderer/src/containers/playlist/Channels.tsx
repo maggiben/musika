@@ -1,14 +1,14 @@
-import { useEffect, useRef } from 'react';
-import { useRecoilState } from 'recoil';
+import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { CgPlayList } from 'react-icons/cg';
 import { preferencesState } from '@renderer/states/atoms';
+import { debounce } from '@shared/lib/utils';
 import { SpaceRight } from '@renderer/components/Spacing/Spacing';
 import type { IPlaylistItem } from 'types/types';
-import { Innertube } from 'youtubei.js';
 
-const PlaylistContainer = styled.div`
+const ChannelsContainer = styled.div`
   max-height: 100vh;
   width: 100%;
   overflow: hidden;
@@ -87,64 +87,80 @@ const GridThumbnailInfo = styled.span`
   padding: ${({ theme }) => theme.spacing.xxs};
 `;
 
+type IChannelInfo = IPlaylistItem['author'] & {
+  totalItems: number;
+  metadata?: Record<string, unknown>;
+};
+
 const AllPlaylists = (): JSX.Element => {
   const { t } = useTranslation();
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const youtubeRef = useRef<Innertube>();
-  const setSelected = (selected: string): void => {
-    setPreferences((prev) => ({
-      ...prev,
-      behaviour: {
-        ...prev.behaviour,
-        sideBar: {
-          ...prev.behaviour.sideBar,
-          selected,
-        },
-      },
-    }));
-  };
+  const preferences = useRecoilValue(preferencesState);
   const authors = preferences.playlists
     .map((playlist) => playlist.items)
     .flat()
+    .slice(0, 8)
     .map((item) => item.author)
     .reduce((prev, curr) => {
-      prev[curr.channelID] = curr;
+      if (!prev[curr.channelID]) {
+        prev[curr.channelID] = { ...curr, totalItems: 1 };
+      } else {
+        let { totalItems } = prev[curr.channelID];
+        totalItems = totalItems + 1;
+        prev[curr.channelID] = { ...curr, totalItems };
+      }
       return prev;
-    }, {}) as Record<string, IPlaylistItem['author']>;
+    }, {}) as Record<string, IChannelInfo>;
+  const [channels, setChannels] = useState<Record<string, IChannelInfo> | undefined>(undefined);
 
   useEffect(() => {
-    const getChannel = async (id: string): Promise<void> => {
-      if (!youtubeRef.current) youtubeRef.current = await Innertube.create(/* options */);
-      const channel = await youtubeRef.current.getChannel(id);
-      console.log('channel', channel);
+    const getChannel = async (
+      authors: Record<string, IChannelInfo>,
+    ): Promise<Record<string, IChannelInfo>> => {
+      const clone = structuredClone(authors);
+      const get = debounce(async (channelId) => {
+        return await window.youtube.call('getChannel', channelId, 'metadata');
+      }, 50);
+
+      for (const key of Object.keys(clone)) {
+        clone[key]['metadata'] = (await get(key)) as Record<string, unknown>;
+        setChannels(clone);
+      }
+      return clone;
     };
-    // getChannel('UC1gxw8cN1J7lwp5Ul5Wm1Wg');
+    getChannel(authors)
+      .then((results) => results)
+      .catch(console.error);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <PlaylistContainer>
+    <ChannelsContainer>
       <GridContainer data-testid="list-container">
-        {Object.entries(authors).map(([channelId, author]) => {
-          return (
-            <GridItem key={channelId} onClick={() => {}}>
-              <GridFigure>
-                <GridThumbnail>
-                  <img src="https://yt3.googleusercontent.com/ytc/AIdro_m5obimB5dDB_wrHmp--CSYMtpWtGj2jVqxfrXV=s900-c-k-c0x00ffffff-no-rj" />
-                  <GridThumbnailInfo>
-                    <CgPlayList />
-                    <SpaceRight size="xxs" />
-                    {'hello'}
-                  </GridThumbnailInfo>
-                </GridThumbnail>
-                <GridFigCaption>
-                  <span>{author.name}</span>
-                </GridFigCaption>
-              </GridFigure>
-            </GridItem>
-          );
-        })}
+        {channels &&
+          Object.entries(channels).map(([channelId, channel]: [string, IChannelInfo]) => {
+            return (
+              <GridItem key={channelId} onClick={() => {}}>
+                <GridFigure>
+                  <GridThumbnail>
+                    <img src={channel?.metadata?.['avatar']?.[0]?.['url'] as string} />
+                    <GridThumbnailInfo>
+                      <CgPlayList />
+                      <SpaceRight size="xxs" />
+                      {t('video count', {
+                        count: channel.totalItems,
+                        total: channel.totalItems,
+                      })}
+                    </GridThumbnailInfo>
+                  </GridThumbnail>
+                  <GridFigCaption>
+                    <span>{channel.name}</span>
+                  </GridFigCaption>
+                </GridFigure>
+              </GridItem>
+            );
+          })}
       </GridContainer>
-    </PlaylistContainer>
+    </ChannelsContainer>
   );
 };
 

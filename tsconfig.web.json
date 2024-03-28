@@ -9,7 +9,6 @@
     "src/shared/*",
     "src/shared/lib/*",
     "src/types/*",
-    "src/main/*",
   ],
   "compilerOptions": {
     "composite": true,
@@ -35,7 +34,6 @@
       "@states/*": ["src/renderer/src/states/*"],
       "@hooks/*": ["src/renderer/src/hooks/*"],
       "@shared/*": ["src/shared/*"],
-      "@main/*": ["src/main/*"],
       "types/*": ["src/types/*"],
       "@locale/*": ["src/shared/locale/*"],
       "@pjson": ["package.json"],

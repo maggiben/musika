@@ -115,19 +115,6 @@ export interface EncoderStreamOptions extends ffmpeg.FfmpegCommandOptions {
   timeout?: number;
 }
 
-export const encodeStream = (inputStream: Readable, outputStream: Writable) => {
-  return ffmpeg(inputStream)
-    .format('mp3')
-    .audioBitrate(64)
-    .once('error', (error, stdout, stderr) => {
-      console.log('Cannot process video: ' + error.message, stdout, stderr);
-    })
-    .once('end', () => {
-      console.log('Processing finished !');
-    })
-    .pipe(outputStream, { end: true });
-};
-
 // Downloads an image from the internet returns the image Buffer
 export const downloadImage = (url: string): Promise<Buffer> => {
   return new Promise((resolve, reject) => {

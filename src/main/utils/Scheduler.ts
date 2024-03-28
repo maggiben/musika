@@ -155,7 +155,7 @@ export class Scheduler extends EventEmitter {
   public async download(): Promise<Array<ISchedulerResult | undefined> | undefined> {
     if (this.playlistId) {
       const playlist = await ytpl(this.playlistId, this.playlistOptions);
-      this.playlistItems = playlist.items as IPlaylistItem[];
+      this.playlistItems = playlist.items as unknown as IPlaylistItem[];
       console.log('items: ', this.playlistItems?.length);
       this.emit('playlistItems', { source: playlist, details: { playlistItems: playlist.items } });
       return this.scheduler(this.playlistItems);
