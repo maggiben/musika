@@ -1,4 +1,4 @@
-import { lazy, useMemo, Suspense, useEffect } from 'react';
+import { lazy, useMemo, Suspense } from 'react';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import { preferencesState } from '@states/atoms';

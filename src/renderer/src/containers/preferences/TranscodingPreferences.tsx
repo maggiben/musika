@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { preferencesState } from '@states/atoms';
 import { useTranslation } from 'react-i18next';
 import { BsFillFolderFill } from 'react-icons/bs';
@@ -283,7 +283,7 @@ const TranscodingOptions = (): JSX.Element => {
 
 const FfmpegBinaryOptions = (): JSX.Element => {
   const { t } = useTranslation();
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const preferences = useRecoilValue(preferencesState);
   const openFileDialog = async (): Promise<void> => {
     const result = await window.commands.dialogs({
       defaultPath: preferences?.transcoding?.ffmpegPath,

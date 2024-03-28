@@ -1,6 +1,7 @@
 import { selector } from 'recoil';
 import { playlistState } from './atoms';
-import type { IPreferences } from 'types/types';
+import { debounce } from '@shared/lib/utils';
+import type { IPreferences, IChannel } from 'types/types';
 
 export const preferencesSelector = selector({
   key: 'preferencesSelector',
@@ -23,6 +24,43 @@ export const playlistSelector = selector({
       properties: undefined,
       playlist,
     };
+  },
+});
+
+export const channelSelector = selector({
+  key: 'channelSelector',
+  get: async ({ get }) => {
+    const preferences = get(preferencesSelector);
+    const getChannel = async (
+      authors: Record<string, IChannel>,
+    ): Promise<Record<string, IChannel>> => {
+      const clone = structuredClone(authors);
+      const get = debounce(async (channelId) => {
+        return await window.youtube.call('getChannel', channelId, 'metadata');
+      }, 150);
+
+      for (const key of Object.keys(clone)) {
+        clone[key]['metadata'] = (await get(key)) as IChannel['metadata'];
+      }
+      return clone;
+    };
+    const authors = preferences.playlists
+      .map((playlist) => playlist.items)
+      .flat()
+      .slice(0, 18)
+      .map((item) => item.author)
+      .reduce((prev, curr) => {
+        if (!prev[curr.channelID]) {
+          prev[curr.channelID] = { ...curr, totalItems: 1 };
+        } else {
+          let { totalItems } = prev[curr.channelID];
+          totalItems = totalItems + 1;
+          prev[curr.channelID] = { ...curr, totalItems };
+        }
+        return prev;
+      }, {});
+
+    return await getChannel(authors);
   },
 });
 

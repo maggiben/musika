@@ -1,6 +1,7 @@
 import 'styled-components';
 import type ytpl from '@distube/ytpl';
 import type ffmpeg from 'fluent-ffmpeg';
+import type { Innertube } from 'youtubei.js';
 export type { ISchedulerResult, ISchedulerMessage } from '@main/utils/Scheduler';
 export type { IDownloadWorkerMessage } from '@main/utils/DownloadWorker';
 import type { ITranscodingOptions } from '@main/utils/EncoderStream';
@@ -15,6 +16,8 @@ interface ITransition {
   duration: string;
   timingFunction: string;
 }
+
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 export type TColorNames =
   | 'accentColor'
@@ -107,6 +110,11 @@ export interface IPlaylistProperties {
   savePath?: string;
   color: 'red' | 'violet' | 'blue' | 'yellow' | 'green';
 }
+
+export type IChannel = IPlaylistItem['author'] & {
+  totalItems: number;
+  metadata?: UnwrapPromise<ReturnType<Innertube['getChannel']>>;
+};
 
 export interface INotificationOptions {
   enabled: boolean;
