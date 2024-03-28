@@ -13,6 +13,16 @@ export declare global {
   interface Window {
     electron: IExtendedElectronApi;
     ipcRenderer: Electron.IpcRenderer;
+    youtube: {
+      call: (
+        command: string,
+        options: unknown,
+        prop: string,
+        ...args: unknown[]
+      ) => Promise<unknown>;
+      getChannel: (id: string, prop: string, ...args: unknown[]) => Promise<unknown>;
+      getPlaylist: (id: string, prop: string, ...args: unknown[]) => Promise<unknown>;
+    };
     commands: {
       dialogs: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
       getVideoInfo: (url: string) => Promise<Record<string, unknown>>;

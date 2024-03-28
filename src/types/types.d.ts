@@ -70,8 +70,10 @@ export interface IPlaylistItem
   favorite?: boolean;
   dislike?: boolean;
   duration?: string | number;
-  author?: {
+  author: {
     name: string;
+    channelID: string;
+    url: string;
   };
 }
 

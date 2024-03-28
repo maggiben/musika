@@ -32,6 +32,7 @@ const Main = (): JSX.Element => {
   } = useRecoilValue(preferencesState);
 
   const containers = {
+    channels: lazy(() => import('@containers/playlist/Channels')),
     'all-playlist': lazy(() => import('@containers/playlist/AllPlaylists')),
     home: lazy(() => import('@components/ResultsHome/ResultsHome')),
     playlist: lazy(() => import('@containers/playlist/Playlist')),

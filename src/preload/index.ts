@@ -1,7 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 import type { IPlaylist, IPreferences } from 'types/types';
-
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -27,6 +26,16 @@ if (process.contextIsolated) {
       loadPlaylist: (location: string) => ipcRenderer.invoke('loadPlaylist', location),
       savePlaylist: (playlist: IPlaylist, location: string) =>
         ipcRenderer.invoke('savePlaylist', playlist, location),
+    });
+    contextBridge.exposeInMainWorld('youtube', {
+      call: (command: string, options: unknown, prop: string, ...args: unknown[]) =>
+        ipcRenderer.invoke('youtube.call', command, options, prop, ...args),
+      getChannel: (id: string, prop: string, ...args: unknown[]) =>
+        ipcRenderer.invoke('youtube.getChannel', id, prop, ...args),
+      getPlaylist: (id: string, prop: string, ...args: unknown[]) =>
+        ipcRenderer.invoke('youtube.getPlaylist', id, prop, ...args),
+      search: (query: string, filters?: unknown) =>
+        ipcRenderer.invoke('youtube.search', query, filters),
     });
     contextBridge.exposeInMainWorld('commands', {
       getVideoInfo: (url: string) => ipcRenderer.invoke('getVideoInfo', url),

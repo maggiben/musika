@@ -50,6 +50,7 @@
     "sanitize-filename": "^1.6.3",
     "sharp": "^0.33.2",
     "usehooks-ts": "^2.16.0",
+    "youtubei.js": "^9.1.0",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
