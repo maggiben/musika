@@ -41,23 +41,38 @@ const PlayTime = styled.span`
 
 const Slider = styled.div`
   position: absolute;
-  transform: rotate(90deg) translate(50%, 50%);
-  top: 100%;
-  left: 0px;
-  transform-origin: 51px -11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(90deg) translate(0%, 50%);
+  top: 0.75em;
+  left: 50%;
+  transform-origin: 0% 100%;
   z-index: 1;
+`;
+
+const Volume = styled.div`
+  position: relative;
+  & ${Slider} {
+    display: none;
+  }
+  &:hover {
+    & ${Slider} {
+      display: flex;
+    }
+  }
 `;
 const PlayerControls = (): JSX.Element => {
   return (
     <PlayerControlsContainer data-testid="playlist-controls">
-      <div className="volume" style={{ lineHeight: '1rem' }}>
+      <Volume>
         <button style={{ position: 'relative' }}>
           volume_up
           <Slider>
             <InputRange min="0" max="100" value="0" step="1" />
           </Slider>
         </button>
-      </div>
+      </Volume>
       <div style={{ lineHeight: '1rem' }}>
         <button>fast_rewind</button>
         <button className="play">play_arrow</button>
