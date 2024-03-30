@@ -1,6 +1,6 @@
 import { selector, DefaultValue } from 'recoil';
 import { playlistState, preferencesState } from './atoms';
-import { debounce } from '@shared/lib/utils';
+import { splitIntoTuples } from '@shared/lib/utils';
 import type { IPreferences, IChannel } from 'types/types';
 
 export const preferencesSelector = selector({
@@ -35,15 +35,26 @@ export const channelSelector = selector({
       authors: Record<string, IChannel>,
     ): Promise<Record<string, IChannel>> => {
       const clone = structuredClone(authors);
-      const get = debounce(async (channelId) => {
-        return await window.youtube.call('getChannel', channelId, 'metadata');
-      }, 50);
-
-      for (const key of Object.keys(clone)) {
-        clone[key]['metadata'] = (await get(key)) as IChannel['metadata'];
+      const getMetadata = (channelId): Promise<IChannel['metadata']> =>
+        window.youtube.call('getChannel', channelId, 'metadata');
+      const promiseTuples = splitIntoTuples(
+        Object.keys(clone).map((key) =>
+          getMetadata(key).then((metadata) => ({
+            key,
+            metadata,
+          })),
+        ),
+        6,
+      );
+      for (const promises of promiseTuples) {
+        const results = await Promise.all(promises);
+        results.forEach(({ key, metadata }) => {
+          clone[key]['metadata'] = metadata;
+        });
       }
       return clone;
     };
+
     const authors = preferences.playlists
       .map((playlist) => playlist.items)
       .flat()
@@ -58,8 +69,7 @@ export const channelSelector = selector({
         }
         return prev;
       }, {});
-
-    return await getChannel(authors);
+    return getChannel(authors);
   },
 });
 

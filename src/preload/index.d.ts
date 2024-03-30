@@ -14,12 +14,7 @@ export declare global {
     electron: IExtendedElectronApi;
     ipcRenderer: Electron.IpcRenderer;
     youtube: {
-      call: (
-        command: string,
-        options: unknown,
-        prop: string,
-        ...args: unknown[]
-      ) => Promise<unknown>;
+      call: <T>(command: string, options: unknown, prop: string, ...args: unknown[]) => Promise<T>;
       getChannel: (id: string, prop: string, ...args: unknown[]) => Promise<unknown>;
       getPlaylist: (id: string, prop: string, ...args: unknown[]) => Promise<unknown>;
     };
