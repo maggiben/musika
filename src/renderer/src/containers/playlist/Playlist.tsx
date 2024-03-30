@@ -19,6 +19,10 @@ const ListContainer = styled.div`
 `;
 
 const Playlist = (): JSX.Element => {
+  // height: 100,
+  //           waveColor: "rgb(200, 0, 200)",
+  //           progressColor: "rgb(100, 0, 100)",
+  //           url: {song}
   // https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4
   const song = window.library.parseUri('/Users/bmaggi/Downloads/find-my-baby.mp3');
   return (
@@ -26,10 +30,12 @@ const Playlist = (): JSX.Element => {
       <PlayerControls />
       {song && (
         <WaveSurferPlayer
-          height={100}
-          waveColor="rgb(200, 0, 200)"
-          progressColor="rgb(100, 0, 100)"
-          url={song}
+          options={{
+            height: 100,
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            url: song,
+          }}
         />
       )}
       <PlaylistInfo />

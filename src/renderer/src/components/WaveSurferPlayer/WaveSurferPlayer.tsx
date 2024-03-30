@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect, useCallback, memo } from 'react';
-import WaveSurfer from 'wavesurfer.js';
+import WaveSurfer, { WaveSurferOptions } from 'wavesurfer.js';
 
 // WaveSurfer hook
-const useWavesurfer = (containerRef, options): WaveSurfer | undefined => {
+const useWavesurfer = (containerRef, options: WaveSurferOptions): WaveSurfer | undefined => {
   const [wavesurfer, setWavesurfer] = useState<WaveSurfer | undefined>(undefined);
 
   // Initialize wavesurfer when the container mounts
@@ -10,13 +10,10 @@ const useWavesurfer = (containerRef, options): WaveSurfer | undefined => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    console.log('options', options);
     const ws = WaveSurfer.create({
       ...options,
       container: containerRef.current,
     });
-
-    ws.setVolume(1);
 
     setWavesurfer(ws);
 
@@ -29,16 +26,26 @@ const useWavesurfer = (containerRef, options): WaveSurfer | undefined => {
 };
 
 // Create a React component that will render wavesurfer.
-// Props are wavesurfer options.
-const WaveSurferPlayer = memo((props) => {
+interface IWaveSurferPlayerParams {
+  media: HTMLMediaElement;
+  peaks: number[][];
+}
+
+interface IWaveSurferPlayer {
+  options: Omit<WaveSurferOptions, 'container'>;
+  onPlay?: (params: IWaveSurferPlayerParams) => void;
+  onReady?: (params: IWaveSurferPlayerParams & { duration: number }) => void;
+}
+
+const WaveSurferPlayer = memo((props: IWaveSurferPlayer) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const wavesurfer = useWavesurfer(containerRef, props);
+  const wavesurfer = useWavesurfer(containerRef, props.options as WaveSurferOptions);
   const { onPlay, onReady } = props;
 
   // On play button click
   const onPlayClick = useCallback(() => {
-    wavesurfer.playPause();
+    wavesurfer?.playPause();
   }, [wavesurfer]);
 
   // Initialize wavesurfer when the container mounts
@@ -46,32 +53,20 @@ const WaveSurferPlayer = memo((props) => {
   useEffect(() => {
     if (!wavesurfer) return;
 
-    const getPlayerParams = () => ({
+    const getPlayerParams = (): IWaveSurferPlayerParams => ({
       media: wavesurfer.getMediaElement(),
       peaks: wavesurfer.exportPeaks(),
     });
 
     const subscriptions = [
-      wavesurfer.on('ready', () => {
+      wavesurfer.on('ready', (duration: number) => {
         console.log('ready', wavesurfer.isPlaying());
-        onReady && onReady(getPlayerParams());
+        onReady && onReady({ ...getPlayerParams(), duration });
 
         setIsPlaying(wavesurfer.isPlaying());
       }),
       wavesurfer.on('play', () => {
-        console.log('play');
-        onPlay &&
-          onPlay((prev) => {
-            const newParams = getPlayerParams();
-            if (!prev || prev.media !== newParams.media) {
-              if (prev) {
-                prev.media.pause();
-                prev.media.currentTime = 0;
-              }
-              return newParams;
-            }
-            return prev;
-          });
+        onPlay && onPlay(getPlayerParams());
 
         setIsPlaying(true);
       }),
