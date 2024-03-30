@@ -114,7 +114,7 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
   const preferredSystemLanguages = app.getPreferredSystemLanguages();
   return {
     behaviour: {
-      shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
+      shouldUseDarkColors: nativeTheme.shouldUseDarkColors ? 'dark' : 'light',
       language: preferredSystemLanguages?.[0]?.split('-')?.[0] ?? 'en',
       preferredSystemLanguages,
       theme: {

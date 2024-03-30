@@ -28,6 +28,7 @@ function createWindow(_preferences: IPreferences): void {
       : {}),
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
+      webSecurity: process.env.ELECTRON_RENDERER_URL == null, // Cannot load local resources without that
       sandbox: false,
     },
   });

@@ -123,7 +123,7 @@ export interface INotificationOptions {
 
 export interface IPreferences {
   behaviour: {
-    shouldUseDarkColors: boolean;
+    shouldUseDarkColors: string;
     language: string;
     preferredSystemLanguages?: string[];
     theme: Record<string, unknown>;

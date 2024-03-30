@@ -97,12 +97,13 @@ const BehaviourPreferences = (): JSX.Element => {
               <DarwinSelect
                 id="behaviour.shouldUseDarkColors"
                 name="behaviour.shouldUseDarkColors"
-                defaultValue={preferences?.behaviour.shouldUseDarkColors ? 'true' : 'false'}
+                defaultValue={preferences?.behaviour.shouldUseDarkColors}
                 style={{ flexBasis: '100%' }}
               >
                 {[
-                  { label: 'light', value: 'false' },
-                  { label: 'dark', value: 'true' },
+                  { label: 'System (default)', value: 'default' },
+                  { label: 'light', value: 'light' },
+                  { label: 'dark', value: 'dark' },
                 ].map(({ label, value }, index) => (
                   <option key={index} value={value}>
                     {label}
