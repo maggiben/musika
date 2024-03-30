@@ -1,5 +1,6 @@
-import { ipcRenderer, contextBridge } from 'electron';
+import { ipcRenderer, contextBridge, shell } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
+import parseUri from '@main/utils/parseUri';
 import type { IPlaylist, IPreferences } from 'types/types';
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -16,6 +17,10 @@ if (process.contextIsolated) {
           return ipcRenderer.off(channel, listener);
         },
       },
+    });
+    contextBridge.exposeInMainWorld('library', {
+      showFileInFolder: (filePath: string) => shell.showItemInFolder(filePath),
+      parseUri,
     });
     contextBridge.exposeInMainWorld('preferences', {
       loadPreferences: () => ipcRenderer.invoke('loadPreferences', {}),

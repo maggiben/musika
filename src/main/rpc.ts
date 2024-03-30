@@ -14,8 +14,8 @@ import type { IPlaylist, IPreferences } from 'types/types';
 import { showOpenDialog } from './utils/dialogs';
 import modal from './utils/modal';
 import { cloneJson } from '@shared/lib/utils';
-import { savePreferences, loadPreferences } from './utils/preferences';
-import { loadPlaylist, savePlaylist } from './utils/playlist';
+import { savePreferences, loadPreferences } from './lib/preferences';
+import { loadPlaylist, savePlaylist } from './lib/playlist';
 
 export const setRpcHandlers = (mainWindow: BrowserWindow): void => {
   const focusedWindow = BrowserWindow.getFocusedWindow();

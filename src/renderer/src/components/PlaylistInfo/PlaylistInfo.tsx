@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -11,6 +11,7 @@ import { BsShuffle, BsThreeDots, BsFilter, BsChevronDown } from 'react-icons/bs'
 import { SpaceRight } from '../Spacing/Spacing';
 import { DarwinButton, CircularButton, DarwinInputSearch, ContextMenuButton } from '../Form/Form';
 import { SchedulerChannels } from '@shared/rpc-channels';
+import player from '@renderer/lib/player';
 import { IPlaylistItem, IPlaylistSortOptions } from 'types/types';
 
 const PlaylistInfoContainer = styled.div`
@@ -161,6 +162,11 @@ const PlaylistInfo = (): JSX.Element => {
       'contextmenu.playlist-sort.descending',
     ],
   );
+
+  const onPlaylistPlay = useCallback(() => {
+    player.play();
+  }, [playlist]);
+
   return (
     <PlaylistInfoContainer data-testid="playlist-info">
       {playlist?.thumbnail && (
@@ -202,7 +208,7 @@ const PlaylistInfo = (): JSX.Element => {
         </InfoNav>
         <ActionGroup>
           <LeftActions>
-            <DarwinButton>
+            <DarwinButton onClick={onPlaylistPlay}>
               <FaPlay />
               <SpaceRight size="xxs" />
               {t('play')}

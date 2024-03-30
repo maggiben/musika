@@ -37,7 +37,7 @@ import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import ytsr from '@distube/ytsr';
 
-import { loadPreferences } from '../utils/preferences';
+import { loadPreferences } from '../lib/preferences';
 import mockResponse from './__mocks__/search.response.json';
 
 export default async function search(searchString: string): Promise<Record<string, unknown>> {

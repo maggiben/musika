@@ -37,11 +37,11 @@ import { EventEmitter } from 'stream';
 import { Worker, WorkerOptions } from 'worker_threads';
 import ytpl from '@distube/ytpl';
 // import { EncoderStream } from './EncoderStream';
-import type { IDownloadWorkerMessage } from './DownloadWorker';
+import type { IDownloadWorkerMessage } from '../lib/DownloadWorker';
 import createWorker from '../workers/worker?nodeWorker';
 import { IPlaylistItem } from 'types/types';
 import type ytdl from 'ytdl-core';
-import type { ITranscodingOptions } from './EncoderStream';
+import type { ITranscodingOptions } from '../lib/EncoderStream';
 
 export interface ISchedulerOptions {
   /**

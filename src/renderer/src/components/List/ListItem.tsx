@@ -30,20 +30,20 @@ const SongDuration = styled.span`
 
 const ListBase = css`
   flex-grow: 1;
-  padding: 0px;
   margin: 0px;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   overflow-y: hidden;
-  & > span {
+  & > * {
     min-width: 0;
     z-index: 0;
     /* Checkbox */
     &:nth-child(1) {
-      text-align: right;
-      font-weight: bold;
+      width: 16px;
+      width: 16px;
+      margin: ${({ theme }) => theme.spacing.xxs};
     }
     /* Index */
     &:nth-child(2) {
@@ -175,7 +175,12 @@ export const ListItem = ({
   return (
     <ListItemWrapper key={`${item.id}:${index}`} $progress={progress}>
       <ListBack data-testid="list-item-back">
-        <input type="checkbox" style={{ visibility: 'hidden' }} />
+        <div
+          style={{
+            userSelect: 'none',
+            visibility: 'hidden',
+          }}
+        />
         <SongIndex>{songIndex}</SongIndex>
         <span>·</span>
         <span>
@@ -194,7 +199,7 @@ export const ListItem = ({
           type="checkbox"
           id={`${item.id}:${index}`}
           data-item-selector={`${item.id}:${index}`}
-          checked={item.selected}
+          defaultChecked={item.selected}
           onChange={handleItemSelect}
         />
         <SongIndex>{songIndex}</SongIndex>

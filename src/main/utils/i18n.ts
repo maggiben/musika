@@ -5,7 +5,7 @@ import { initReactI18next } from 'react-i18next';
 import translationES from '@locale/es/translation.json';
 import translationEN from '@locale/en/translation.json';
 import translationFR from '@locale/fr/translation.json';
-import { loadPreferences } from '../utils/preferences';
+import { loadPreferences } from '../lib/preferences';
 
 const fallbackLng = 'en';
 const languageDetector = {

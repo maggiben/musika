@@ -42,7 +42,7 @@ import ytpl from '@distube/ytpl';
 import ProgressStream from 'progress-stream';
 import * as utils from '@shared/lib/utils';
 import { AsyncCreatable } from '@shared/lib/AsyncCreatable';
-import TimeoutStream from './TimeoutStream';
+import TimeoutStream from '../utils/TimeoutStream';
 import EncoderStream, { EncoderStreamOptions, ITranscodingOptions } from './EncoderStream';
 
 export interface IDownloadWorkerOptions {
@@ -436,7 +436,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       this.downloadStream.unpipe(this.timeoutStream);
       this.error(
         new Error(`stream timeout for workerId: ${this.item.id} title: ${this.item.title}`),
-        'timeout',
+        DownloadWorkerChannels.TIMEOUT,
       );
     });
   }

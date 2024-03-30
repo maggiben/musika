@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { applicationMenu } from './menu';
 import { setRpcHandlers } from './rpc';
 import type { IPreferences } from 'types/types';
-import { loadPreferences } from './utils/preferences';
+import { loadPreferences } from './lib/preferences';
 // import creatWorker from './workers/worker-simple?nodeWorker';
 import pjson from '@pjson';
 // import checkAndInstall from './utils/checkAndInstall';
@@ -28,6 +28,7 @@ function createWindow(_preferences: IPreferences): void {
       : {}),
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
+      autoplayPolicy: 'no-user-gesture-required',
       webSecurity: process.env.ELECTRON_RENDERER_URL == null, // Cannot load local resources without that
       sandbox: false,
     },

@@ -37,8 +37,8 @@ import ytpl from '@distube/ytpl';
 import ytdl from 'ytdl-core';
 import { BrowserWindow, ipcMain } from 'electron';
 import { Scheduler } from '../utils/Scheduler';
-import { loadPreferences } from '../utils/preferences';
-import { DownloadWorkerChannels } from '../utils/DownloadWorker';
+import { loadPreferences } from '../lib/preferences';
+import { DownloadWorkerChannels } from '../lib/DownloadWorker';
 import { SchedulerChannels } from '../utils/Scheduler';
 import type { IDownloadWorkerMessage, IPlaylistItem } from 'types/types';
 

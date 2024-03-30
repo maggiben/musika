@@ -34,7 +34,7 @@
  */
 
 import { workerData, isMainThread, parentPort } from 'worker_threads';
-import { DownloadWorker, IDownloadWorkerOptions } from '../utils/DownloadWorker';
+import { DownloadWorker, IDownloadWorkerOptions } from '../lib/DownloadWorker';
 
 export default void (async (options: IDownloadWorkerOptions): Promise<DownloadWorker> => {
   process
