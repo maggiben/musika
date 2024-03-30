@@ -1,21 +1,9 @@
-import {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-  memo,
-  useMemo,
-  forwardRef,
-  RefObject,
-  useImperativeHandle,
-  Ref,
-} from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { BsVolumeDownFill } from 'react-icons/bs';
 import { MdSkipPrevious, MdSkipNext, MdPlayArrow, MdPause } from 'react-icons/md';
 import { TiArrowLoop, TiArrowShuffle } from 'react-icons/ti';
-import { WaveSurferOptions } from 'wavesurfer.js';
-import useWaveSurfer from '@hooks/useWaveSurfer';
+import WaveSurfer, { IWaveSurferPlayerParams } from '@components/WaveSurfer/WaveSurfer';
 import InputRange from '@components/InputRange/InputRange';
 import { SpaceRight } from '../Spacing/Spacing';
 
@@ -33,9 +21,13 @@ const PlayerControlsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-right: ${({ theme }) => theme.spacing.xs};
+  padding-left: ${({ theme }) => theme.spacing.xs};
+  box-sizing: border-box;
 `;
 
 const PlayTime = styled.span`
+  font-family: ${({ theme }) => theme.fontFamily.mono};
   color: ${({ theme }) => theme.colors.lightGray};
   margin-right: ${({ theme }) => theme.spacing.xs};
 `;
@@ -108,92 +100,6 @@ const StyledInputCheck = styled.div`
   }
 `;
 
-// Create a React component that will render wavesurfer.
-interface IWaveSurferPlayerParams {
-  media: HTMLMediaElement;
-  peaks: number[][];
-  isPlaying: boolean;
-}
-
-interface IWaveSurferPlayer {
-  options: Omit<WaveSurferOptions, 'container'>;
-  onPlay?: (params: IWaveSurferPlayerParams) => void;
-  onReady?: (params: IWaveSurferPlayerParams & { duration: number }) => void;
-}
-
-const WaveSurferPlayer = memo(
-  forwardRef<HTMLDivElement, IWaveSurferPlayer>(
-    (props: IWaveSurferPlayer, containerRef: Ref<HTMLDivElement>) => {
-      const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
-      const wavesurfer = useWaveSurfer(
-        containerRef as RefObject<HTMLElement>,
-        props.options as WaveSurferOptions,
-      );
-      const { onPlay, onReady } = props;
-
-      useImperativeHandle(
-        containerRef,
-        () => waveSurferContainerRef.current as unknown as HTMLDivElement,
-      );
-
-      // On play button click
-      const onPlayPause = useCallback(() => {
-        wavesurfer?.playPause();
-      }, [wavesurfer]);
-
-      // Initialize wavesurfer when the container mounts
-      // or any of the props change
-      useEffect(() => {
-        if (!wavesurfer) return;
-        if (!containerRef && !waveSurferContainerRef.current) return;
-
-        const domNode = waveSurferContainerRef.current;
-
-        const getPlayerParams = (): IWaveSurferPlayerParams => ({
-          media: wavesurfer.getMediaElement(),
-          peaks: wavesurfer.exportPeaks(),
-          isPlaying: wavesurfer.isPlaying(),
-        });
-
-        const subscriptions = [
-          wavesurfer.on('ready', (duration: number) => {
-            onReady && onReady({ ...getPlayerParams(), duration });
-          }),
-          wavesurfer.on('play', () => {
-            onPlay && onPlay(getPlayerParams());
-          }),
-        ];
-
-        const listeners = {
-          playPause: onPlayPause,
-          url: onPlayPause,
-          volume: onPlayPause,
-        };
-
-        Object.entries(listeners).forEach(([event, listener]) => {
-          domNode?.addEventListener(event, listener);
-        });
-
-        return () => {
-          subscriptions.forEach((unsub) => unsub());
-          Object.entries(listeners).forEach(([event, listener]) => {
-            domNode?.removeEventListener(event, listener);
-          });
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [wavesurfer]);
-
-      return (
-        <div
-          id="wave-surfer-container"
-          ref={waveSurferContainerRef}
-          style={{ minWidth: '200px' }}
-        />
-      );
-    },
-  ),
-);
-
 const PlayerControls = (): JSX.Element => {
   const [isPlaying, setIsPlaying] = useState(false);
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
@@ -210,9 +116,9 @@ const PlayerControls = (): JSX.Element => {
     console.log('ready', params, 'duration', params.duration);
   }, []);
 
-  const WaveSurferPlayerComponent = useMemo(
+  const WaveSurferPlayer = useMemo(
     () => (
-      <WaveSurferPlayer
+      <WaveSurfer
         ref={waveSurferContainerRef}
         onPlay={onWsPlay}
         onReady={onWsReady}
@@ -224,6 +130,7 @@ const PlayerControls = (): JSX.Element => {
         }}
       />
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
@@ -260,7 +167,10 @@ const PlayerControls = (): JSX.Element => {
           <StyledPlayerButton onClick={console.log}>
             <MdSkipPrevious />
           </StyledPlayerButton>
-          <StyledPlayerButton onClick={handlePlayButtonClick}>
+          <StyledPlayerButton
+            onClick={handlePlayButtonClick}
+            style={{ fontSize: '2.25em', lineHeight: '2.25em' }}
+          >
             {!isPlaying ? <MdPlayArrow /> : <MdPause />}
           </StyledPlayerButton>
           <StyledPlayerButton onClick={console.log}>
@@ -275,9 +185,11 @@ const PlayerControls = (): JSX.Element => {
           </StyledPlayerLabel>
         </StyledInputCheck>
       </StyledButtonGroup>
-      <div style={{ display: 'flex', gap: '1em', height: 'calc(100% - 6px)' }}>
-        {WaveSurferPlayerComponent}
+      <SpaceRight size="xl" />
+      <div style={{ display: 'flex', gap: '1em', height: 'calc(100% - 6px)', width: '100%' }}>
+        {WaveSurferPlayer}
       </div>
+      <SpaceRight size="xl" />
       <PlayTime>3:47</PlayTime>
     </PlayerControlsContainer>
   );

@@ -11,13 +11,13 @@ import {
 import { WaveSurferOptions } from 'wavesurfer.js';
 import useWaveSurfer from '@hooks/useWaveSurfer';
 
-interface IWaveSurferPlayerParams {
+export interface IWaveSurferPlayerParams {
   media: HTMLMediaElement;
   peaks: number[][];
   isPlaying: boolean;
 }
 
-interface IWaveSurferPlayer {
+export interface IWaveSurferPlayer {
   options: Omit<WaveSurferOptions, 'container'>;
   onPlay?: (params: IWaveSurferPlayerParams) => void;
   onReady?: (params: IWaveSurferPlayerParams & { duration: number }) => void;
@@ -89,7 +89,7 @@ const WaveSurfer = memo(
         <div
           id="wave-surfer-container"
           ref={waveSurferContainerRef}
-          style={{ minWidth: '200px' }}
+          style={{ minWidth: '100%' }}
         />
       );
     },
