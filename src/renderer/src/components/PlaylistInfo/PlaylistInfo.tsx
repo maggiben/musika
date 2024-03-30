@@ -10,6 +10,7 @@ import { FaPlay, FaCloudDownloadAlt, FaPencilAlt, FaStop } from 'react-icons/fa'
 import { BsShuffle, BsThreeDots, BsFilter, BsChevronDown } from 'react-icons/bs';
 import { SpaceRight } from '../Spacing/Spacing';
 import { DarwinButton, CircularButton, DarwinInputSearch, ContextMenuButton } from '../Form/Form';
+import { SchedulerChannels } from '@shared/rpc-channels';
 import { IPlaylistItem, IPlaylistSortOptions } from 'types/types';
 
 const PlaylistInfoContainer = styled.div`
@@ -126,13 +127,13 @@ const PlaylistInfo = (): JSX.Element => {
     if (selectedItems) {
       setIsDownloading(true);
       await window.commands.download(selectedItems);
-      window.electron.ipcRenderer.once('finished', () => setIsDownloading(false));
+      window.electron.ipcRenderer.once(SchedulerChannels.FINISHED, () => setIsDownloading(false));
     }
   };
 
   const stopDownloads = async (): Promise<void> => {
     setIsDownloading(false);
-    window.electron.ipcRenderer.send('stop-downloads', {});
+    window.electron.ipcRenderer.send(SchedulerChannels.STOP, {});
   };
 
   useContextMenu<ISortOrderContextMenuMessage>(

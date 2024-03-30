@@ -1,5 +1,6 @@
-import type { IpcRendererEvent } from 'electron';
 import { useEffect, DependencyList } from 'react';
+import { IpcChannels } from '@shared/rpc-channels';
+import type { IpcRendererEvent } from 'electron';
 
 const useContextMenu = <T>(
   callback: (message: T) => void,
@@ -14,7 +15,7 @@ const useContextMenu = <T>(
   };
   useEffect(() => {
     const removeListener = window.electron.ipcRenderer.on(
-      'context-menu-click',
+      IpcChannels.APP_CONTEXT_MENU_CLICK,
       handleContextMenuClick,
     );
     return () => {

@@ -16,6 +16,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { IconContext } from 'react-icons';
 import { LuInspect } from 'react-icons/lu';
 import i18n from './utils/i18n';
+import { IpcChannels } from '@shared/rpc-channels';
 import { IPlaylistItem, IPlaylistSortOptions } from 'types/types';
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
@@ -44,7 +45,7 @@ export const applicationMenu = (
               id: 'menu.app.file.new.playlist',
               accelerator: 'CmdOrCtrl+N',
               click: async ({ id }: Electron.MenuItem) =>
-                mainWindow?.webContents.send('menu-click', { id }),
+                mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, { id }),
             },
             {
               label: 'Playlist from Selection',
@@ -52,7 +53,7 @@ export const applicationMenu = (
               enabled: false,
               accelerator: 'CmdOrCtrl+Shift+N',
               click: async ({ id }: Electron.MenuItem) =>
-                mainWindow?.webContents.send('menu-click', { id }),
+                mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, { id }),
             },
           ],
         },
@@ -72,7 +73,7 @@ export const applicationMenu = (
             });
             if (!openResult.canceled) {
               const { filePaths } = openResult;
-              mainWindow?.webContents.send('menu-click', { id, filePaths });
+              mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, { id, filePaths });
             }
           },
         },
@@ -81,7 +82,7 @@ export const applicationMenu = (
           id: 'menu.app.file.open-url',
           accelerator: 'CmdOrCtrl+U',
           click: async ({ id }: Electron.MenuItem) =>
-            mainWindow?.webContents.send('menu-click', { id }),
+            mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, { id }),
         },
         { type: 'separator' },
         {
@@ -89,7 +90,7 @@ export const applicationMenu = (
           id: 'menu.app.file.save',
           accelerator: 'CmdOrCtrl+S',
           click: async ({ id }: Electron.MenuItem) =>
-            mainWindow?.webContents.send('menu-click', { id }),
+            mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, { id }),
         },
         {
           label: 'Save As',
@@ -103,7 +104,7 @@ export const applicationMenu = (
             });
             if (!saveResult.canceled) {
               const { filePath } = saveResult;
-              mainWindow?.webContents.send('menu-click', { id, filePath });
+              mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, { id, filePath });
             }
           },
         },
@@ -173,7 +174,9 @@ export const applicationMenu = (
           label: i18n.t('menu.app.preferences'),
           accelerator: 'CmdOrCtrl+,',
           click: async () =>
-            mainWindow?.webContents.send('menu-click', { id: 'menu.app.preferences' }),
+            mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, {
+              id: 'menu.app.preferences',
+            }),
         },
         { type: 'separator' },
         { role: 'services', submenu: [] },
@@ -247,7 +250,7 @@ export const contextMenu = async (
       id: 'contextmenu.playlist-item.get-media-info',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        window?.webContents.send('context-menu-click', { id: menuItem.id, options });
+        window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, { id: menuItem.id, options });
       },
     },
     { type: 'separator' },
@@ -256,7 +259,7 @@ export const contextMenu = async (
       id: 'contextmenu.playlist-item.copy-link',
       click: async (menuItem: Electron.MenuItem) => {
         console.log('menu click !', menuItem);
-        window?.webContents.send('context-menu-click', { id: menuItem.id, options });
+        window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, { id: menuItem.id, options });
         options && clipboard.writeText(item.url as string);
       },
     },
@@ -272,7 +275,7 @@ export const contextMenu = async (
       ) => {
         console.log('open browser', item.url);
         await shell.openExternal(item.url);
-        window?.webContents.send('context-menu-click', { id, options });
+        window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, { id, options });
       },
     },
   ];
@@ -284,7 +287,7 @@ export const contextMenu = async (
       checked: sortOptions.filter === 'all',
       id: 'contextmenu.playlist-sort.filter-all',
       click: async ({ id, checked, type }: Electron.MenuItem) =>
-        window?.webContents.send('context-menu-click', {
+        window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
           id,
           checked,
           type,
@@ -301,7 +304,7 @@ export const contextMenu = async (
       checked: sortOptions.filter === 'favorites',
       id: 'contextmenu.playlist-sort.filter-favorites',
       click: async ({ id, checked, type }: Electron.MenuItem) =>
-        window?.webContents.send('context-menu-click', {
+        window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
           id,
           checked,
           type,
@@ -322,7 +325,7 @@ export const contextMenu = async (
           checked: sortOptions.criteria === 'default',
           id: 'contextmenu.playlist-sort.criteria-default',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -339,7 +342,7 @@ export const contextMenu = async (
           checked: sortOptions.criteria === 'title',
           id: 'contextmenu.playlist-sort.criteria-title',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -356,7 +359,7 @@ export const contextMenu = async (
           checked: sortOptions.criteria === 'author',
           id: 'contextmenu.playlist-sort.criteria-author',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -373,7 +376,7 @@ export const contextMenu = async (
           checked: sortOptions.criteria === 'genere',
           id: 'contextmenu.playlist-sort.criteria-genere',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -390,7 +393,7 @@ export const contextMenu = async (
           checked: sortOptions.criteria === 'year',
           id: 'contextmenu.playlist-sort.criteria-year',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -407,7 +410,7 @@ export const contextMenu = async (
           checked: sortOptions.criteria === 'time',
           id: 'contextmenu.playlist-sort.criteria-time',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -425,7 +428,7 @@ export const contextMenu = async (
           checked: sortOptions.order === 'ascending',
           id: 'contextmenu.playlist-sort.ascending',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -442,7 +445,7 @@ export const contextMenu = async (
           checked: sortOptions.order === 'descending',
           id: 'contextmenu.playlist-sort.descending',
           click: async ({ id, checked, type }: Electron.MenuItem) =>
-            window?.webContents.send('context-menu-click', {
+            window?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
               id,
               checked,
               type,
@@ -492,7 +495,9 @@ export const contextMenu = async (
           if (window?.webContents.isDevToolsOpened()) {
             window?.webContents?.devToolsWebContents?.focus();
           }
-          mainWindow?.webContents.send('context-menu-click', { id: 'contextmenu.open-link' });
+          mainWindow?.webContents.send(IpcChannels.APP_CONTEXT_MENU_CLICK, {
+            id: 'contextmenu.open-link',
+          });
           return;
         },
       },

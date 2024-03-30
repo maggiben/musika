@@ -4,11 +4,7 @@
     "electron.vite.config.*",
     "package.json",
     "src/main/*",
-    "src/main/commands/*",
-    "src/preload/*",
-    "src/main/workers/worker-simple.ts",
     "src/shared/*",
-    "src/shared/lib/*",
     "src/main/utils/*",
     "src/main/workers/*",
     "src/types/*",
@@ -29,9 +25,9 @@
     "baseUrl": ".",
     "paths": {
       "@main/*": ["src/main/*"],
-      "types/*": ["src/types/*"],
+      "@renderer/*": ["src/renderer/*"],
       "@shared/*": ["src/shared/*"],
-      "@locale/*": ["src/shared/locale/*"],
+      "types/*": ["src/types/*"],
       "@pjson": ["package.json"],
     }
   }

@@ -117,6 +117,16 @@ export interface ISchedulerWorkerOptions extends WorkerOptions {
   encode?: ISchedulerOptions['encode'];
 }
 
+export const SchedulerChannels = {
+  STOP: 'STOP',
+  RETRY: 'RETRY',
+  FINISHED: 'FINISHED',
+  PLAYLISTI_ITEMS: 'PLAYLISTI_ITEMS',
+  WORKER_ERROR: 'WORKER_ERROR',
+  WORKER_ONLINE: 'WORKER_ONLINE',
+  WORKER_EXIT: 'WORKER_EXIT',
+};
+
 /*
   blender playlist: https://www.youtube.com/playlist?list=PL6B3937A5D230E335
   live items playlist: https://www.youtube.com/watch?v=5qap5aO4i9A&list=RDLV5qap5aO4i9A&start_radio=1&rv=5qap5aO4i9A&t=15666341
@@ -157,11 +167,14 @@ export class Scheduler extends EventEmitter {
       const playlist = await ytpl(this.playlistId, this.playlistOptions);
       this.playlistItems = playlist.items as unknown as IPlaylistItem[];
       console.log('items: ', this.playlistItems?.length);
-      this.emit('playlistItems', { source: playlist, details: { playlistItems: playlist.items } });
+      this.emit(SchedulerChannels.PLAYLISTI_ITEMS, {
+        source: playlist,
+        details: { playlistItems: playlist.items },
+      });
       return this.scheduler(this.playlistItems);
     } else if (this.playlistItems) {
       console.log('items: ', this.playlistItems?.length);
-      this.emit('playlistItems', {
+      this.emit(SchedulerChannels.PLAYLISTI_ITEMS, {
         source: this.playlistItems,
         details: { playlistItems: this.playlistItems },
       });
@@ -174,7 +187,7 @@ export class Scheduler extends EventEmitter {
    * Stops the task scheduler and any running taks.
    */
   public async stop(): Promise<void> {
-    this.emit('stop');
+    this.emit(SchedulerChannels.STOP);
   }
 
   /*
@@ -191,8 +204,8 @@ export class Scheduler extends EventEmitter {
     )) {
       results.push(result);
     }
-    this.emit('finished', {
-      type: 'finished',
+    this.emit(SchedulerChannels.FINISHED, {
+      type: SchedulerChannels.FINISHED,
       details: results,
     });
     return results;
@@ -262,7 +275,7 @@ export class Scheduler extends EventEmitter {
     // Each worker is an async generator that polls for tasks
     // from the shared iterator.
     // Sharing the iterator ensures that each worker gets unique tasks.
-    this.once('stop', () => (stop = true));
+    this.once(SchedulerChannels.STOP, () => (stop = true));
     const workers = new Array(maxConcurrency) as Array<AsyncIterator<T>>;
     for (let i = 0; i < maxConcurrency; i++) {
       workers[i] = (async function* (): AsyncIterator<T, void, unknown> {
@@ -297,7 +310,7 @@ export class Scheduler extends EventEmitter {
     const retryItem = this.retryItems.get(item.id);
     if (retryItem && retryItem.left > 0) {
       try {
-        this.emit('retry', {
+        this.emit(SchedulerChannels.RETRY, {
           source: item,
           details: {
             left: retryItem.left,
@@ -318,7 +331,7 @@ export class Scheduler extends EventEmitter {
     if (!worker) return;
     const code = await worker.terminate();
     this.workers.delete(item.id);
-    this.emit('workerTerminated', {
+    this.emit(SchedulerChannels.WORKER_EXIT, {
       source: item,
       details: {
         code,
@@ -358,7 +371,7 @@ export class Scheduler extends EventEmitter {
       this.emit(message.type, message);
     };
     const onExit = (code: number): void => {
-      this.emit('exit', { source: item, details: { code } });
+      this.emit(SchedulerChannels.WORKER_EXIT, { source: item, details: { code } });
       if (code !== 0) {
         this.retryDownloadWorker<T>(item)
           .then(resolve)
@@ -372,27 +385,25 @@ export class Scheduler extends EventEmitter {
       }
     };
     worker.on('message', onMessageHandler);
-    worker.once('online', () => this.emit('online', { source: item }));
+    worker.once('online', () => this.emit(SchedulerChannels.WORKER_ONLINE, { source: item }));
     worker.once('exit', onExit);
     worker.once('error', (error) => {
       /* Remove listeners */
       worker.off('message', onMessageHandler);
       worker.off('exit', onExit);
-      this.emit('error', { source: item, error });
+      this.emit(SchedulerChannels.WORKER_ERROR, { source: item, error });
       /* retry if error */
       this.retryDownloadWorker<T>(item)
         .then(resolve)
         .catch(() => reject(error));
     });
     /* terminate this worker */
-    this.once('stop', () => {
+    this.once(SchedulerChannels.STOP, async () => {
       worker.off('message', onMessageHandler);
       worker.off('exit', onExit);
-      worker.terminate();
-      worker.once('exit', (code: number) => {
-        this.emit('exit', { source: item, details: { code } });
-        reject(new Error(`Worker id: ${item.id} exited with code ${code}`));
-      });
+      const code = await worker.terminate();
+      this.emit(SchedulerChannels.WORKER_EXIT, { source: item, details: { code } });
+      reject(new Error(`Worker id: ${item.id} exited with code ${code}`));
     });
   }
 }

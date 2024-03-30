@@ -87,6 +87,16 @@ export interface IDownloadWorkerMessage {
   details: Record<string, unknown>;
 }
 
+export const DownloadWorkerChannels = {
+  END: 'END',
+  TIMEOUT: 'TIMEOUT',
+  PROGRESS: 'PROGRESS',
+  INFO: 'INFO',
+  VIDEO_INFO: 'VIDEO_INFO',
+  ENCODING_ERROR: 'ENCODING_ERROR',
+  CONTENT_LENGTH: 'CONTENT_LENGTH',
+};
+
 export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private downloadStream!: Readable;
   private parentPort: MessagePort;
@@ -164,7 +174,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   /**
    * Worker download simulator
    */
-  private async downloadTest(delay: number = 250): Promise<void> {
+  public async downloadTest(delay: number = 250): Promise<void> {
     return new Promise<void>((resolve) => {
       let percentage = 0;
       const interval = setInterval(() => {
@@ -172,7 +182,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         percentage += increment;
         if (percentage >= 100) {
           this.parentPort.postMessage({
-            type: 'end',
+            type: DownloadWorkerChannels.END,
             source: this.item,
             details: {},
           });
@@ -182,7 +192,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
           throw new Error('caca');
         } else {
           this.parentPort.postMessage({
-            type: 'progress',
+            type: DownloadWorkerChannels.PROGRESS,
             source: this.item,
             details: {
               progress: {
@@ -203,7 +213,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   > {
     const videoInfo = await this.getVideoInfo();
     this.parentPort.postMessage({
-      type: 'videoInfo',
+      type: DownloadWorkerChannels.VIDEO_INFO,
       source: this.item,
       details: {
         videoInfo,
@@ -226,7 +236,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         // Send the end event
         if (shouldEnd) {
           this.parentPort.postMessage({
-            type: 'end',
+            type: DownloadWorkerChannels.END,
             source: this.item,
             details: {
               videoInfo: this.videoInfo,
@@ -237,6 +247,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
           ffmpegCommand?.once('end', () => {
             resolve();
           });
+          /* Omit metadata options */
           ffmpegCommand?.once('error', () => {
             resolve();
           });
@@ -267,7 +278,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         }
         /* If making a copy then just emit error */
         this.parentPort.postMessage({
-          type: 'encoding-error',
+          type: DownloadWorkerChannels.ENCODING_ERROR,
           source: this.item,
           error,
         });
@@ -387,7 +398,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private postVideoSize(contentLength: number): void {
     this.contentLength = contentLength;
     this.parentPort.postMessage({
-      type: 'contentLength',
+      type: DownloadWorkerChannels.CONTENT_LENGTH,
       source: this.item,
       details: {
         contentLength,
@@ -409,7 +420,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     this.downloadStream.pipe(progressStream, { end: true });
     progressStream.on('progress', (progress) => {
       this.parentPort.postMessage({
-        type: 'progress',
+        type: DownloadWorkerChannels.PROGRESS,
         source: this.item,
         details: {
           progress,
@@ -481,7 +492,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
         'info',
         (videoInfo: ytdl.videoInfo, videoFormat: ytdl.videoFormat): void => {
           this.parentPort.postMessage({
-            type: 'info',
+            type: DownloadWorkerChannels.INFO,
             source: this.item,
             details: {
               videoInfo,

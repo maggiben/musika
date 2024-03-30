@@ -38,8 +38,9 @@ import ytdl from 'ytdl-core';
 import { BrowserWindow, ipcMain } from 'electron';
 import { Scheduler } from '../utils/Scheduler';
 import { loadPreferences } from '../utils/preferences';
-import type { IDownloadWorkerMessage } from '../utils/DownloadWorker';
-import type { IPlaylistItem } from 'types/types';
+import { DownloadWorkerChannels } from '../utils/DownloadWorker';
+import { SchedulerChannels } from '../utils/Scheduler';
+import type { IDownloadWorkerMessage, IPlaylistItem } from 'types/types';
 
 export default async function download(
   source: string | IPlaylistItem[],
@@ -74,35 +75,36 @@ export default async function download(
       },
     });
     scheduler
-      .on('online', (message: IDownloadWorkerMessage) => {
+      .on(SchedulerChannels.WORKER_ONLINE, (message: IDownloadWorkerMessage) => {
         console.log('worker online:', message.source.id);
+        mainWindow?.webContents.send(SchedulerChannels.WORKER_ONLINE, message);
       })
-      .once('playlistItems', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('playlistItems', message);
+      .once(SchedulerChannels.PLAYLISTI_ITEMS, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(SchedulerChannels.PLAYLISTI_ITEMS, message);
       })
-      .on('contentLength', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('contentLength', message);
+      .on(DownloadWorkerChannels.CONTENT_LENGTH, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(DownloadWorkerChannels.CONTENT_LENGTH, message);
       })
-      .on('finished', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('finished', message);
+      .once(SchedulerChannels.FINISHED, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(SchedulerChannels.FINISHED, message);
       })
-      .on('end', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('end', message);
+      .on(DownloadWorkerChannels.END, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(DownloadWorkerChannels.END, message);
       })
-      .on('timeout', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('timeout', message);
+      .on(DownloadWorkerChannels.TIMEOUT, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(DownloadWorkerChannels.TIMEOUT, message);
       })
-      .on('encoding-error', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('encoding-error', message);
+      .on(DownloadWorkerChannels.ENCODING_ERROR, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(DownloadWorkerChannels.ENCODING_ERROR, message);
       })
-      .on('exit', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('exit', message);
+      .on(SchedulerChannels.WORKER_EXIT, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(SchedulerChannels.WORKER_EXIT, message);
       })
-      .on('progress', (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send('progress', message);
+      .on(DownloadWorkerChannels.PROGRESS, (message: IDownloadWorkerMessage) => {
+        mainWindow?.webContents.send(DownloadWorkerChannels.PROGRESS, message);
       });
     scheduler.download();
-    ipcMain.once('stop-downloads', () => scheduler.stop());
+    ipcMain.once(SchedulerChannels.STOP, () => scheduler.stop());
   }
   return {
     source,

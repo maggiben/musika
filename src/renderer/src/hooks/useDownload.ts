@@ -5,6 +5,7 @@ import type { Progress } from 'progress-stream';
 import type { IDownloadWorkerMessage, ISchedulerMessage, ISchedulerResult } from 'types/types';
 import type { IpcRendererEvent } from 'electron';
 import { useRecoilValue } from 'recoil';
+import { DownloadWorkerChannels, SchedulerChannels } from '@shared/rpc-channels';
 import { preferencesState } from '@renderer/states/atoms';
 
 interface IProgress {
@@ -138,14 +139,23 @@ const useDownload = (): IDownloadStatus => {
     };
 
     const listeners = {
-      playlistItems: window.electron.ipcRenderer.on('playlistItems', playlistItemsListener),
-      contentLength: window.electron.ipcRenderer.on('contentLength', contentLengthListener),
-      finished: window.electron.ipcRenderer.on('finished', finishedListener),
-      end: window.electron.ipcRenderer.on('end', endListener),
-      timeout: window.electron.ipcRenderer.on('timeout', timeoutListener),
-      exit: window.electron.ipcRenderer.on('exit', exitListener),
-      'encoding-error': window.electron.ipcRenderer.on('encoding-error', encodingErrorListener),
-      progress: window.electron.ipcRenderer.on('progress', progressListener),
+      playlistItems: window.electron.ipcRenderer.on(
+        SchedulerChannels.PLAYLISTI_ITEMS,
+        playlistItemsListener,
+      ),
+      contentLength: window.electron.ipcRenderer.on(
+        DownloadWorkerChannels.CONTENT_LENGTH,
+        contentLengthListener,
+      ),
+      finished: window.electron.ipcRenderer.on(SchedulerChannels.FINISHED, finishedListener),
+      end: window.electron.ipcRenderer.on(DownloadWorkerChannels.END, endListener),
+      timeout: window.electron.ipcRenderer.on(DownloadWorkerChannels.TIMEOUT, timeoutListener),
+      exit: window.electron.ipcRenderer.on(SchedulerChannels.WORKER_EXIT, exitListener),
+      'encoding-error': window.electron.ipcRenderer.on(
+        DownloadWorkerChannels.ENCODING_ERROR,
+        encodingErrorListener,
+      ),
+      progress: window.electron.ipcRenderer.on(DownloadWorkerChannels.PROGRESS, progressListener),
     };
 
     return () => {
