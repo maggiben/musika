@@ -3,7 +3,7 @@ import List from '@components/List/List';
 import PlayerControls from '@components/PlayerControls/PlayerControls';
 import PlaylistInfo from '@components/PlaylistInfo/PlaylistInfo';
 import WaveSurferPlayer from '@components/WaveSurferPlayer/WaveSurferPlayer';
-import song from '../../../../../test.mp3';
+// import song from '../../../../../test.mp3';
 
 const PlaylistContainer = styled.div`
   max-height: 100vh;
@@ -20,6 +20,7 @@ const ListContainer = styled.div`
 
 const Playlist = (): JSX.Element => {
   // https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4
+  const song = window.library.parseUri('/Users/bmaggi/Downloads/find-my-baby.mp3');
   return (
     <PlaylistContainer>
       <PlayerControls />

@@ -23,6 +23,10 @@ export declare global {
       getChannel: (id: string, prop: string, ...args: unknown[]) => Promise<unknown>;
       getPlaylist: (id: string, prop: string, ...args: unknown[]) => Promise<unknown>;
     };
+    library: {
+      showFileInFolder: (filePath: string) => void;
+      parseUri: (uri: string) => string;
+    };
     commands: {
       dialogs: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
       getVideoInfo: (url: string) => Promise<Record<string, unknown>>;

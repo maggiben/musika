@@ -43,7 +43,9 @@ class Player {
 
   async play() {
     if (!this.audio.src) {
-      this.audio.src = 'file:///Users/bmaggi/Downloads/Natural%20Blues.%20Moby-.mp3';
+      const src = window.library.parseUri('/Users/bmaggi/Downloads/find-my-baby.mp3');
+      console.log('play: ', src);
+      this.audio.src = src; //'file:///Users/bmaggi/Downloads/Natural%20Blues.%20Moby-.mp3';
       // throw new Error('Trying to play a track but not audio.src is defined');
     }
 
