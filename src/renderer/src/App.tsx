@@ -1,5 +1,5 @@
 import '@assets/styles/App.css';
-import { useEffect, Suspense } from 'react';
+import { Suspense } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
@@ -11,7 +11,6 @@ import {
   useRecoilValue,
 } from 'recoil';
 import { preferencesState, playlistState } from '@states/atoms';
-import type { IpcRendererEvent } from 'electron';
 import SideBar from '@components/SideBar/SideBar';
 import Main from '@containers/main/Main';
 import { defaultTheme } from '@assets/themes';
@@ -43,36 +42,6 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   const [preferences, setPreferences] = useRecoilState(preferencesState);
   const { playlist } = useRecoilValue(playlistState);
   const resetPlaylistState = useResetRecoilState(playlistState);
-  const handleMenuClick = async (
-    _event: IpcRendererEvent,
-    message: { id: string; options?: Record<string, unknown> },
-  ): Promise<void> => {
-    console.log('handleMenuClick called', message);
-    switch (message?.id) {
-      case 'menu.app.preferences':
-        console.log('menu.app.preferences');
-        await window.commands.modal('preferences', { width: 520, height: 480 });
-        window.electron.ipcRenderer.once('sync-preferences', async () => {
-          console.log('sync pref');
-          // const newPreferences = await window.preferences.loadPreferences();
-          // // Update Language
-          // preferences?.behaviour?.language !== newPreferences?.behaviour?.language &&
-          //   i18n.changeLanguage(newPreferences?.behaviour?.language);
-          // setPreferences(structuredClone(newPreferences));
-        });
-        break;
-      case 'menu.app.file.new.playlist':
-        console.log('menu.app.file.new.playlist');
-        await window.commands.modal('new-playlist', { width: 420, height: 580 });
-        break;
-      case 'menu.app.file.open-url':
-        console.log('menu.app.file.open-url', message);
-        await window.commands.modal('open-url', { width: 480, height: 240, ...message.options });
-        break;
-      default:
-        break;
-    }
-  };
 
   const asyncSearch = useRecoilCallback(({ set, snapshot }) => async (url: string) => {
     try {
@@ -148,6 +117,24 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     ['open-url', 'preferences', 'new-playlist'],
   );
 
+  useMainMenu(
+    () => window.commands.modal('new-playlist', { width: 420, height: 580, resizable: false }),
+    'menu.app.file.new.playlist',
+    [],
+  );
+
+  useMainMenu(
+    () => window.commands.modal('preferences', { width: 520, height: 480, resizable: false }),
+    'menu.app.preferences',
+    [],
+  );
+
+  useMainMenu(
+    () => window.commands.modal('open-url', { width: 480, height: 240, resizable: false }),
+    'menu.app.file.open-url',
+    [],
+  );
+
   useMainMenu<{ filePath: string }>(
     async ({ filePath }) => {
       if (!playlist) {
@@ -174,16 +161,6 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
     'menu.app.file.save-as',
     [playlist],
   );
-
-  useEffect(() => {
-    // Add event listener for menu bar clicks
-    const removeMenuClickListener = window.electron.ipcRenderer.on('menu-click', handleMenuClick);
-    // Remove event listener on cleanup
-    return () => {
-      removeMenuClickListener();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const currentTheme = {
     ...defaultTheme,

@@ -173,10 +173,9 @@ export const applicationMenu = (
         {
           label: i18n.t('menu.app.preferences'),
           accelerator: 'CmdOrCtrl+,',
-          click: async () =>
-            mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, {
-              id: 'menu.app.preferences',
-            }),
+          id: 'menu.app.preferences',
+          click: async ({ id }: Electron.MenuItem) =>
+            mainWindow?.webContents.send(IpcChannels.APP_MAIN_MENU_CLICK, { id }),
         },
         { type: 'separator' },
         { role: 'services', submenu: [] },
