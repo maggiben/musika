@@ -14,7 +14,7 @@ export const playlistSelector = selector({
     const preferences = get(preferencesSelector);
     const selected = preferences.behaviour.sideBar.selected;
     const list = preferences.playlists.find(({ id }) => id === selected);
-    const playlist = list?.filePath && (await window.playlist.loadPlaylist(list.filePath));
+    const playlist = list?.filePath ? await window.playlist.loadPlaylist(list.filePath) : list;
     return {
       sortOptions: {
         filter: 'all' as const,
@@ -71,6 +71,7 @@ export const selectedItemsSelector = selector({
   },
   set: ({ get, set }, newVal) => {
     const { playlist, ...state } = get(playlistState);
+    console.log('setting all selected', newVal);
     if (!playlist) return;
     set(playlistState, {
       ...state,

@@ -69,7 +69,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         ...oldPlaylistState,
         playlist,
       });
-      set(preferencesState, {
+      const newPreferences = {
         ...oldPreferencesState,
         behaviour: {
           ...oldPreferencesState.behaviour,
@@ -79,7 +79,9 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
           },
         },
         playlists: [...oldPreferencesState.playlists, playlist],
-      });
+      };
+      await window.preferences.savePreferences(newPreferences);
+      set(preferencesState, newPreferences);
     } catch (error) {
       console.error(error);
     }
