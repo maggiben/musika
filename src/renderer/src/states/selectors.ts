@@ -1,5 +1,5 @@
-import { selector } from 'recoil';
-import { playlistState } from './atoms';
+import { selector, DefaultValue } from 'recoil';
+import { playlistState, preferencesState } from './atoms';
 import { debounce } from '@shared/lib/utils';
 import type { IPreferences, IChannel } from 'types/types';
 
@@ -71,7 +71,6 @@ export const selectedItemsSelector = selector({
   },
   set: ({ get, set }, newVal) => {
     const { playlist, ...state } = get(playlistState);
-    console.log('setting all selected', newVal);
     if (!playlist) return;
     set(playlistState, {
       ...state,
@@ -80,5 +79,33 @@ export const selectedItemsSelector = selector({
         items: playlist.items.map((item, index) => ({ ...item, selected: newVal[index] })),
       },
     });
+  },
+});
+
+export const sideBarSelector = selector({
+  key: 'sideBarSelector',
+  get: ({ get }) => {
+    const preferences = get(preferencesState);
+    return preferences.behaviour.sideBar.selected;
+  },
+  set: ({ get, set }, newVal) => {
+    const preferences = get(preferencesState);
+    if (newVal instanceof DefaultValue) {
+      const defaultValue = get(preferencesSelector);
+      // Reset to default value if DefaultValue is provided
+      set(preferencesState, defaultValue);
+    } else {
+      const newPreferences = {
+        ...preferences,
+        behaviour: {
+          ...preferences.behaviour,
+          sideBar: {
+            ...preferences.behaviour.sideBar,
+            selected: newVal,
+          },
+        },
+      };
+      set(preferencesState, newPreferences);
+    }
   },
 });

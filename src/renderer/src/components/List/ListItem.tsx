@@ -1,6 +1,7 @@
 import React from 'react';
 import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import { padZeroes } from '@shared/lib/utils';
 import * as utils from '@shared/lib/utils';
 import { BsThreeDots } from 'react-icons/bs';
@@ -160,75 +161,72 @@ interface IListItemProps {
   progress: number[];
   handleItemSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
-export const ListItem = ({
-  item,
-  index,
-  total,
-  progress,
-  handleItemSelect,
-}: IListItemProps): JSX.Element | null => {
-  const songIndex = padZeroes(index + 1, total.toString().split('').length);
-  const duration =
-    typeof item.duration === 'string'
-      ? utils.timeStringToSeconds(item.duration)
-      : item.duration ?? 0;
-  return (
-    <ListItemWrapper key={`${item.id}:${index}`} $progress={progress}>
-      <ListBack data-testid="list-item-back">
-        <div
-          style={{
-            userSelect: 'none',
-            visibility: 'hidden',
-          }}
-        />
-        <SongIndex>{songIndex}</SongIndex>
-        <span>·</span>
-        <span>
-          <SongName>{item.title}</SongName>
-        </span>
-        <Stars stars={3} />
-        <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
-        <span>
-          <ClearButton>
-            <BsThreeDots />
-          </ClearButton>
-        </span>
-      </ListBack>
-      <ListFront $progress={progress} data-testid="list-item-front">
-        <input
-          type="checkbox"
-          id={`${item.id}:${index}`}
-          data-item-selector={`${item.id}:${index}`}
-          defaultChecked={item.selected}
-          onChange={handleItemSelect}
-        />
-        <SongIndex>{songIndex}</SongIndex>
-        <span>·</span>
-        <span>
-          <SongName>{item.title}</SongName>
-        </span>
-        <Stars stars={3} />
-        <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
-        <span>
-          <ClearButton
-            onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
-              const { clientX, clientY } = event;
-              await window.commands.contextMenu('playlist-item', {
-                item,
-                x: clientX,
-                y: clientY,
-              });
+export const ListItem = React.memo(
+  ({ item, index, total, progress, handleItemSelect }: IListItemProps): JSX.Element | null => {
+    const songIndex = padZeroes(index + 1, total.toString().split('').length);
+    const duration =
+      typeof item.duration === 'string'
+        ? utils.timeStringToSeconds(item.duration)
+        : item.duration ?? 0;
+    return (
+      <ListItemWrapper key={`${item.id}:${index}`} $progress={progress}>
+        <ListBack data-testid="list-item-back">
+          <div
+            style={{
+              userSelect: 'none',
+              visibility: 'hidden',
             }}
-          >
-            <BsThreeDots />
-          </ClearButton>
-        </span>
-      </ListFront>
-    </ListItemWrapper>
-  );
-};
+          />
+          <SongIndex>{songIndex}</SongIndex>
+          <span>·</span>
+          <span>
+            <SongName>{item.title}</SongName>
+          </span>
+          <Stars stars={3} />
+          <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
+          <span>
+            <ClearButton>
+              <BsThreeDots />
+            </ClearButton>
+          </span>
+        </ListBack>
+        <ListFront $progress={progress} data-testid="list-item-front">
+          <input
+            type="checkbox"
+            id={`${item.id}:${index}`}
+            data-item-selector={`${item.id}:${index}`}
+            defaultChecked={item.selected}
+            onChange={handleItemSelect}
+          />
+          <SongIndex>{songIndex}</SongIndex>
+          <span>·</span>
+          <span>
+            <SongName>{item.title}</SongName>
+          </span>
+          <Stars stars={3} />
+          <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
+          <span>
+            <ClearButton
+              onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
+                const { clientX, clientY } = event;
+                await window.commands.contextMenu('playlist-item', {
+                  item,
+                  x: clientX,
+                  y: clientY,
+                });
+              }}
+            >
+              <BsThreeDots />
+            </ClearButton>
+          </span>
+        </ListFront>
+      </ListItemWrapper>
+    );
+  },
+);
 
 export const ListHeader = (): JSX.Element => {
+  const { t } = useTranslation();
   return (
     <StyledListItem>
       <ListBack data-testid="list-header">
@@ -236,10 +234,10 @@ export const ListHeader = (): JSX.Element => {
         <SpaceRight size="l" />
         <SpaceRight size="s" />
         <span>
-          <SongName>Title</SongName>
+          <SongName>{t('title')}</SongName>
         </span>
-        <span style={{ textAlign: 'left' }}>Rating</span>
-        <SongDuration style={{ fontFamily: 'inherit' }}>Duration</SongDuration>
+        <span style={{ textAlign: 'left' }}>{t('rating')}</span>
+        <SongDuration style={{ fontFamily: 'inherit' }}>{t('duration')}</SongDuration>
         <span style={{ visibility: 'hidden' }}>
           <BsThreeDots />
         </span>

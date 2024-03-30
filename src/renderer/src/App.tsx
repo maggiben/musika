@@ -1,5 +1,5 @@
 import '@assets/styles/App.css';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import i18n from '@utils/i18n';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
@@ -18,6 +18,7 @@ import Loading from '@containers/loading/Loading';
 import type ytdl from 'ytdl-core';
 import type ytsr from '@distube/ytsr';
 import type { IPlaylist } from 'types/types';
+import { isObjectEqual } from '@shared/lib/utils';
 import useModal from '@hooks/useModal';
 import useMainMenu from '@hooks/useMainMenu';
 
@@ -40,8 +41,16 @@ const Container = styled.div`
 const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   const { i18n } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const preferencesRef = useRef(preferences);
   const { playlist } = useRecoilValue(playlistState);
   const resetPlaylistState = useResetRecoilState(playlistState);
+
+  /* Save preferences if changed */
+  useEffect(() => {
+    if (isObjectEqual(preferencesRef.current, preferences)) return;
+    preferencesRef.current = preferences;
+    window.preferences.savePreferences(preferences);
+  }, [preferences]);
 
   const asyncSearch = useRecoilCallback(({ set, snapshot }) => async (url: string) => {
     try {

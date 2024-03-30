@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import { playlistState, preferencesState } from '@renderer/states/atoms';
+import { playlistState, preferencesState } from '@states/atoms';
+import { sideBarSelector } from '@states/selectors';
 import { TbPlaylist } from 'react-icons/tb';
 import { BsClock, BsHandThumbsUp } from 'react-icons/bs';
 import { MdApps } from 'react-icons/md';
@@ -118,20 +119,12 @@ interface ISideBarItem {
 const SideBar = (): JSX.Element => {
   const { t } = useTranslation();
   const [, setPlaylist] = useRecoilState(playlistState);
-  const [preferences, setPreferences] = useRecoilState(preferencesState);
+  const [sideBarSelectedItem, setSideBarSelectedItem] = useRecoilState(sideBarSelector);
+  const preferences = useRecoilValue(preferencesState);
 
   const setSelected = (id: string): void => {
     const selected = id.split(':').slice(1, 2).pop();
-    setPreferences((prev) => ({
-      ...prev,
-      behaviour: {
-        ...prev.behaviour,
-        sideBar: {
-          ...prev.behaviour.sideBar,
-          selected,
-        },
-      },
-    }));
+    setSideBarSelectedItem(selected);
   };
 
   const onPlaylistSelect =
@@ -140,8 +133,8 @@ const SideBar = (): JSX.Element => {
       if (!checked) return;
       const { filePath } = playlist;
       if (filePath) {
-        const playlist = await window.playlist.loadPlaylist(filePath);
-        setPlaylist((prev) => ({ ...prev, playlist }));
+        const localPlaylist = await window.playlist.loadPlaylist(filePath);
+        setPlaylist((prev) => ({ ...prev, playlist: localPlaylist ?? playlist }));
       } else if (playlist.url) {
         setPlaylist((prev) => ({ ...prev, playlist: playlist as IPlaylist }));
       }
@@ -243,7 +236,7 @@ const SideBar = (): JSX.Element => {
                   <StyledListItem key={`${item.id}-${index}`}>
                     <StyledInputRadio
                       id={`item:${item.id}:${index}`}
-                      checked={preferences.behaviour.sideBar?.selected === item.id}
+                      checked={sideBarSelectedItem === item.id}
                       type="radio"
                       name={`sidebar-menu-item`}
                       onChange={item.onChange}
