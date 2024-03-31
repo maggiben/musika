@@ -182,6 +182,12 @@ export const ListItem = React.memo(
         : item.duration ?? 0;
 
     const onItemClick = (item: IPlaylistItem): void => {
+      if (!item.id || track?.id == item.id) return;
+      setTrack(item);
+    };
+    const onItemDoubleClick = (item: IPlaylistItem): void => {
+      /* TODO: autoplay when double click */
+      if (!item.id || track?.id == item.id) return;
       setTrack(item);
     };
 
@@ -190,8 +196,8 @@ export const ListItem = React.memo(
         key={`${item.id}:${index}`}
         $progress={progress}
         $clicked={track?.id === item.id}
-        data-item-clicked={`${track?.id === item.id ? 'true' : 'false'}`}
         onClick={() => onItemClick(item)}
+        onDoubleClick={() => onItemDoubleClick(item)}
       >
         <ListBack data-testid="list-item-back">
           <div

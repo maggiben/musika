@@ -167,6 +167,22 @@ export const sideBarSelector = selector({
   },
 });
 
+const getCircularArrayItems = <T>(list: T[], id: string): { prev: T; next: T } | undefined => {
+  const index = list.findIndex((item) => item['id'] === id);
+  if (index === -1) {
+    return; // Item with given id not found
+  }
+
+  const length = list.length;
+  const prevIndex = (index - 1 + length) % length; // Handle negative indexes
+  const nextIndex = (index + 1) % length;
+
+  return {
+    prev: list[prevIndex],
+    next: list[nextIndex],
+  };
+};
+
 export const trackSelector = selector({
   key: 'trackSelector',
   get: async ({ get }): Promise<ITrack | undefined> => {
@@ -181,14 +197,24 @@ export const trackSelector = selector({
     if (newVal instanceof DefaultValue) {
       // Reset to default value if DefaultValue is provided
       set(preferencesState, newVal);
-    } else {
+    } else if (newVal) {
+      const { playlist } = get(playlistState);
+      if (!playlist) return;
+      const { prev, next } = getCircularArrayItems(playlist.items, newVal.id) ?? {
+        prev: undefined,
+        next: undefined,
+      };
       const newPreferences = {
         ...preferences,
         behaviour: {
           ...preferences.behaviour,
           mediaPlayer: {
             ...preferences.behaviour.mediaPlayer,
-            track: newVal,
+            track: {
+              ...newVal,
+              next: next,
+              prev: prev,
+            },
           },
         },
       };
