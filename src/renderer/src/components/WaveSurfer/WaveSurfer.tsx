@@ -8,7 +8,8 @@ import {
   useImperativeHandle,
   Ref,
 } from 'react';
-import { WaveSurferOptions } from 'wavesurfer.js';
+import { WaveSurferOptions, WaveSurferEvents } from 'wavesurfer.js';
+import type { GeneralEventTypes } from 'wavesurfer.js/dist/event-emitter';
 import useWaveSurfer from '@hooks/useWaveSurfer';
 
 export interface IWaveSurferPlayerParams {
@@ -21,6 +22,8 @@ export interface IWaveSurferPlayer {
   options: Omit<WaveSurferOptions, 'container'>;
   onPlay?: (params: IWaveSurferPlayerParams) => void;
   onReady?: (params: IWaveSurferPlayerParams & { duration: number }) => void;
+  onFinish?: (params: IWaveSurferPlayerParams) => void;
+  onError?: (error: unknown) => void;
 }
 
 export type TWaveSurferListener =
@@ -36,7 +39,7 @@ const WaveSurfer = memo(
         containerRef as RefObject<HTMLElement>,
         props.options as WaveSurferOptions,
       );
-      const { onPlay, onReady } = props;
+      const { onPlay, onReady, onFinish, onError } = props;
 
       useImperativeHandle(
         containerRef,
@@ -44,15 +47,17 @@ const WaveSurfer = memo(
       );
 
       // On play button click
-      const onPlayPause = useCallback((): void => {
-        wavesurfer?.playPause();
-      }, [wavesurfer]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const onPlayPause = useCallback(() => wavesurfer?.playPause(), [wavesurfer]);
 
       const onSetVolume = useCallback(
-        (event: CustomEvent<{ volume: number }>) => {
-          console.log('volume', Math.round(event.detail.volume / 10) / 10);
-          wavesurfer?.setVolume(Math.round(event.detail.volume / 10) / 10);
-        },
+        ({ detail: { volume } }: CustomEvent<{ volume: number }>) =>
+          wavesurfer?.setVolume(Math.round(volume / 10) / 10),
+        [wavesurfer],
+      ) as TWaveSurferListener;
+
+      const onSetMuted = useCallback(
+        ({ muted }: { muted: boolean }) => wavesurfer?.setMuted(muted),
         [wavesurfer],
       ) as TWaveSurferListener;
 
@@ -70,18 +75,36 @@ const WaveSurfer = memo(
           isPlaying: wavesurfer.isPlaying(),
         });
 
-        const subscriptions = [
-          wavesurfer.on('ready', (duration: number) => {
-            onReady && onReady({ ...getPlayerParams(), duration });
-          }),
-          wavesurfer.on('play', () => {
-            onPlay && onPlay(getPlayerParams());
-          }),
-        ];
+        /* WS Events */
+        const subscriptions: { [key: string]: unknown } = {
+          ready: (duration: number) => onReady && onReady({ ...getPlayerParams(), duration }),
+          play: () => onPlay && onPlay(getPlayerParams()),
+          finish: () => onFinish && onFinish(getPlayerParams()),
+          error: (error) => onError && onError(error),
+        };
 
+        /* WS Event Listeners */
+        const wsSubscriptions = Object.entries(subscriptions).map(([event, listener]) => {
+          /* this type was extracted from wavesurfer.js/dist/event-emitter.d.ts which is not exported */
+          type EventListener<
+            EventTypes extends GeneralEventTypes,
+            EventName extends keyof EventTypes,
+          > = (...args: EventTypes[EventName]) => () => void;
+          const eventListener = [
+            event,
+            wavesurfer.on(
+              event as keyof WaveSurferEvents,
+              listener as EventListener<WaveSurferEvents, keyof WaveSurferEvents>,
+            ),
+          ] as [keyof WaveSurferEvents, EventListener<WaveSurferEvents, keyof WaveSurferEvents>];
+          return eventListener;
+        });
+
+        /* Player Events sent though DOM Container */
         const listeners = {
           playPause: onPlayPause,
           setVolume: onSetVolume,
+          setMuted: onSetMuted,
         };
 
         Object.entries(listeners).forEach(
@@ -94,7 +117,11 @@ const WaveSurfer = memo(
         );
 
         return () => {
-          subscriptions.forEach((unsub) => unsub());
+          /* Unsubscribe from WS events */
+          wsSubscriptions.forEach(([, unsub]) => {
+            unsub();
+          });
+          /* Unsubscribe from DOM events */
           Object.entries(listeners).forEach(
             ([event, listener]: [event: unknown, listener: TWaveSurferListener]) => {
               domNode?.removeEventListener(

@@ -116,12 +116,17 @@ const PlayerControls = (): JSX.Element => {
     console.log('ready', params, 'duration', params.duration);
   }, []);
 
+  const onWsFinish = useCallback((): void => {
+    console.log('finishi');
+  }, []);
+
   const WaveSurferPlayer = useMemo(
     () => (
       <WaveSurfer
         ref={waveSurferContainerRef}
         onPlay={onWsPlay}
         onReady={onWsReady}
+        onFinish={onWsFinish}
         options={{
           height: 'auto',
           waveColor: 'gray',

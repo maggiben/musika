@@ -165,7 +165,7 @@ const PlaylistInfo = (): JSX.Element => {
 
   const onPlaylistPlay = useCallback(() => {
     player.play();
-  }, [playlist]);
+  }, []);
 
   return (
     <PlaylistInfoContainer data-testid="playlist-info">

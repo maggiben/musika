@@ -15,8 +15,6 @@ interface PlayerOptions {
  */
 class Player {
   private audio: HTMLAudioElement;
-  private durationThresholdReached: boolean;
-  public threshold: number;
 
   constructor(options?: PlayerOptions) {
     const mergedOptions = {
@@ -36,86 +34,69 @@ class Player {
     this.audio.playbackRate = mergedOptions.playbackRate;
     this.audio.volume = mergedOptions.volume;
     this.audio.muted = mergedOptions.muted;
-
-    this.threshold = 0.75;
-    this.durationThresholdReached = false;
   }
 
-  async play() {
+  async play(): Promise<void> {
     if (!this.audio.src) {
-      const src = window.library.parseUri('/Users/bmaggi/Downloads/find-my-baby.mp3');
-      console.log('play: ', src);
-      this.audio.src = src; //'file:///Users/bmaggi/Downloads/Natural%20Blues.%20Moby-.mp3';
-      // throw new Error('Trying to play a track but not audio.src is defined');
+      throw new Error('Trying to play a track but not audio.src is defined');
     }
 
     await this.audio.play();
   }
 
-  pause() {
+  pause(): void {
+    return this.audio.pause();
+  }
+
+  stop(): void {
     this.audio.pause();
   }
 
-  stop() {
-    this.audio.pause();
-  }
-
-  mute() {
+  mute(): void {
     this.audio.muted = true;
   }
 
-  unmute() {
+  unmute(): void {
     this.audio.muted = false;
   }
 
-  getAudio() {
+  getAudio(): HTMLAudioElement {
     return this.audio;
   }
 
-  getCurrentTime() {
+  getCurrentTime(): number {
     return this.audio.currentTime;
   }
 
-  getVolume() {
+  getVolume(): number {
     return this.audio.volume;
   }
 
-  setVolume(volume: number) {
+  setVolume(volume: number): void {
     this.audio.volume = volume;
   }
 
-  setPlaybackRate(playbackRate: number) {
+  setPlaybackRate(playbackRate: number): void {
     this.audio.playbackRate = playbackRate;
     this.audio.defaultPlaybackRate = playbackRate;
   }
 
-  async setOutputDevice(deviceID: string) {
+  async setOutputDevice(deviceID: string): Promise<void> {
     // eslint-disable-next-line
     // @ts-ignore
     await this.audio.setSinkId(deviceID);
   }
 
-  setCurrentTime(currentTime: number) {
+  setCurrentTime(currentTime: number): void {
     this.audio.currentTime = currentTime;
   }
 
-  isMuted() {
+  isMuted(): boolean {
     return this.audio.muted;
   }
 
-  isPaused() {
+  isPaused(): boolean {
     return this.audio.paused;
-  }
-
-  isThresholdReached() {
-    if (
-      !this.durationThresholdReached &&
-      this.audio.currentTime >= this.audio.duration * this.threshold
-    ) {
-      this.durationThresholdReached = true;
-    }
-
-    return this.durationThresholdReached;
   }
 }
 
