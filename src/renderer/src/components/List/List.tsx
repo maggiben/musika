@@ -34,7 +34,7 @@ const List = (): JSX.Element | null => {
 
   const [{ playlist, sortOptions }] = useRecoilState(playlistState);
   const [, setSelectedItems] = useRecoilState(selectedItemsSelector);
-  const { progress } = useDownload();
+  const { progress } = useDownload([playlist]);
 
   /* for testing */
   // const progress = useFakeProgress({

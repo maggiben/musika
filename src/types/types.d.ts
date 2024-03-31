@@ -3,8 +3,8 @@ import type ytpl from '@distube/ytpl';
 import type ffmpeg from 'fluent-ffmpeg';
 import type { Innertube } from 'youtubei.js';
 export type { ISchedulerResult, ISchedulerMessage } from '@main/utils/Scheduler';
-export type { IDownloadWorkerMessage } from '@main/utils/DownloadWorker';
-import type { ITranscodingOptions } from '@main/utils/EncoderStream';
+export type { IDownloadWorkerMessage } from '@main/lib/DownloadWorker';
+import type { ITranscodingOptions } from '@main/lib/EncoderStream';
 export type { IMenuClickMessage } from '@main/menu';
 
 interface IAnimation {
@@ -84,7 +84,7 @@ export interface IPlaylistItem
 export interface IPlaylist
   extends Omit<
     ytpl.result,
-    'views' | 'items' | 'visibility' | 'last_updated' | 'url' | 'description' | 'author'
+    'views' | 'items' | 'visibility' | 'last_updated' | 'description' | 'author'
   > {
   thumbnail?: {
     height?: number;
@@ -93,7 +93,6 @@ export interface IPlaylist
   };
   visibility?: ytpl.result['visibility'];
   description?: ytpl.result['description'];
-  url: ytpl.result['url'];
   author?: ytpl.result['author'];
   views?: string | number;
   filePath?: string;

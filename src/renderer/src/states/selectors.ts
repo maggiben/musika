@@ -92,6 +92,48 @@ export const selectedItemsSelector = selector({
   },
 });
 
+export const itemsFilePathsSelector = selector({
+  key: 'itemsFilePathsSelector',
+  get: ({ get }) => {
+    const { playlist } = get(playlistState);
+    return playlist ? playlist.items.map((item) => [item.id, item.filePath]) : [];
+  },
+  set: ({ get, set }, newVal) => {
+    if (newVal instanceof DefaultValue) {
+      // Reset to default value if DefaultValue is provided
+      set(playlistState, newVal);
+      set(preferencesState, newVal);
+    } else {
+      newVal.forEach(([itemId, filePath]) => {
+        if (!filePath) return;
+        const { playlist, ...state } = get(playlistState);
+        const preferences = get(preferencesSelector);
+        set(preferencesState, {
+          ...preferences,
+          playlists: preferences.playlists.map((playlist) => ({
+            ...playlist,
+            items: playlist.items.map((item) => ({
+              ...item,
+              filePath: item.id === itemId ? filePath : item.filePath,
+            })),
+          })),
+        });
+        if (!playlist) return;
+        set(playlistState, {
+          ...state,
+          playlist: {
+            ...playlist,
+            items: playlist!.items.map((item) => ({
+              ...item,
+              filePath: item.id === itemId ? filePath : item.filePath,
+            })),
+          },
+        });
+      });
+    }
+  },
+});
+
 export const sideBarSelector = selector({
   key: 'sideBarSelector',
   get: ({ get }) => {
@@ -99,11 +141,11 @@ export const sideBarSelector = selector({
     return preferences.behaviour.sideBar.selected;
   },
   set: ({ get, set }, newVal) => {
-    const preferences = get(preferencesState);
     if (newVal instanceof DefaultValue) {
       // Reset to default value if DefaultValue is provided
       set(preferencesState, newVal);
     } else {
+      const preferences = get(preferencesState);
       const newPreferences = {
         ...preferences,
         behaviour: {

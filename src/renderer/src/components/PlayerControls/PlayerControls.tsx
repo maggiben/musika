@@ -1,11 +1,13 @@
-import { useRef, useState, useCallback, useMemo } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
+import { useRecoilState } from 'recoil';
 import { BsVolumeDownFill } from 'react-icons/bs';
 import { MdSkipPrevious, MdSkipNext, MdPlayArrow, MdPause } from 'react-icons/md';
 import { TiArrowLoop, TiArrowShuffle } from 'react-icons/ti';
 import WaveSurfer, { IWaveSurferPlayerParams } from '@components/WaveSurfer/WaveSurfer';
+import { trackSelector } from '@states/selectors';
 import InputRange from '@components/InputRange/InputRange';
-import { SpaceRight } from '../Spacing/Spacing';
+import { SpaceRight } from '@components/Spacing/Spacing';
 
 const PlayerControlsContainer = styled.div`
   --player-controls-height: 42px;
@@ -72,9 +74,14 @@ const StyledPlayerButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  user-select: none;
   color: ${({ theme }) => theme.colors.lightGray};
-  &:hover {
+  &:hover:not(:disabled) {
     color: ${({ theme }) => theme.colors.white};
+  }
+  &:disabled {
+    color: ${({ theme }) => theme.colors.midGray};
+    cursor: inherit;
   }
 `;
 
@@ -101,12 +108,16 @@ const StyledInputCheck = styled.div`
 `;
 
 const PlayerControls = (): JSX.Element => {
+  const [track, setTrack] = useRecoilState(trackSelector);
   const [isPlaying, setIsPlaying] = useState(false);
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
-  const song = useMemo(
-    () => window.library.parseUri('/Users/bmaggi/Downloads/find-my-baby.mp3'),
-    [],
-  );
+  const song = useMemo(() => track?.filePath && window.library.parseUri(track.filePath), [track]);
+
+  // window.library.parseUri('/Users/bmaggi/Downloads/find-my-baby.mp3')
+
+  useEffect(() => {
+    console.log('track changed:', track, 'song', song);
+  }, [track, song]);
 
   const onWsPlay = useCallback((params: IWaveSurferPlayerParams): void => {
     setIsPlaying(params.isPlaying);
@@ -182,6 +193,7 @@ const PlayerControls = (): JSX.Element => {
             <MdSkipPrevious />
           </StyledPlayerButton>
           <StyledPlayerButton
+            disabled={!song}
             onClick={handlePlayButtonClick}
             style={{ fontSize: '2.25em', lineHeight: '2.25em' }}
           >

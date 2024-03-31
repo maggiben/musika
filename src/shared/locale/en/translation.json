@@ -25,6 +25,8 @@
   "video count_one": "{{total}} video",
   "video count_other": "{{total}} videos",
   "all playlists": "All Alaylists",
+  "duration": "Duration",
+  "rating": "Rating",
   "unsaved playlists": "Unsaved playlists",
   "download complete": "Download Complete",
   "all items done": "All items done",

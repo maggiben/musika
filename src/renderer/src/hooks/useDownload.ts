@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, DependencyList } from 'react';
 import { useTranslation } from 'react-i18next';
 import type ytpl from '@distube/ytpl';
+import type { IpcRendererEvent } from 'electron';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import type { Progress } from 'progress-stream';
 import type { IDownloadWorkerMessage, ISchedulerMessage, ISchedulerResult } from 'types/types';
-import type { IpcRendererEvent } from 'electron';
-import { useRecoilValue } from 'recoil';
 import { DownloadWorkerChannels, SchedulerChannels } from '@shared/rpc-channels';
-import { preferencesState } from '@renderer/states/atoms';
+import { preferencesState } from '@states/atoms';
+import { itemsFilePathsSelector } from '@states/selectors';
 
 interface IProgress {
   [key: string]: number[];
@@ -16,11 +17,12 @@ interface IDownloadStatus {
   finished: boolean;
 }
 
-const useDownload = (): IDownloadStatus => {
+const useDownload = (deps?: DependencyList): IDownloadStatus => {
   const { t } = useTranslation();
   const [progress, setProgress] = useState<IProgress>({});
   const [finished, setFinished] = useState(false);
   const preferences = useRecoilValue(preferencesState);
+  const [itemsFilePaths, setItemsFilePaths] = useRecoilState(itemsFilePathsSelector);
 
   useEffect(() => {
     const notify = async (
@@ -87,11 +89,19 @@ const useDownload = (): IDownloadStatus => {
     };
 
     const endListener = (_event: IpcRendererEvent, message: IDownloadWorkerMessage): void => {
+      console.log('ended: ', message?.source);
       setProgress((prevState) => {
         const newState = { ...prevState };
         delete newState[message?.source?.id];
         return newState;
       });
+
+      const mappedFilePaths = itemsFilePaths.map(([itemId, filePath]) => [
+        itemId,
+        message?.source?.id === itemId ? message?.source?.filePath : filePath,
+      ]);
+
+      setItemsFilePaths(mappedFilePaths);
 
       // notify(t('download complete'), {
       //   body: `${message.source.title} complete !`,
@@ -162,7 +172,7 @@ const useDownload = (): IDownloadStatus => {
       Object.values(listeners).forEach((listener) => listener());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [deps]);
 
   return { progress, finished };
 };

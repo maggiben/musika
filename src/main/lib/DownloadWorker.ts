@@ -38,18 +38,18 @@ import { Readable, Writable } from 'node:stream';
 import path from 'node:path';
 import fs from 'node:fs';
 import ytdl from 'ytdl-core';
-import ytpl from '@distube/ytpl';
 import ProgressStream from 'progress-stream';
 import * as utils from '@shared/lib/utils';
 import { AsyncCreatable } from '@shared/lib/AsyncCreatable';
 import TimeoutStream from '../utils/TimeoutStream';
 import EncoderStream, { EncoderStreamOptions, ITranscodingOptions } from './EncoderStream';
+import type { IPlaylistItem } from 'types/types';
 
 export interface IDownloadWorkerOptions {
   /**
    * Playlist item.
    */
-  item: ytpl.result['items'][number];
+  item: IPlaylistItem;
   /**
    * Output file name
    */
@@ -82,7 +82,7 @@ export interface IDownloadWorkerOptions {
 
 export interface IDownloadWorkerMessage {
   type: string;
-  source: ytpl.result['items'][number];
+  source: IPlaylistItem;
   error: Error;
   details: Record<string, unknown>;
 }
@@ -94,13 +94,14 @@ export const DownloadWorkerChannels = {
   INFO: 'INFO',
   VIDEO_INFO: 'VIDEO_INFO',
   ENCODING_ERROR: 'ENCODING_ERROR',
+  METADATA_ERROR: 'METADATA_ERROR',
   CONTENT_LENGTH: 'CONTENT_LENGTH',
 };
 
 export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
   private downloadStream!: Readable;
   private parentPort: MessagePort;
-  private item: ytpl.result['items'][number];
+  private item: IPlaylistItem;
   private output!: string;
   private savePath: string;
   private timeout: number;
@@ -227,29 +228,38 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
       let downloadEnded = false;
       let outputStreamClosed = false;
       let cloneStreamClosed = false;
+      const sendEndEvent = (): void => {
+        const filePath = this.outputStream.path.toString();
+        this.parentPort.postMessage({
+          type: DownloadWorkerChannels.END,
+          source: { ...this.item, filePath },
+          details: {
+            videoInfo: this.videoInfo,
+            videoFormat: this.videoFormat,
+          },
+        });
+        resolve();
+      };
       const checkClose = async (): Promise<void> => {
         const shouldEnd =
           downloadEnded &&
           outputStreamClosed &&
           (cloneStreamClosed || !this.encode?.enabled || this.encode?.replace);
 
-        // Send the end event
+        /* Downloads and Encoding (if any) have ended, write id3v2 tags and finish */
         if (shouldEnd) {
-          this.parentPort.postMessage({
-            type: DownloadWorkerChannels.END,
-            source: this.item,
-            details: {
-              videoInfo: this.videoInfo,
-              videoFormat: this.videoFormat,
-            },
-          });
+          /* Add id3v2 media tags */
           const ffmpegCommand = await this.encoderStream?.setCoverArt(this.item.thumbnail);
-          ffmpegCommand?.once('end', () => {
-            resolve();
-          });
+          ffmpegCommand?.once('end', sendEndEvent);
           /* Omit metadata options */
-          ffmpegCommand?.once('error', () => {
-            resolve();
+          ffmpegCommand?.once('error', (error) => {
+            /* Gracefully end when error writing id3v2 tags (file is still ok) */
+            this.parentPort.postMessage({
+              type: DownloadWorkerChannels.METADATA_ERROR,
+              source: this.item,
+              error,
+            });
+            return sendEndEvent();
           });
         }
       };
@@ -306,7 +316,6 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     this.onTimeout();
     await this.setVideoOutput();
     await this.onEnd();
-    console.info('download complete!');
     return {
       videoInfo: this.videoInfo,
       videoFormat: this.videoFormat,

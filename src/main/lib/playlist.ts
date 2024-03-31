@@ -3,14 +3,15 @@ import { M3uPlaylist, M3uMedia, M3uParser } from 'm3u-parser-generator';
 import type { IPlaylist } from 'types/types';
 import { timeStringToSeconds } from '@shared/lib/utils';
 
-export async function loadPlaylist(location: string): Promise<IPlaylist | undefined> {
+export async function loadPlaylist(filePath: string): Promise<IPlaylist | undefined> {
   try {
-    await fs.access(location, fs.constants.R_OK);
-    const m3uString = await fs.readFile(location, 'utf8');
+    await fs.access(filePath, fs.constants.R_OK);
+    const m3uString = await fs.readFile(filePath, 'utf8');
 
     const playlist = M3uParser.parse(m3uString);
     const items = playlist.medias.map((media, index) => ({
-      url: media.location,
+      url: media.attributes['url'] ?? media.location,
+      filePath: media.attributes['filePath'] ?? media.location,
       title: media.name ?? '',
       duration: media.duration ?? 0,
       id: media.attributes['tvg-id'] ?? media.name + ':' + index,
@@ -49,19 +50,22 @@ export async function loadPlaylist(location: string): Promise<IPlaylist | undefi
   }
 }
 
-export async function savePlaylist(playlist: IPlaylist, location: string): Promise<boolean> {
+export async function savePlaylist(playlist: IPlaylist, savePath: string): Promise<boolean> {
   try {
     const m3uPlaylist = new M3uPlaylist();
     m3uPlaylist.title = playlist.title;
+    // m3uPlaylist.attributes[]
     m3uPlaylist.attributes['tvg-id'] = playlist.id;
     m3uPlaylist.attributes['tvg-logo'] = playlist.thumbnail?.url;
     m3uPlaylist.attributes['author-name'] = playlist.author?.name;
     m3uPlaylist.attributes['author-avatar'] = playlist.author?.avatar;
     playlist.items.forEach((item) => {
-      const media = new M3uMedia(item.url);
+      const media = new M3uMedia(item.filePath ? item.filePath : item.url);
       media.attributes = {
         'tvg-id': item.id,
         'tvg-logo': item.thumbnail,
+        url: item.url,
+        filePath: item.filePath,
         favorite: item.favorite ? 'true' : 'false',
         dislike: item.dislike ? 'true' : 'false',
         'channel-id': item.author.channelID,
@@ -73,7 +77,7 @@ export async function savePlaylist(playlist: IPlaylist, location: string): Promi
       media.image = item.thumbnail;
       m3uPlaylist.medias.push(media);
     });
-    await fs.writeFile(location, m3uPlaylist.getM3uString(), 'utf8');
+    await fs.writeFile(savePath, m3uPlaylist.getM3uString(), 'utf8');
     return true;
   } catch (error) {
     console.error(error);

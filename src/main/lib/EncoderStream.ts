@@ -240,7 +240,7 @@ export default class EncoderStream {
 
   private command(input?: Readable | string): ffmpeg.FfmpegCommand {
     return ffmpeg(input, {
-      timeout: this.options.timeout ?? 30 * 1000,
+      timeout: this.options.timeout ?? 30 * 1000, // 30 seconds timeout
       logger: {
         debug: (arg) => {
           console.log('[DEBUG] ' + arg);
@@ -278,6 +278,7 @@ export default class EncoderStream {
     return false;
   }
 
+  /* returns a new instance of FfmpegCommand */
   public async setCoverArt(
     image: string = '/Users/bmaggi/Downloads/cat.jpg',
   ): Promise<ffmpeg.FfmpegCommand> {
