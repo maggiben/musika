@@ -140,8 +140,9 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
         showWaveForm: true,
         seek: true,
         autoplay: false,
-        volume: 1,
+        volume: 50,
         playExternal: true,
+        muted: false,
       },
     },
     downloads: {

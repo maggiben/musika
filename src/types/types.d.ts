@@ -145,6 +145,7 @@ export interface IPreferences {
       volume: number;
       track?: ITrack;
       playExternal: boolean;
+      muted: boolean;
     };
   };
   advanced: {

@@ -1,11 +1,17 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
-import { BsVolumeDownFill } from 'react-icons/bs';
+import {
+  BsVolumeDownFill,
+  BsVolumeMuteFill,
+  BsVolumeOffFill,
+  BsVolumeUpFill,
+} from 'react-icons/bs';
 import { MdSkipPrevious, MdSkipNext, MdPlayArrow, MdPause } from 'react-icons/md';
 import { TiArrowLoop, TiArrowShuffle } from 'react-icons/ti';
 import WaveSurfer, { IWaveSurferPlayerParams } from '@components/WaveSurfer/WaveSurfer';
 import { trackSelector } from '@states/selectors';
+import { preferencesState } from '@states/atoms';
 import InputRange from '@components/InputRange/InputRange';
 import { SpaceRight } from '@components/Spacing/Spacing';
 
@@ -108,6 +114,7 @@ const StyledInputCheck = styled.div`
 `;
 
 const PlayerControls = (): JSX.Element => {
+  const [preferences, setPreferences] = useRecoilState(preferencesState);
   const [track, setTrack] = useRecoilState(trackSelector);
   const [isPlaying, setIsPlaying] = useState(false);
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
@@ -165,17 +172,50 @@ const PlayerControls = (): JSX.Element => {
       bubbles: false,
       cancelable: true,
     });
+    setPreferences((prev) => {
+      return {
+        ...prev,
+        behaviour: {
+          ...prev.behaviour,
+          mediaPlayer: {
+            ...prev.behaviour.mediaPlayer,
+            volume,
+          },
+        },
+      };
+    });
     waveSurferContainerRef.current!.dispatchEvent(event);
   };
+
+  const volumeIcon = useMemo(() => {
+    const { volume, muted } = preferences.behaviour.mediaPlayer;
+    if (muted) return <BsVolumeMuteFill />;
+    if (volume >= 0 && volume <= 30) {
+      return <BsVolumeOffFill />;
+    } else if (volume > 30 && volume <= 65) {
+      return <BsVolumeDownFill />;
+    } else if (volume > 65 && volume <= 100) {
+      return <BsVolumeUpFill />;
+    } else {
+      return <BsVolumeOffFill />;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences.behaviour.mediaPlayer.volume, preferences.behaviour.mediaPlayer.muted]);
 
   return (
     <PlayerControlsContainer data-testid="playlist-controls">
       <StyledButtonGroup>
         <Volume>
           <StyledPlayerButton style={{ position: 'relative' }}>
-            <BsVolumeDownFill />
+            {volumeIcon}
             <VolumeSlider>
-              <InputRange min="0" max="100" value="50" step="1" onChange={handleVolumeChange} />
+              <InputRange
+                min="0"
+                max="100"
+                value={preferences.behaviour.mediaPlayer.volume}
+                step="1"
+                onChange={handleVolumeChange}
+              />
             </VolumeSlider>
           </StyledPlayerButton>
         </Volume>
