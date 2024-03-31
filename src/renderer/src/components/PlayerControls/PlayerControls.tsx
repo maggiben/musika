@@ -38,7 +38,7 @@ const VolumeSlider = styled.div`
   justify-content: center;
   align-items: center;
   transform: rotate(90deg) translate(0%, 50%);
-  top: 0.85em;
+  top: calc(100% - 14px); /* choosen by chance */
   left: 50%;
   transform-origin: 0% 100%;
   z-index: 1;
@@ -144,6 +144,15 @@ const PlayerControls = (): JSX.Element => {
     waveSurferContainerRef.current!.dispatchEvent(event);
   }, [isPlaying]);
 
+  const handleVolumeChange = (volume: number): void => {
+    const event = new CustomEvent('setVolume', {
+      detail: { volume },
+      bubbles: false,
+      cancelable: true,
+    });
+    waveSurferContainerRef.current!.dispatchEvent(event);
+  };
+
   return (
     <PlayerControlsContainer data-testid="playlist-controls">
       <StyledButtonGroup>
@@ -151,7 +160,7 @@ const PlayerControls = (): JSX.Element => {
           <StyledPlayerButton style={{ position: 'relative' }}>
             <BsVolumeDownFill />
             <VolumeSlider>
-              <InputRange min="0" max="100" value="50" step="1" />
+              <InputRange min="0" max="100" value="50" step="1" onChange={handleVolumeChange} />
             </VolumeSlider>
           </StyledPlayerButton>
         </Volume>

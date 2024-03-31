@@ -23,6 +23,11 @@ export interface IWaveSurferPlayer {
   onReady?: (params: IWaveSurferPlayerParams & { duration: number }) => void;
 }
 
+export type TWaveSurferListener =
+  | (() => void)
+  | (<T>(event: CustomEvent<T>) => void)
+  | EventListener;
+
 const WaveSurfer = memo(
   forwardRef<HTMLDivElement, IWaveSurferPlayer>(
     (props: IWaveSurferPlayer, containerRef: Ref<HTMLDivElement>) => {
@@ -39,9 +44,17 @@ const WaveSurfer = memo(
       );
 
       // On play button click
-      const onPlayPause = useCallback(() => {
+      const onPlayPause = useCallback((): void => {
         wavesurfer?.playPause();
       }, [wavesurfer]);
+
+      const onSetVolume = useCallback(
+        (event: CustomEvent<{ volume: number }>) => {
+          console.log('volume', Math.round(event.detail.volume / 10) / 10);
+          wavesurfer?.setVolume(Math.round(event.detail.volume / 10) / 10);
+        },
+        [wavesurfer],
+      ) as TWaveSurferListener;
 
       // Initialize wavesurfer when the container mounts
       // or any of the props change
@@ -68,29 +81,34 @@ const WaveSurfer = memo(
 
         const listeners = {
           playPause: onPlayPause,
-          url: onPlayPause,
-          volume: onPlayPause,
+          setVolume: onSetVolume,
         };
 
-        Object.entries(listeners).forEach(([event, listener]) => {
-          domNode?.addEventListener(event, listener);
-        });
+        Object.entries(listeners).forEach(
+          ([event, listener]: [event: unknown, listener: TWaveSurferListener]) => {
+            domNode?.addEventListener(
+              event as keyof HTMLElementEventMap,
+              listener as EventListener,
+            );
+          },
+        );
 
         return () => {
           subscriptions.forEach((unsub) => unsub());
-          Object.entries(listeners).forEach(([event, listener]) => {
-            domNode?.removeEventListener(event, listener);
-          });
+          Object.entries(listeners).forEach(
+            ([event, listener]: [event: unknown, listener: TWaveSurferListener]) => {
+              domNode?.removeEventListener(
+                event as keyof HTMLElementEventMap,
+                listener as EventListener,
+              );
+            },
+          );
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [wavesurfer]);
 
       return (
-        <div
-          id="wave-surfer-container"
-          ref={waveSurferContainerRef}
-          style={{ minWidth: '100%' }}
-        />
+        <div id="wave-surfer-container" ref={waveSurferContainerRef} style={{ minWidth: '100%' }} />
       );
     },
   ),

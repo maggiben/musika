@@ -138,6 +138,11 @@ export interface IPreferences {
       resizable: boolean;
       selected?: string;
     };
+    mediaPlayer: {
+      showWaveForm: boolean;
+      seek: boolean;
+      volume: number;
+    };
   };
   advanced: {
     isDev?: boolean;

@@ -144,6 +144,11 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
         visible: true,
         resizable: true,
       },
+      mediaPlayer: {
+        showWaveForm: true,
+        seek: true,
+        volume: 1,
+      },
     },
     downloads: {
       savePath: app.getPath('downloads'),
