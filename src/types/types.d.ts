@@ -144,6 +144,7 @@ export interface IPreferences {
       autoplay: boolean;
       volume: number;
       track?: ITrack;
+      playExternal: boolean;
     };
   };
   advanced: {
@@ -184,6 +185,7 @@ export interface IPreferences {
     quality: string;
     filter: string;
     fileNameTmpl: string;
+    autoSave: boolean;
   };
 }
 

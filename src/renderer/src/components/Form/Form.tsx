@@ -19,9 +19,6 @@ export const InputPairContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  &:not(:last-child) {
-    margin-bottom: ${({ theme }) => theme.spacing.xxs};
-  }
   & > label {
     width: 100%;
   }

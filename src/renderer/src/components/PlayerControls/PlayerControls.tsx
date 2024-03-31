@@ -188,7 +188,7 @@ const PlayerControls = (): JSX.Element => {
         </StyledInputCheck>
         <SpaceRight size="xs" />
         <StyledButtonGroup>
-          <StyledPlayerButton onClick={console.log}>
+          <StyledPlayerButton disabled={!track?.prev} onClick={console.log}>
             <MdSkipPrevious />
           </StyledPlayerButton>
           <StyledPlayerButton
@@ -198,7 +198,7 @@ const PlayerControls = (): JSX.Element => {
           >
             {!isPlaying ? <MdPlayArrow /> : <MdPause />}
           </StyledPlayerButton>
-          <StyledPlayerButton onClick={console.log}>
+          <StyledPlayerButton disabled={!track?.next} onClick={console.log}>
             <MdSkipNext />
           </StyledPlayerButton>
         </StyledButtonGroup>

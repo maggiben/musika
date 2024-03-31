@@ -79,7 +79,10 @@ const WaveSurfer = memo(
         const subscriptions: { [key: string]: unknown } = {
           ready: (duration: number) => onReady && onReady({ ...getPlayerParams(), duration }),
           play: () => onPlay && onPlay(getPlayerParams()),
-          finish: () => onFinish && onFinish(getPlayerParams()),
+          finish: () => {
+            wavesurfer.stop();
+            onFinish && onFinish(getPlayerParams());
+          },
           error: (error) => onError && onError(error),
         };
 

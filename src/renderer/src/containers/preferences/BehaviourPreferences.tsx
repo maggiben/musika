@@ -196,22 +196,34 @@ const BehaviourPreferences = (): JSX.Element => {
         <legend>{t('media player')}</legend>
         <div>
           <InputPairContainer>
-            <StyledLabel htmlFor="behaviour.mediaPlayer.autoplay">{t('auto play')}</StyledLabel>
-            <ToggleSwitch
-              id="behaviour.mediaPlayer.autoplay"
-              name="behaviour.mediaPlayer.autoplay"
-              defaultChecked={preferences.behaviour.mediaPlayer.autoplay}
-            />
-          </InputPairContainer>
-          <InputPairContainer>
-            <StyledLabel htmlFor="behaviour.mediaPlayer.showWaveForm">
-              {t('show waveform')}
-            </StyledLabel>
-            <ToggleSwitch
-              id="behaviour.mediaPlayer.showWaveForm"
-              name="behaviour.mediaPlayer.showWaveForm"
-              defaultChecked={preferences.behaviour.mediaPlayer.showWaveForm}
-            />
+            <InputGroup>
+              <StyledLabel htmlFor="behaviour.mediaPlayer.autoplay">{t('auto play')}</StyledLabel>
+              <ToggleSwitch
+                id="behaviour.mediaPlayer.autoplay"
+                name="behaviour.mediaPlayer.autoplay"
+                defaultChecked={preferences.behaviour.mediaPlayer.autoplay}
+              />
+              <InputPairContainer>
+                <StyledLabel htmlFor="behaviour.mediaPlayer.showWaveForm">
+                  {t('show waveform')}
+                </StyledLabel>
+                <ToggleSwitch
+                  id="behaviour.mediaPlayer.showWaveForm"
+                  name="behaviour.mediaPlayer.showWaveForm"
+                  defaultChecked={preferences.behaviour.mediaPlayer.showWaveForm}
+                />
+              </InputPairContainer>
+              <InputPairContainer>
+                <StyledLabel htmlFor="behaviour.mediaPlayer.playExternal">
+                  {t('play external sources')}
+                </StyledLabel>
+                <ToggleSwitch
+                  id="behaviour.mediaPlayer.playExternal"
+                  name="behaviour.mediaPlayer.playExternal"
+                  defaultChecked={preferences.behaviour.mediaPlayer.playExternal}
+                />
+              </InputPairContainer>
+            </InputGroup>
           </InputPairContainer>
         </div>
       </StyledFieldset>

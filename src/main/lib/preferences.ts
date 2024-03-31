@@ -141,6 +141,7 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
         seek: true,
         autoplay: false,
         volume: 1,
+        playExternal: true,
       },
     },
     downloads: {
@@ -151,6 +152,7 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
       quality: 'highest',
       filter: 'audioandvideo',
       fileNameTmpl: '{videoDetails.title}',
+      autoSave: true,
     },
     transcoding: {
       ffmpegPath: require('ffmpeg-static'),

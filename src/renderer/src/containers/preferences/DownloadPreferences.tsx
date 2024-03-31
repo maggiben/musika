@@ -10,6 +10,7 @@ import {
   DarwinButton,
   DarwinInput,
   DarwinSelect,
+  ToggleSwitch,
 } from '@components/Form/Form';
 import { SpaceBottom, SpaceRight } from '@components/Spacing/Spacing';
 
@@ -106,6 +107,20 @@ const DownloadOptions = (): JSX.Element => {
               style={{ flex: 1 }}
             />
           </InputGroup>
+        </InputPairContainer>
+        <InputPairContainer>
+          <StyledLabel htmlFor="downloads.autoSave">
+            {t('autosave save when playing remote media')}
+          </StyledLabel>
+          <ToggleSwitch
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+            id="downloads.autoSave"
+            name="downloads.autoSave"
+            defaultChecked={preferences.downloads.autoSave}
+          />
         </InputPairContainer>
       </div>
     </StyledFieldset>
