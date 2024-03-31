@@ -4,8 +4,9 @@ import type {
   IPlaylist,
   IPlaylistSortOptions,
   IPlaylistProperties,
+  ITrack,
 } from 'types/types';
-import { preferencesSelector, playlistSelector } from './selectors';
+import { preferencesSelector, playlistSelector, trackSelector } from './selectors';
 
 /*
 gta: https://www.youtube.com/watch?v=Lfgf9HatIHI&list=PLJV9FvSQV-k5MsXAYXZiRlR2nGzO9_kAD
@@ -24,4 +25,9 @@ export const playlistState = atom<{
 export const preferencesState = atom<IPreferences>({
   key: 'preferencesState',
   default: preferencesSelector,
+});
+
+export const trackState = atom<ITrack | undefined>({
+  key: 'trackState',
+  default: trackSelector,
 });

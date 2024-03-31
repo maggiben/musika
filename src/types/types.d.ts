@@ -73,6 +73,7 @@ export interface IPlaylistItem
   favorite?: boolean;
   dislike?: boolean;
   duration?: string | number;
+  filePath?: string;
   author: {
     name: string;
     channelID: string;
@@ -142,6 +143,7 @@ export interface IPreferences {
       showWaveForm: boolean;
       seek: boolean;
       volume: number;
+      track?: ITrack;
     };
   };
   advanced: {
@@ -183,4 +185,9 @@ export interface IPreferences {
     filter: string;
     fileNameTmpl: string;
   };
+}
+
+export interface ITrack extends IPlaylistItem {
+  next?: ITrack;
+  prev?: ITrack;
 }

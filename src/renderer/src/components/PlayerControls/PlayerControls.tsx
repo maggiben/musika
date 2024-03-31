@@ -117,7 +117,7 @@ const PlayerControls = (): JSX.Element => {
   }, []);
 
   const onWsFinish = useCallback((): void => {
-    console.log('finishi');
+    setIsPlaying(false);
   }, []);
 
   const WaveSurferPlayer = useMemo(
@@ -136,7 +136,7 @@ const PlayerControls = (): JSX.Element => {
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [song],
   );
 
   const handlePlayButtonClick = useCallback((): void => {

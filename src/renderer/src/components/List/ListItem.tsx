@@ -2,13 +2,16 @@ import React from 'react';
 import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useRecoilState } from 'recoil';
 import { padZeroes } from '@shared/lib/utils';
 import * as utils from '@shared/lib/utils';
 import { BsThreeDots } from 'react-icons/bs';
+// import { CiFloppyDisk } from 'react-icons/ci';
 import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { IPlaylistItem } from 'types/types';
 import SelectAllCheckbox from './SelectAllCheckbox';
+import { trackSelector } from '@states/selectors';
 
 const SongIndex = styled.span`
   user-select: none;
@@ -114,13 +117,21 @@ const ListFront = styled.div<{ $progress: number[] | undefined }>`
     `}
 `;
 
-const ListItemWrapper = styled.li<{ $progress?: number[] }>`
+const ListItemWrapper = styled.li<{ $progress?: number[]; $clicked: boolean }>`
   position: relative;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   user-select: none;
   cursor: default;
+  ${({ $clicked }) =>
+    $clicked &&
+    css`
+      & ${ListFront} {
+        background-color: ${({ theme }) => theme.colors.midGray};
+        color: ${({ theme }) => theme.colors.white};
+      }
+    `}
   &::before {
     content: '';
     position: absolute;
@@ -139,7 +150,7 @@ const ListItemWrapper = styled.li<{ $progress?: number[] }>`
   }
 `;
 
-const StyledListItem = styled.li`
+const StyledListHeader = styled.li`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -163,13 +174,25 @@ interface IListItemProps {
 }
 export const ListItem = React.memo(
   ({ item, index, total, progress, handleItemSelect }: IListItemProps): JSX.Element | null => {
+    const [track, setTrack] = useRecoilState(trackSelector);
     const songIndex = padZeroes(index + 1, total.toString().split('').length);
     const duration =
       typeof item.duration === 'string'
         ? utils.timeStringToSeconds(item.duration)
         : item.duration ?? 0;
+
+    const onItemClick = (item: IPlaylistItem): void => {
+      setTrack(item);
+    };
+
     return (
-      <ListItemWrapper key={`${item.id}:${index}`} $progress={progress}>
+      <ListItemWrapper
+        key={`${item.id}:${index}`}
+        $progress={progress}
+        $clicked={track?.id === item.id}
+        data-item-clicked={`${track?.id === item.id ? 'true' : 'false'}`}
+        onClick={() => onItemClick(item)}
+      >
         <ListBack data-testid="list-item-back">
           <div
             style={{
@@ -228,7 +251,7 @@ export const ListItem = React.memo(
 export const ListHeader = (): JSX.Element => {
   const { t } = useTranslation();
   return (
-    <StyledListItem>
+    <StyledListHeader>
       <ListBack data-testid="list-header">
         <SelectAllCheckbox />
         <SpaceRight size="l" />
@@ -242,6 +265,6 @@ export const ListHeader = (): JSX.Element => {
           <BsThreeDots />
         </span>
       </ListBack>
-    </StyledListItem>
+    </StyledListHeader>
   );
 };

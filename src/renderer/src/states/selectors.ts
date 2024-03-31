@@ -1,7 +1,7 @@
 import { selector, DefaultValue } from 'recoil';
 import { playlistState, preferencesState } from './atoms';
 import { splitIntoTuples } from '@shared/lib/utils';
-import type { IPreferences, IChannel } from 'types/types';
+import type { IPreferences, IChannel, ITrack } from 'types/types';
 
 export const preferencesSelector = selector({
   key: 'preferencesSelector',
@@ -101,9 +101,8 @@ export const sideBarSelector = selector({
   set: ({ get, set }, newVal) => {
     const preferences = get(preferencesState);
     if (newVal instanceof DefaultValue) {
-      const defaultValue = get(preferencesSelector);
       // Reset to default value if DefaultValue is provided
-      set(preferencesState, defaultValue);
+      set(preferencesState, newVal);
     } else {
       const newPreferences = {
         ...preferences,
@@ -112,6 +111,36 @@ export const sideBarSelector = selector({
           sideBar: {
             ...preferences.behaviour.sideBar,
             selected: newVal,
+          },
+        },
+      };
+      set(preferencesState, newPreferences);
+    }
+  },
+});
+
+export const trackSelector = selector({
+  key: 'trackSelector',
+  get: async ({ get }): Promise<ITrack | undefined> => {
+    const preferences = get(preferencesState);
+    const {
+      behaviour: { mediaPlayer: { track = undefined } = { track: undefined } },
+    } = preferences;
+    return track;
+  },
+  set: ({ get, set }, newVal) => {
+    const preferences = get(preferencesState);
+    if (newVal instanceof DefaultValue) {
+      // Reset to default value if DefaultValue is provided
+      set(preferencesState, newVal);
+    } else {
+      const newPreferences = {
+        ...preferences,
+        behaviour: {
+          ...preferences.behaviour,
+          mediaPlayer: {
+            ...preferences.behaviour.mediaPlayer,
+            track: newVal,
           },
         },
       };
