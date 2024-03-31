@@ -141,6 +141,7 @@ export interface IPreferences {
     mediaPlayer: {
       showWaveForm: boolean;
       seek: boolean;
+      autoplay: boolean;
       volume: number;
       track?: ITrack;
     };

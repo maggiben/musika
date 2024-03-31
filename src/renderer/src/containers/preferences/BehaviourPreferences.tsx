@@ -144,7 +144,7 @@ const BehaviourPreferences = (): JSX.Element => {
         </div>
       </StyledFieldset>
       <SpaceBottom size="s" />
-      <StyledFieldset>
+      <StyledFieldset style={{ display: 'none' }}>
         <legend>{t('search options')}</legend>
         <div>
           <InputPairContainer>
@@ -188,6 +188,30 @@ const BehaviourPreferences = (): JSX.Element => {
                 ))}
               </DarwinSelect>
             </InputGroup>
+          </InputPairContainer>
+        </div>
+      </StyledFieldset>
+      <SpaceBottom size="s" />
+      <StyledFieldset>
+        <legend>{t('media player')}</legend>
+        <div>
+          <InputPairContainer>
+            <StyledLabel htmlFor="behaviour.mediaPlayer.autoplay">{t('auto play')}</StyledLabel>
+            <ToggleSwitch
+              id="behaviour.mediaPlayer.autoplay"
+              name="behaviour.mediaPlayer.autoplay"
+              defaultChecked={preferences.behaviour.mediaPlayer.autoplay}
+            />
+          </InputPairContainer>
+          <InputPairContainer>
+            <StyledLabel htmlFor="behaviour.mediaPlayer.showWaveForm">
+              {t('show waveform')}
+            </StyledLabel>
+            <ToggleSwitch
+              id="behaviour.mediaPlayer.showWaveForm"
+              name="behaviour.mediaPlayer.showWaveForm"
+              defaultChecked={preferences.behaviour.mediaPlayer.showWaveForm}
+            />
           </InputPairContainer>
         </div>
       </StyledFieldset>

@@ -113,8 +113,6 @@ const PlayerControls = (): JSX.Element => {
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
   const song = useMemo(() => track?.filePath && window.library.parseUri(track.filePath), [track]);
 
-  // window.library.parseUri('/Users/bmaggi/Downloads/find-my-baby.mp3')
-
   useEffect(() => {
     console.log('track changed:', track, 'song', song);
   }, [track, song]);
@@ -127,7 +125,8 @@ const PlayerControls = (): JSX.Element => {
     console.log('ready', params, 'duration', params.duration);
   }, []);
 
-  const onWsFinish = useCallback((): void => {
+  const onWsFinish = useCallback((params: IWaveSurferPlayerParams): void => {
+    console.log('finished', params);
     setIsPlaying(false);
   }, []);
 

@@ -1,15 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {
-  app,
-  systemPreferences,
-  ipcMain,
-  IpcMainInvokeEvent,
-  BrowserWindow,
-  dialog,
-  nativeTheme,
-} from 'electron';
-import { is } from '@electron-toolkit/utils';
+import { app, systemPreferences, BrowserWindow, dialog, nativeTheme } from 'electron';
+import { mergeDeep } from '@shared/lib/utils';
 import type { IPreferences } from 'types/types';
 import EncoderStream from './EncoderStream';
 
@@ -147,6 +139,7 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
       mediaPlayer: {
         showWaveForm: true,
         seek: true,
+        autoplay: false,
         volume: 1,
       },
     },
@@ -200,55 +193,13 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
   };
 }
 
-export function setPreferencesModal(mainWindow: BrowserWindow): BrowserWindow {
-  const modal = new BrowserWindow({
-    parent: mainWindow,
-    modal: true,
-    show: false,
-    webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
-      sandbox: false,
-    },
-  });
-  const setEventHandlers = (modal: BrowserWindow): void => {
-    modal.once('ready-to-show', () => {
-      ipcMain.on('show-modal', async (_event: IpcMainInvokeEvent, options) => {
-        console.log('show-modal', options);
-        modal.show();
-      });
-      ipcMain.on('hide-modal', async (_event: IpcMainInvokeEvent, options) => {
-        console.log('hide-modal', options);
-        if (options?.sync) {
-          mainWindow?.webContents.send('sync-preferences', options);
-        }
-        modal.hide();
-      });
-    });
-  };
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    modal.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/modal.html`);
-    setEventHandlers(modal);
-  } else {
-    modal.loadFile(path.join(__dirname, '../renderer/modal.html'));
-    setEventHandlers(modal);
-  }
-  return modal;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function loadPreferences(mainWindow?: BrowserWindow | null): Promise<IPreferences> {
   const defaultPreferences = await getDefaultPreferences();
   try {
     await fs.access(preferencesPath, fs.constants.R_OK);
     const savedPreferences = JSON.parse(await fs.readFile(preferencesPath, 'utf8'));
-
-    return {
-      ...defaultPreferences,
-      ...savedPreferences,
-    };
+    return mergeDeep<IPreferences>(defaultPreferences, savedPreferences);
   } catch (error) {
     try {
       const focusedWindow = BrowserWindow.getFocusedWindow();

@@ -5,7 +5,7 @@ import checkPath from './checkPath';
 /**
  * Parse an URI, encoding some characters
  */
-const parseUri = (uri: string, check = true): string | undefined => {
+const parseUri = (uri: string, check: boolean = true): string | undefined => {
   if (check && !checkPath(uri)) return;
   // path and os should not be used
   const root = os.platform() === 'win32' ? '' : path.parse(uri).root;

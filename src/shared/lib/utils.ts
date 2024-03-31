@@ -245,6 +245,34 @@ export const splitIntoTuples = <T>(array: T[], size: number): T[][] => {
 };
 
 /**
+ * Performs a deep merge of objects and returns new object. Does not modify
+ * objects (immutable) and merges arrays via concatenation.
+ *
+ * @param {...object} objects - Objects to merge
+ * @returns {object} New object with merged key/values
+ */
+export const mergeDeep = <T>(...objects): T => {
+  const isObject = (obj): boolean => obj && typeof obj === 'object';
+
+  return objects.reduce((prev, obj) => {
+    Object.keys(obj).forEach((key) => {
+      const pVal = prev[key];
+      const oVal = obj[key];
+
+      if (Array.isArray(pVal) && Array.isArray(oVal)) {
+        prev[key] = pVal.concat(...oVal);
+      } else if (isObject(pVal) && isObject(oVal)) {
+        prev[key] = mergeDeep(pVal, oVal);
+      } else {
+        prev[key] = oVal;
+      }
+    });
+
+    return prev;
+  }, {});
+};
+
+/**
  * Retrieves a nested property from an object using a dot-separated path.
  *
  * @param {T} obj The object from which to retrieve the nested property.
