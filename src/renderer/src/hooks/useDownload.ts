@@ -96,12 +96,10 @@ const useDownload = (deps?: DependencyList): IDownloadStatus => {
         return newState;
       });
 
-      const mappedFilePaths = itemsFilePaths.map(([itemId, filePath]) => [
-        itemId,
-        message?.source?.id === itemId ? message?.source?.filePath : filePath,
-      ]);
-
-      setItemsFilePaths(mappedFilePaths);
+      setItemsFilePaths({
+        ...itemsFilePaths,
+        [message?.source?.id]: message?.source?.filePath,
+      });
 
       // notify(t('download complete'), {
       //   body: `${message.source.title} complete !`,

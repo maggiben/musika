@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises';
+import fs from 'node:fs';
 
 export const isValidUrl = (url: string): boolean => {
   try {
@@ -10,7 +10,7 @@ export const isValidUrl = (url: string): boolean => {
   }
 };
 
-const checkPath = async (pathOrUrl: string, mode = fs.constants.F_OK): Promise<boolean> => {
+const checkPath = (pathOrUrl: string, mode = fs.constants.F_OK): boolean => {
   if (typeof pathOrUrl !== 'string') {
     return false;
   }
@@ -19,7 +19,7 @@ const checkPath = async (pathOrUrl: string, mode = fs.constants.F_OK): Promise<b
     if (isValidUrl(pathOrUrl)) {
       return false;
     } else {
-      await fs.access(pathOrUrl, mode);
+      fs.accessSync(pathOrUrl, mode);
       return true;
     }
   } catch (error) {

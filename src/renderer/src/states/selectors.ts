@@ -96,7 +96,14 @@ export const itemsFilePathsSelector = selector({
   key: 'itemsFilePathsSelector',
   get: ({ get }) => {
     const { playlist } = get(playlistState);
-    return playlist ? playlist.items.map((item) => [item.id, item.filePath]) : [];
+    return playlist
+      ? playlist.items
+          .map((item) => [item.id, item.filePath] as [string, string | undefined])
+          .reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+          }, {})
+      : {};
   },
   set: ({ get, set }, newVal) => {
     if (newVal instanceof DefaultValue) {
@@ -104,31 +111,30 @@ export const itemsFilePathsSelector = selector({
       set(playlistState, newVal);
       set(preferencesState, newVal);
     } else {
-      newVal.forEach(([itemId, filePath]) => {
-        if (!filePath) return;
-        const { playlist, ...state } = get(playlistState);
-        const preferences = get(preferencesSelector);
-        set(preferencesState, {
-          ...preferences,
-          playlists: preferences.playlists.map((playlist) => ({
-            ...playlist,
-            items: playlist.items.map((item) => ({
-              ...item,
-              filePath: item.id === itemId ? filePath : item.filePath,
-            })),
+      const { playlist, ...state } = get(playlistState);
+      if (!playlist) return;
+      set(playlistState, {
+        ...state,
+        playlist: {
+          ...playlist,
+          items: playlist!.items.map((item) => ({
+            ...item,
+            filePath: newVal[item.id] ?? item.filePath,
           })),
-        });
-        if (!playlist) return;
-        set(playlistState, {
-          ...state,
-          playlist: {
-            ...playlist,
-            items: playlist!.items.map((item) => ({
+        },
+      });
+      const preferences = get(preferencesState);
+      set(preferencesState, {
+        ...preferences,
+        playlists: preferences.playlists.map((playlist) => ({
+          ...playlist,
+          items: playlist.items.map((item) => {
+            return {
               ...item,
-              filePath: item.id === itemId ? filePath : item.filePath,
-            })),
-          },
-        });
+              filePath: newVal[item.id] ?? item.filePath,
+            };
+          }),
+        })),
       });
     }
   },

@@ -20,7 +20,7 @@ export declare global {
     };
     library: {
       showFileInFolder: (filePath: string) => void;
-      parseUri: (uri: string) => string;
+      parseUri: (uri: string, check: boolean) => string | undefined;
     };
     commands: {
       dialogs: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;

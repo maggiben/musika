@@ -48,8 +48,10 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   /* Save preferences if changed */
   useEffect(() => {
     if (isObjectEqual(preferencesRef.current, preferences)) return;
-    preferencesRef.current = preferences;
-    window.preferences.savePreferences(preferences);
+    window.preferences
+      .savePreferences(preferences)
+      .then(() => (preferencesRef.current = preferences))
+      .catch(console.error);
   }, [preferences]);
 
   const asyncSearch = useRecoilCallback(({ set, snapshot }) => async (url: string) => {
