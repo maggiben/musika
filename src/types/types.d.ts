@@ -97,6 +97,7 @@ export interface IPlaylist
   views?: string | number;
   filePath?: string;
   items: IPlaylistItem[];
+  lastUpdate: number;
 }
 
 export interface IPlaylistSortOptions {

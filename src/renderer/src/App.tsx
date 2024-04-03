@@ -48,6 +48,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
   /* Save preferences if changed */
   useEffect(() => {
     if (isObjectEqual(preferencesRef.current, preferences)) return;
+    console.info('saving preferences');
     window.preferences
       .savePreferences(preferences)
       .then(() => (preferencesRef.current = preferences))
@@ -76,6 +77,7 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         playlist: IPlaylist;
         searchResults: ytsr.PlaylistResult;
       };
+      playlist.lastUpdate = new Date().getTime();
       set(playlistState, {
         ...oldPlaylistState,
         playlist,
@@ -91,7 +93,6 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
         },
         playlists: [...oldPreferencesState.playlists, playlist],
       };
-      await window.preferences.savePreferences(newPreferences);
       set(preferencesState, newPreferences);
     } catch (error) {
       console.error(error);
@@ -165,7 +166,6 @@ const AppContainer = ({ children }: { children: JSX.Element }): JSX.Element => {
             return newItem;
           }),
         };
-        await window.preferences.savePreferences(newPreferences);
         setPreferences(newPreferences);
       } catch (error) {
         console.error(error);

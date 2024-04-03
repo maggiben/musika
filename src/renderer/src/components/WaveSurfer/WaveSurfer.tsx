@@ -23,6 +23,7 @@ export interface IWaveSurferPlayer {
   onPlay?: (params: IWaveSurferPlayerParams) => void;
   onReady?: (params: IWaveSurferPlayerParams & { duration: number }) => void;
   onFinish?: (params: IWaveSurferPlayerParams) => void;
+  onTimeupdate?: (currentTime: number) => void;
   onError?: (error: unknown) => void;
 }
 
@@ -39,7 +40,7 @@ const WaveSurfer = memo(
         containerRef as RefObject<HTMLElement>,
         props.options as WaveSurferOptions,
       );
-      const { onPlay, onReady, onFinish, onError } = props;
+      const { onPlay, onReady, onFinish, onError, onTimeupdate } = props;
 
       useImperativeHandle(
         containerRef,
@@ -84,6 +85,7 @@ const WaveSurfer = memo(
             onFinish && onFinish(getPlayerParams());
           },
           error: (error) => onError && onError(error),
+          timeupdate: (currentTime: number) => onTimeupdate && onTimeupdate(currentTime),
         };
 
         /* WS Event Listeners */

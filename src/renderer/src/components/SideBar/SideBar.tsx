@@ -134,10 +134,13 @@ const SideBar = (): JSX.Element => {
       const { filePath } = playlist;
       if (filePath) {
         const localPlaylist = await window.playlist.loadPlaylist(filePath);
-        setPlaylist((prev) => ({ ...prev, playlist: localPlaylist ?? playlist }));
-      } else if (playlist.url) {
-        setPlaylist((prev) => ({ ...prev, playlist: playlist as IPlaylist }));
+        if (localPlaylist!.lastUpdate > playlist.lastUpdate) {
+          setPlaylist((prev) => ({ ...prev, playlist: localPlaylist ?? playlist }));
+        } else {
+          console.info('local playlist is out of sync');
+        }
       }
+      playlist.url && setPlaylist((prev) => ({ ...prev, playlist }));
       setSelected(id);
     };
 

@@ -185,6 +185,7 @@ export const ListItem = React.memo(
       if (!item.id || track?.id == item.id) return;
       setTrack(item);
     };
+
     const onItemDoubleClick = (item: IPlaylistItem): void => {
       /* TODO: autoplay when double click */
       if (!item.id || track?.id == item.id) return;

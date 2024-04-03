@@ -14,7 +14,10 @@ export const playlistSelector = selector({
     const preferences = get(preferencesSelector);
     const selected = preferences.behaviour.sideBar.selected;
     const list = preferences.playlists.find(({ id }) => id === selected);
-    const playlist = list?.filePath ? await window.playlist.loadPlaylist(list.filePath) : list;
+    const localPlaylist = list?.filePath
+      ? await window.playlist.loadPlaylist(list.filePath)
+      : undefined;
+    const isLocalOutdated = localPlaylist!.lastUpdate < list!.lastUpdate;
     return {
       sortOptions: {
         filter: 'all' as const,
@@ -22,7 +25,7 @@ export const playlistSelector = selector({
         criteria: 'default' as const,
       },
       properties: undefined,
-      playlist,
+      playlist: isLocalOutdated ? list : localPlaylist,
     };
   },
 });
@@ -128,6 +131,7 @@ export const itemsFilePathsSelector = selector({
         ...preferences,
         playlists: preferences.playlists.map((playlist) => ({
           ...playlist,
+          lastUpdate: new Date().getTime(),
           items: playlist.items.map((item) => {
             return {
               ...item,
@@ -198,6 +202,7 @@ export const trackSelector = selector({
       // Reset to default value if DefaultValue is provided
       set(preferencesState, newVal);
     } else if (newVal) {
+      console.log('setting new track', newVal);
       const { playlist } = get(playlistState);
       if (!playlist) return;
       const { prev, next } = getCircularArrayItems(playlist.items, newVal.id) ?? {
@@ -218,6 +223,10 @@ export const trackSelector = selector({
           },
         },
       };
+      const {
+        behaviour: { mediaPlayer: { track = undefined } = { track: undefined } },
+      } = newPreferences;
+      console.log('saving track: ', track);
       set(preferencesState, newPreferences);
     }
   },

@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import {
@@ -14,6 +14,7 @@ import { trackSelector } from '@states/selectors';
 import { preferencesState } from '@states/atoms';
 import InputRange from '@components/InputRange/InputRange';
 import { SpaceRight } from '@components/Spacing/Spacing';
+import { ITrack } from 'types/types';
 
 const PlayerControlsContainer = styled.div`
   --player-controls-height: 42px;
@@ -116,13 +117,41 @@ const StyledInputCheck = styled.div`
 const PlayerControls = (): JSX.Element => {
   const [preferences, setPreferences] = useRecoilState(preferencesState);
   const [track, setTrack] = useRecoilState(trackSelector);
+  const playingTrack = useRef<ITrack | undefined>(track);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
-  const song = useMemo(() => track?.filePath && window.library.parseUri(track.filePath), [track]);
+  const song = useMemo(
+    () => track?.filePath && window.library.parseUri(track.filePath, true),
+    [track],
+  );
+
+  const playNextTrack = useCallback(async (track: ITrack, isReady: boolean) => {
+    setIsPlaying(false);
+    isReady && setIsReady(false);
+    console.log('playNextTrack track', track, 'isReady', isReady);
+    if (!track || isReady) return;
+    const { next } = track;
+    console.log('play next track', next);
+    if (!next?.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
+      console.log('no file no external allowed');
+      setTrack(next);
+    } else if (!next?.filePath && next?.url && preferences.behaviour.mediaPlayer.playExternal) {
+      console.log('will play remote', next?.url);
+      const result = await window.commands.download(next?.url);
+      console.log('playNextTrack.remote: ', next?.url, result);
+      setTrack(next);
+    } else if (next?.filePath) {
+      console.log('playNextTrack local file', next.filePath);
+      setTrack(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    console.log('track changed:', track, 'song', song);
-  }, [track, song]);
+    console.log('song: ', song);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [song]);
 
   const onWsPlay = useCallback((params: IWaveSurferPlayerParams): void => {
     setIsPlaying(params.isPlaying);
@@ -130,12 +159,21 @@ const PlayerControls = (): JSX.Element => {
 
   const onWsReady = useCallback((params: IWaveSurferPlayerParams & { duration: number }): void => {
     console.log('ready', params, 'duration', params.duration);
+    setIsReady(true);
   }, []);
 
-  const onWsFinish = useCallback((params: IWaveSurferPlayerParams): void => {
-    console.log('finished', params);
+  const onWsError = useCallback((error: unknown): void => {
     setIsPlaying(false);
+    setIsReady(false);
+    console.log('we error', error);
   }, []);
+
+  const onWsFinish = useCallback(async (): Promise<void> => {
+    console.log('finished playing: ', track);
+    if (!track) return;
+    await playNextTrack(track, isReady);
+    console.log('ready to play !', isReady, track);
+  }, [track, isReady]);
 
   const WaveSurferPlayer = useMemo(
     () => (
@@ -144,6 +182,7 @@ const PlayerControls = (): JSX.Element => {
         onPlay={onWsPlay}
         onReady={onWsReady}
         onFinish={onWsFinish}
+        onError={onWsError}
         options={{
           height: 'auto',
           waveColor: 'gray',
@@ -156,7 +195,7 @@ const PlayerControls = (): JSX.Element => {
     [song],
   );
 
-  const handlePlayButtonClick = useCallback((): void => {
+  const playPause = useCallback((): void => {
     const event = new CustomEvent('playPause', {
       detail: { key: 'value' },
       bubbles: false,
@@ -233,7 +272,7 @@ const PlayerControls = (): JSX.Element => {
           </StyledPlayerButton>
           <StyledPlayerButton
             disabled={!song}
-            onClick={handlePlayButtonClick}
+            onClick={playPause}
             style={{ fontSize: '2.25em', lineHeight: '2.25em' }}
           >
             {!isPlaying ? <MdPlayArrow /> : <MdPause />}

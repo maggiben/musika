@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import { M3uPlaylist, M3uMedia, M3uParser } from 'm3u-parser-generator';
 import type { IPlaylist } from 'types/types';
 import { timeStringToSeconds } from '@shared/lib/utils';
+import checkPath from '@main/utils/checkPath';
 
 export async function loadPlaylist(filePath: string): Promise<IPlaylist | undefined> {
   try {
@@ -11,7 +12,9 @@ export async function loadPlaylist(filePath: string): Promise<IPlaylist | undefi
     const playlist = M3uParser.parse(m3uString);
     const items = playlist.medias.map((media, index) => ({
       url: media.attributes['url'] ?? media.location,
-      filePath: media.attributes['filePath'] ?? media.location,
+      filePath: checkPath(media.attributes['filePath'] ?? media.location)
+        ? media.attributes['filePath'] ?? media.location
+        : undefined,
       title: media.name ?? '',
       duration: media.duration ?? 0,
       id: media.attributes['tvg-id'] ?? media.name + ':' + index,
@@ -34,6 +37,7 @@ export async function loadPlaylist(filePath: string): Promise<IPlaylist | undefi
       visibility: playlist.attributes['visibility'] as 'link only' | 'everyone',
       description: playlist.attributes['description'],
       url: playlist.attributes['url'] ?? '',
+      lastUpdate: parseInt(playlist.attributes['last-update'] ?? '0', 10),
       author: {
         id: playlist.attributes['author-id'] ?? '',
         name: playlist.attributes['author-name'] ?? '',
@@ -59,6 +63,7 @@ export async function savePlaylist(playlist: IPlaylist, savePath: string): Promi
     m3uPlaylist.attributes['tvg-logo'] = playlist.thumbnail?.url;
     m3uPlaylist.attributes['author-name'] = playlist.author?.name;
     m3uPlaylist.attributes['author-avatar'] = playlist.author?.avatar;
+    m3uPlaylist.attributes['last-update'] = new Date().getTime().toString();
     playlist.items.forEach((item) => {
       const media = new M3uMedia(item.filePath ? item.filePath : item.url);
       media.attributes = {
