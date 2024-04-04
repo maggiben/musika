@@ -10,14 +10,10 @@ import {
 import { MdSkipPrevious, MdSkipNext, MdPlayArrow, MdPause } from 'react-icons/md';
 import { TiArrowLoop, TiArrowShuffle } from 'react-icons/ti';
 import WaveSurfer, { IWaveSurferPlayerParams } from '@components/WaveSurfer/WaveSurfer';
-import player from '@renderer/lib/player';
-import { trackSelector } from '@states/selectors';
-import { preferencesState } from '@states/atoms';
+import { preferencesState, playerState as currentPlayerState } from '@states/atoms';
 import InputRange from '@components/InputRange/InputRange';
 import { SpaceRight } from '@components/Spacing/Spacing';
-import { debounce } from '@shared/lib/utils';
-import type { ITrack } from 'types/types';
-import { PlayerStoryboardSpec } from 'youtubei.js/dist/src/parser/nodes';
+import { debounce, getCircularArrayItems } from '@shared/lib/utils';
 
 const PlayerControlsContainer = styled.div`
   --player-controls-height: 42px;
@@ -119,21 +115,25 @@ const StyledInputCheck = styled.div`
 
 const PlayerControls = (): JSX.Element => {
   const [preferences, setPreferences] = useRecoilState(preferencesState);
-  const [track, setTrack] = useRecoilState(trackSelector);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-  const [canplaythrough, setCanplaythrough] = useState(false);
+  const [playerState, setPlayerState] = useRecoilState(currentPlayerState);
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
-  // const audioRef = useRef<HTMLAudioElement | null>(null);
-  const song = useMemo(
-    () => track?.filePath && window.library.parseUri(track.filePath, true),
-    [track],
-  );
+  const song = useMemo(() => {
+    const filePath = playerState.queue[playerState.queueCursor]?.filePath;
+    return filePath && window.library.parseUri(filePath, true);
+  }, [playerState]);
 
   const playNextTrack = (): void => {
-    console.log('asked to playNextTrack:', track, track?.next);
-    if (!track?.next) return;
-    const { next } = track;
+    const queueCursor = playerState.queueCursor + 1;
+    /* TODO: take prev and next from a queue not from the list */
+    const { next } = getCircularArrayItems(
+      playerState.queue,
+      'id',
+      playerState.queue[playerState.queueCursor].id,
+    ) ?? {
+      next: undefined,
+    };
+    console.log('asked to playNextTrack:', next);
+    if (!next) return;
     console.log('play next track', next);
     if (!next?.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
       console.log('no file no external allowed');
@@ -145,7 +145,7 @@ const PlayerControls = (): JSX.Element => {
       // setTrack(next);
     } else if (next?.filePath) {
       console.log('playNextTrack local file', next.filePath);
-      setTrack(next);
+      setPlayerState((prev) => ({ ...prev, queueCursor }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   };
@@ -157,7 +157,7 @@ const PlayerControls = (): JSX.Element => {
   const onWsReady = useCallback(
     (params: IWaveSurferPlayerParams & { duration: number }): void => {
       console.log('onWsReady', params, 'duration', params.duration);
-      if (isPlaying) {
+      if (playerState.status === 'play') {
         const event = new CustomEvent('playPause', {
           detail: { key: 'value' },
           bubbles: false,
@@ -166,13 +166,13 @@ const PlayerControls = (): JSX.Element => {
         waveSurferContainerRef.current!.dispatchEvent(event);
       }
     },
-    [isPlaying],
+    [playerState],
   );
 
   const onWsFinish = useCallback(async (): Promise<void> => {
     console.log('onWsFinish', waveSurferContainerRef.current);
     playNextTrack();
-  }, [track]);
+  }, [song]);
 
   const WaveSurferPlayer = useMemo(
     () => (
@@ -191,58 +191,8 @@ const PlayerControls = (): JSX.Element => {
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [track],
+    [song],
   );
-
-  // const playNextTrack = useCallback(() => {
-  //   console.log('asked to playNextTrack:', track?.next, isPlaying);
-  //   if (!track || !isPlaying) return;
-  //   const { next } = track;
-  //   console.log('play next track', next);
-  //   if (!next?.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
-  //     console.log('no file no external allowed');
-  //     // setTrack(next);
-  //   } else if (!next?.filePath && next?.url && preferences.behaviour.mediaPlayer.playExternal) {
-  //     console.log('will play remote', next?.url);
-  //     // const result = await window.commands.download(next?.url);
-  //     // console.log('playNextTrack.remote: ', next?.url, result);
-  //     // setTrack(next);
-  //   } else if (next?.filePath) {
-  //     console.log('playNextTrack local file', next.filePath);
-  //     setTrack(next);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [track, isPlaying]);
-
-  /* loading has started sync artwork */
-  // const onLoadStart = useCallback(async (event: Event): Promise<void> => {
-  //   console.log('audio onLoadStart', event);
-  //   setCanplaythrough(false);
-  // }, []);
-
-  // const onCanPlayThrough = useCallback(async (): Promise<void> => {
-  //   console.log('audio canplaythrough');
-  //   setCanplaythrough(true);
-  //   if (isPlaying) {
-  //     const event = new CustomEvent('playPause', {
-  //       detail: { key: 'value' },
-  //       bubbles: false,
-  //       cancelable: true,
-  //     });
-  //     waveSurferContainerRef.current!.dispatchEvent(event);
-  //   }
-  // }, [isPlaying]);
-
-  /* Audio has ended */
-  // const onEnded = useCallback(async (): Promise<void> => {
-  //   console.log('audio ended');
-  //   setCanplaythrough(false);
-  //   playNextTrack();
-  // }, []);
-
-  // const onPlay = useCallback(async (event: Event): Promise<void> => {
-  //   console.log('play or pause', event);
-  // }, []);
 
   const playPause = useCallback((): void => {
     const event = new CustomEvent('playPause', {
@@ -250,9 +200,14 @@ const PlayerControls = (): JSX.Element => {
       bubbles: false,
       cancelable: true,
     });
-    setIsPlaying(!isPlaying);
+    setPlayerState((prev) => {
+      return {
+        ...prev,
+        status: prev.status === 'play' ? 'pause' : 'play',
+      };
+    });
     waveSurferContainerRef.current!.dispatchEvent(event);
-  }, [isPlaying]);
+  }, [playerState]);
 
   const handleVolumeChange = debounce((volume: number): void => {
     const event = new CustomEvent('setVolume', {
@@ -277,44 +232,6 @@ const PlayerControls = (): JSX.Element => {
 
   useEffect(() => {
     console.info('init player controls!');
-    // if (!song) return;
-    // player.setSrc(song);
-
-    /* Media event handlers */
-    const mediaEvents = {
-      // loadstart: onLoadStart,
-      // canplaythrough: onCanPlayThrough,
-      // ended: onEnded,
-      // play: onPlay,
-    };
-
-    /* WS Events */
-    // const wsEvents: { [key: string]: unknown } = {
-    //   ready: () => {},
-    // };
-
-    /* Subscribe to Media events */
-    // Object.entries(mediaEvents).forEach(
-    //   ([event, listener]: [
-    //     event: string,
-    //     listener: ((event: Event) => Promise<void>) | (() => Promise<void>) | (() => Promise<void>),
-    //   ]) => player.getAudio().addEventListener(event, listener),
-    // );
-
-    return () => {
-      /* Unsubscribe from Media events */
-      // Object.entries(mediaEvents).forEach(
-      //   ([event, listener]: [
-      //     event: string,
-      //     listener:
-      //       | ((event: Event) => Promise<void>)
-      //       | (() => Promise<void>)
-      //       | (() => Promise<void>),
-      //   ]) => {
-      //     player.getAudio().removeEventListener(event, listener);
-      //   },
-      // );
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -358,9 +275,8 @@ const PlayerControls = (): JSX.Element => {
           </StyledPlayerLabel>
         </StyledInputCheck>
         <SpaceRight size="xs" />
-        <span style={{ color: 'white' }}>isPlaying: {isPlaying ? 'true' : 'false'}</span>
         <StyledButtonGroup>
-          <StyledPlayerButton disabled={!track?.prev} onClick={console.log}>
+          <StyledPlayerButton /* disabled={!track?.prev} */ onClick={console.log}>
             <MdSkipPrevious />
           </StyledPlayerButton>
           <StyledPlayerButton
@@ -368,9 +284,13 @@ const PlayerControls = (): JSX.Element => {
             onClick={playPause}
             style={{ fontSize: '2.25em', lineHeight: '2.25em' }}
           >
-            {!isPlaying ? <MdPlayArrow /> : <MdPause />}
+            {['stop', 'pause'].includes(playerState.status) || !song ? (
+              <MdPlayArrow />
+            ) : (
+              <MdPause />
+            )}
           </StyledPlayerButton>
-          <StyledPlayerButton disabled={!track?.next} onClick={console.log}>
+          <StyledPlayerButton /* disabled={!track?.next} */ onClick={console.log}>
             <MdSkipNext />
           </StyledPlayerButton>
         </StyledButtonGroup>
@@ -384,8 +304,8 @@ const PlayerControls = (): JSX.Element => {
       </StyledButtonGroup>
       <SpaceRight size="xl" />
       <div style={{ display: 'flex', gap: '1em', height: 'calc(100% - 6px)', width: '100%' }}>
-        {/* {WaveSurferPlayer} */}
-        <WaveSurfer
+        {WaveSurferPlayer}
+        {/* <WaveSurfer
           ref={waveSurferContainerRef}
           onPlay={onWsPlay}
           onReady={onWsReady}
@@ -397,7 +317,7 @@ const PlayerControls = (): JSX.Element => {
             progressColor: 'white',
             url: song,
           }}
-        />
+        /> */}
       </div>
       <SpaceRight size="xl" />
       <PlayTime>3:47</PlayTime>

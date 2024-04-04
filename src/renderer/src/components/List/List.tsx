@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import useDownload from '@hooks/useDownload';
-import { playlistState } from '@states/atoms';
+import { playlistState, playerState as currentPlayerState } from '@states/atoms';
 import { selectedItemsSelector } from '@states/selectors';
 import useContextMenu from '@renderer/hooks/useContextMenu';
 import sortPlaylist from './sortPlaylist';
@@ -32,6 +32,10 @@ const List = (): JSX.Element | null => {
     ['contextmenu.playlist-item.get-media-info'],
   );
 
+  const playerState = useRecoilValue(currentPlayerState);
+  const [clickedItemId, setClickedItemId] = useState(
+    playerState.queue[playerState.queueCursor]?.id,
+  );
   const [{ playlist, sortOptions }] = useRecoilState(playlistState);
   const [, setSelectedItems] = useRecoilState(selectedItemsSelector);
   const { progress } = useDownload([playlist]);
@@ -51,6 +55,11 @@ const List = (): JSX.Element | null => {
     setSelectedItems(selected);
   };
 
+  const onItemClick = (id: string): void => {
+    if (!id || clickedItemId === id) return;
+    setClickedItemId(id);
+  };
+
   return playlist?.items ? (
     <ListWrapper data-testid="list-wrapper">
       <ListHeader />
@@ -59,6 +68,8 @@ const List = (): JSX.Element | null => {
           key={item.id}
           item={item}
           index={index}
+          clickedItemId={clickedItemId}
+          onItemClick={onItemClick}
           progress={progress?.[item.id]}
           total={playlist.items.length}
           handleItemSelect={handleItemSelect}

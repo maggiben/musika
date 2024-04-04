@@ -73,6 +73,8 @@ export interface IPlaylistItem
   favorite?: boolean;
   dislike?: boolean;
   duration?: string | number;
+  album?: string;
+  genre?: string[];
   filePath?: string;
   author: {
     name: string;
@@ -142,11 +144,13 @@ export interface IPreferences {
     mediaPlayer: {
       showWaveForm: boolean;
       seek: boolean;
-      autoplay: boolean;
       volume: number;
+      autoplay?: boolean;
       track?: ITrack;
-      playExternal: boolean;
-      muted: boolean;
+      playExternal?: boolean;
+      playbackRate?: number;
+      outputDevice?: string;
+      muted?: boolean;
     };
   };
   advanced: {
@@ -194,4 +198,12 @@ export interface IPreferences {
 export interface ITrack extends IPlaylistItem {
   next?: ITrack;
   prev?: ITrack;
+}
+
+export interface IPlayerState {
+  queue: ITrack[] | undefined[];
+  queueCursor: number;
+  repeat: 'all' | 'one' | 'none';
+  shuffle: boolean;
+  status: 'play' | 'pause' | 'stop';
 }

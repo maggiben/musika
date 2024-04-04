@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Stars from '@components/Stars/Stars';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -6,12 +6,13 @@ import { useRecoilState } from 'recoil';
 import { padZeroes } from '@shared/lib/utils';
 import * as utils from '@shared/lib/utils';
 import { BsThreeDots } from 'react-icons/bs';
+import { MdPlayArrow } from 'react-icons/md';
 // import { CiFloppyDisk } from 'react-icons/ci';
 import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { IPlaylistItem } from 'types/types';
 import SelectAllCheckbox from './SelectAllCheckbox';
-import { trackSelector } from '@states/selectors';
+import { playerState as currentPlayerState } from '@states/atoms';
 
 const SongIndex = styled.span`
   user-select: none;
@@ -19,6 +20,11 @@ const SongIndex = styled.span`
   margin-left: ${({ theme }) => theme.spacing.xxs};
 `;
 
+const SongNameContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
 const SongName = styled.p`
   text-align: left;
   text-overflow: ellipsis;
@@ -170,34 +176,45 @@ interface IListItemProps {
   index: number;
   total: number;
   progress: number[];
+  clickedItemId?: string;
+  onItemClick: (item: string) => void;
   handleItemSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 export const ListItem = React.memo(
-  ({ item, index, total, progress, handleItemSelect }: IListItemProps): JSX.Element | null => {
-    const [track, setTrack] = useRecoilState(trackSelector);
+  ({
+    item,
+    index,
+    total,
+    progress,
+    clickedItemId,
+    onItemClick,
+    handleItemSelect,
+  }: IListItemProps): JSX.Element | null => {
+    const [playerState, setPlayerState] = useRecoilState(currentPlayerState);
     const songIndex = padZeroes(index + 1, total.toString().split('').length);
     const duration =
       typeof item.duration === 'string'
         ? utils.timeStringToSeconds(item.duration)
         : item.duration ?? 0;
 
-    const onItemClick = (item: IPlaylistItem): void => {
-      if (!item.id || track?.id == item.id) return;
-      setTrack(item);
-    };
+    const isPlayingItem = useMemo(() => {
+      return (
+        playerState.status === 'play' && playerState.queue[playerState.queueCursor]?.id === item.id
+      );
+    }, [playerState]);
 
     const onItemDoubleClick = (item: IPlaylistItem): void => {
-      /* TODO: autoplay when double click */
-      if (!item.id || track?.id == item.id) return;
-      setTrack(item);
+      if (!item.id) return;
+      const queueCursor = playerState.queue.findIndex((track) => track.id === item.id);
+      setPlayerState((prev) => ({ ...prev, status: 'play', queueCursor }));
     };
 
     return (
       <ListItemWrapper
         key={`${item.id}:${index}`}
         $progress={progress}
-        $clicked={track?.id === item.id}
-        onClick={() => onItemClick(item)}
+        $clicked={clickedItemId === item.id}
+        onClick={() => onItemClick(item.id)}
         onDoubleClick={() => onItemDoubleClick(item)}
       >
         <ListBack data-testid="list-item-back">
@@ -209,9 +226,11 @@ export const ListItem = React.memo(
           />
           <SongIndex>{songIndex}</SongIndex>
           <span>·</span>
-          <span>
+          <SongNameContainer>
+            {isPlayingItem && <MdPlayArrow />}
+            <SpaceRight size="xxs" />
             <SongName>{item.title}</SongName>
-          </span>
+          </SongNameContainer>
           <Stars stars={3} />
           <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
           <span>
@@ -230,9 +249,11 @@ export const ListItem = React.memo(
           />
           <SongIndex>{songIndex}</SongIndex>
           <span>·</span>
-          <span>
+          <SongNameContainer>
+            {isPlayingItem && <MdPlayArrow />}
+            <SpaceRight size="xxs" />
             <SongName>{item.title}</SongName>
-          </span>
+          </SongNameContainer>
           <Stars stars={3} />
           <SongDuration>{utils.toHumanTime(duration, true)}</SongDuration>
           <span>

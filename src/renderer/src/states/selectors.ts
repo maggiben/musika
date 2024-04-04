@@ -1,7 +1,7 @@
 import { selector, DefaultValue } from 'recoil';
 import { playlistState, preferencesState } from './atoms';
 import { getCircularArrayItems, splitIntoTuples } from '@shared/lib/utils';
-import type { IPreferences, IChannel, ITrack } from 'types/types';
+import type { IPreferences, IChannel, ITrack, IPlayerState } from 'types/types';
 
 export const preferencesSelector = selector({
   key: 'preferencesSelector',
@@ -178,7 +178,19 @@ export const trackSelector = selector({
     const {
       behaviour: { mediaPlayer: { track = undefined } = { track: undefined } },
     } = preferences;
-    return track;
+    const { playlist } = get(playlistState);
+    /* TODO: take prev and next from a queue not from the list */
+    const { prev, next } = (playlist &&
+      track &&
+      getCircularArrayItems(playlist.items, 'id', track.id)) ?? {
+      prev: undefined,
+      next: undefined,
+    };
+    return {
+      ...track,
+      prev,
+      next,
+    } as ITrack;
   },
   set: ({ get, set }, newVal) => {
     const preferences = get(preferencesState);
@@ -186,32 +198,39 @@ export const trackSelector = selector({
       // Reset to default value if DefaultValue is provided
       set(preferencesState, newVal);
     } else if (newVal) {
-      console.log('setting new track', newVal);
-      const { playlist } = get(playlistState);
-      if (!playlist) return;
-      const { prev, next } = getCircularArrayItems(playlist.items, 'id', newVal.id) ?? {
-        prev: undefined,
-        next: undefined,
-      };
+      delete newVal.prev;
+      delete newVal.next;
+
       const newPreferences = {
         ...preferences,
         behaviour: {
           ...preferences.behaviour,
           mediaPlayer: {
             ...preferences.behaviour.mediaPlayer,
-            track: {
-              ...newVal,
-              next: next,
-              prev: prev,
-            },
+            track: newVal,
           },
         },
       };
-      const {
-        behaviour: { mediaPlayer: { track = undefined } = { track: undefined } },
-      } = newPreferences;
-      console.log('saving track: ', track);
       set(preferencesState, newPreferences);
     }
+  },
+});
+
+export const playerSelector = selector({
+  key: 'playerSelector',
+  get: async ({ get }): Promise<IPlayerState> => {
+    const preferences = get(preferencesState);
+    const {
+      behaviour: { mediaPlayer },
+    } = preferences;
+    // const track = get(trackSelector);
+    const { playlist } = get(playlistState);
+    return {
+      queue: playlist ? playlist.items : [],
+      queueCursor: 0,
+      repeat: 'none',
+      shuffle: false,
+      status: 'stop',
+    };
   },
 });
