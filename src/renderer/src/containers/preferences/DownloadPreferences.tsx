@@ -109,17 +109,19 @@ const DownloadOptions = (): JSX.Element => {
           </InputGroup>
         </InputPairContainer>
         <InputPairContainer>
-          <StyledLabel htmlFor="downloads.autoSave">
-            {t('autosave save when playing remote media')}
+          <StyledLabel
+            htmlFor="downloads.autoSave"
+            title={t('this option is only available when remote playback is enabled')}
+          >
+            {t('save remote media after playback')}
           </StyledLabel>
           <ToggleSwitch
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
+            disabled={!preferences.behaviour.mediaPlayer.playExternal}
             id="downloads.autoSave"
             name="downloads.autoSave"
-            defaultChecked={preferences.downloads.autoSave}
+            defaultChecked={
+              preferences.behaviour.mediaPlayer.playExternal && preferences.downloads.autoSave
+            }
           />
         </InputPairContainer>
       </div>

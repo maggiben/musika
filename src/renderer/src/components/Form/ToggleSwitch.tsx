@@ -1,13 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Label = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-`;
-
 const Switch = styled.div`
   position: relative;
   width: 28px;
@@ -15,6 +8,7 @@ const Switch = styled.div`
   background: rgb(179, 179, 179);
   border-radius: 32px;
   transition: 300ms all;
+  cursor: pointer;
 
   &:before {
     transition: 300ms all;
@@ -30,6 +24,12 @@ const Switch = styled.div`
   }
 `;
 
+const Label = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
 const Input = styled.input`
   opacity: 0;
   position: absolute;
@@ -40,6 +40,9 @@ const Input = styled.input`
     &:before {
       transform: translate(12px, -50%);
     }
+  }
+  &:disabled + ${Switch} {
+    cursor: inherit;
   }
 `;
 

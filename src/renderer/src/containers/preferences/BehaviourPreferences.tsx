@@ -215,7 +215,7 @@ const BehaviourPreferences = (): JSX.Element => {
               </InputPairContainer>
               <InputPairContainer>
                 <StyledLabel htmlFor="behaviour.mediaPlayer.playExternal">
-                  {t('play external sources')}
+                  {t('play external media')}
                 </StyledLabel>
                 <ToggleSwitch
                   id="behaviour.mediaPlayer.playExternal"
