@@ -12,7 +12,6 @@ const MainContainer = styled.div`
   --background-color-darker-translucent: color-mix(in srgb, var(--background-color), #0000001f 15%);
   --background-color-darkest: color-mix(in srgb, var(--background-color), #000 30%);
   background-color: var(--background-color-darkest);
-  color: var(--background-color-darkest);
   max-height: 100vh;
   overflow: hidden;
   width: 100%;
@@ -27,7 +26,7 @@ const Main = (): JSX.Element => {
   const {
     playlists,
     behaviour: {
-      sideBar: { selected },
+      sideBar: { selected = 'home' },
     },
   } = useRecoilValue(preferencesState);
 

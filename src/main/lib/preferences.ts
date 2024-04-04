@@ -135,6 +135,7 @@ export async function getDefaultPreferences(): Promise<IPreferences> {
       sideBar: {
         visible: true,
         resizable: true,
+        selected: 'home',
       },
       mediaPlayer: {
         showWaveForm: true,

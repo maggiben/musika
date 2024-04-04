@@ -17,7 +17,7 @@ export const playlistSelector = selector({
     const localPlaylist = list?.filePath
       ? await window.playlist.loadPlaylist(list.filePath)
       : undefined;
-    const isLocalOutdated = localPlaylist!.lastUpdate < list!.lastUpdate;
+    const isLocalOutdated = localPlaylist && list && localPlaylist.lastUpdate < list.lastUpdate;
     return {
       sortOptions: {
         filter: 'all' as const,
