@@ -1,6 +1,6 @@
 import { selector, DefaultValue } from 'recoil';
 import { playlistState, preferencesState } from './atoms';
-import { splitIntoTuples } from '@shared/lib/utils';
+import { getCircularArrayItems, splitIntoTuples } from '@shared/lib/utils';
 import type { IPreferences, IChannel, ITrack } from 'types/types';
 
 export const preferencesSelector = selector({
@@ -171,22 +171,6 @@ export const sideBarSelector = selector({
   },
 });
 
-const getCircularArrayItems = <T>(list: T[], id: string): { prev: T; next: T } | undefined => {
-  const index = list.findIndex((item) => item['id'] === id);
-  if (index === -1) {
-    return; // Item with given id not found
-  }
-
-  const length = list.length;
-  const prevIndex = (index - 1 + length) % length; // Handle negative indexes
-  const nextIndex = (index + 1) % length;
-
-  return {
-    prev: list[prevIndex],
-    next: list[nextIndex],
-  };
-};
-
 export const trackSelector = selector({
   key: 'trackSelector',
   get: async ({ get }): Promise<ITrack | undefined> => {
@@ -205,7 +189,7 @@ export const trackSelector = selector({
       console.log('setting new track', newVal);
       const { playlist } = get(playlistState);
       if (!playlist) return;
-      const { prev, next } = getCircularArrayItems(playlist.items, newVal.id) ?? {
+      const { prev, next } = getCircularArrayItems(playlist.items, 'id', newVal.id) ?? {
         prev: undefined,
         next: undefined,
       };

@@ -10,11 +10,14 @@ import {
 import { MdSkipPrevious, MdSkipNext, MdPlayArrow, MdPause } from 'react-icons/md';
 import { TiArrowLoop, TiArrowShuffle } from 'react-icons/ti';
 import WaveSurfer, { IWaveSurferPlayerParams } from '@components/WaveSurfer/WaveSurfer';
+import player from '@renderer/lib/player';
 import { trackSelector } from '@states/selectors';
 import { preferencesState } from '@states/atoms';
 import InputRange from '@components/InputRange/InputRange';
 import { SpaceRight } from '@components/Spacing/Spacing';
-import { ITrack } from 'types/types';
+import { debounce } from '@shared/lib/utils';
+import type { ITrack } from 'types/types';
+import { PlayerStoryboardSpec } from 'youtubei.js/dist/src/parser/nodes';
 
 const PlayerControlsContainer = styled.div`
   --player-controls-height: 42px;
@@ -117,63 +120,59 @@ const StyledInputCheck = styled.div`
 const PlayerControls = (): JSX.Element => {
   const [preferences, setPreferences] = useRecoilState(preferencesState);
   const [track, setTrack] = useRecoilState(trackSelector);
-  const playingTrack = useRef<ITrack | undefined>(track);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [canplaythrough, setCanplaythrough] = useState(false);
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
+  // const audioRef = useRef<HTMLAudioElement | null>(null);
   const song = useMemo(
     () => track?.filePath && window.library.parseUri(track.filePath, true),
     [track],
   );
 
-  const playNextTrack = useCallback(async (track: ITrack, isReady: boolean) => {
-    setIsPlaying(false);
-    isReady && setIsReady(false);
-    console.log('playNextTrack track', track, 'isReady', isReady);
-    if (!track || isReady) return;
+  const playNextTrack = (): void => {
+    console.log('asked to playNextTrack:', track, track?.next);
+    if (!track?.next) return;
     const { next } = track;
     console.log('play next track', next);
     if (!next?.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
       console.log('no file no external allowed');
-      setTrack(next);
+      // setTrack(next);
     } else if (!next?.filePath && next?.url && preferences.behaviour.mediaPlayer.playExternal) {
       console.log('will play remote', next?.url);
-      const result = await window.commands.download(next?.url);
-      console.log('playNextTrack.remote: ', next?.url, result);
-      setTrack(next);
+      // const result = await window.commands.download(next?.url);
+      // console.log('playNextTrack.remote: ', next?.url, result);
+      // setTrack(next);
     } else if (next?.filePath) {
       console.log('playNextTrack local file', next.filePath);
       setTrack(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  };
+
+  const onWsPlay = useCallback((): void => {
+    console.log('onWsPlay');
   }, []);
 
-  useEffect(() => {
-    console.log('song: ', song);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [song]);
-
-  const onWsPlay = useCallback((params: IWaveSurferPlayerParams): void => {
-    setIsPlaying(params.isPlaying);
-  }, []);
-
-  const onWsReady = useCallback((params: IWaveSurferPlayerParams & { duration: number }): void => {
-    console.log('ready', params, 'duration', params.duration);
-    setIsReady(true);
-  }, []);
-
-  const onWsError = useCallback((error: unknown): void => {
-    setIsPlaying(false);
-    setIsReady(false);
-    console.log('we error', error);
-  }, []);
+  const onWsReady = useCallback(
+    (params: IWaveSurferPlayerParams & { duration: number }): void => {
+      console.log('onWsReady', params, 'duration', params.duration);
+      if (isPlaying) {
+        const event = new CustomEvent('playPause', {
+          detail: { key: 'value' },
+          bubbles: false,
+          cancelable: true,
+        });
+        waveSurferContainerRef.current!.dispatchEvent(event);
+      }
+    },
+    [isPlaying],
+  );
 
   const onWsFinish = useCallback(async (): Promise<void> => {
-    console.log('finished playing: ', track);
-    if (!track) return;
-    await playNextTrack(track, isReady);
-    console.log('ready to play !', isReady, track);
-  }, [track, isReady]);
+    console.log('onWsFinish', waveSurferContainerRef.current);
+    playNextTrack();
+  }, [track]);
 
   const WaveSurferPlayer = useMemo(
     () => (
@@ -182,7 +181,7 @@ const PlayerControls = (): JSX.Element => {
         onPlay={onWsPlay}
         onReady={onWsReady}
         onFinish={onWsFinish}
-        onError={onWsError}
+        onError={console.error}
         options={{
           height: 'auto',
           waveColor: 'gray',
@@ -192,8 +191,58 @@ const PlayerControls = (): JSX.Element => {
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [song],
+    [track],
   );
+
+  // const playNextTrack = useCallback(() => {
+  //   console.log('asked to playNextTrack:', track?.next, isPlaying);
+  //   if (!track || !isPlaying) return;
+  //   const { next } = track;
+  //   console.log('play next track', next);
+  //   if (!next?.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
+  //     console.log('no file no external allowed');
+  //     // setTrack(next);
+  //   } else if (!next?.filePath && next?.url && preferences.behaviour.mediaPlayer.playExternal) {
+  //     console.log('will play remote', next?.url);
+  //     // const result = await window.commands.download(next?.url);
+  //     // console.log('playNextTrack.remote: ', next?.url, result);
+  //     // setTrack(next);
+  //   } else if (next?.filePath) {
+  //     console.log('playNextTrack local file', next.filePath);
+  //     setTrack(next);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [track, isPlaying]);
+
+  /* loading has started sync artwork */
+  // const onLoadStart = useCallback(async (event: Event): Promise<void> => {
+  //   console.log('audio onLoadStart', event);
+  //   setCanplaythrough(false);
+  // }, []);
+
+  // const onCanPlayThrough = useCallback(async (): Promise<void> => {
+  //   console.log('audio canplaythrough');
+  //   setCanplaythrough(true);
+  //   if (isPlaying) {
+  //     const event = new CustomEvent('playPause', {
+  //       detail: { key: 'value' },
+  //       bubbles: false,
+  //       cancelable: true,
+  //     });
+  //     waveSurferContainerRef.current!.dispatchEvent(event);
+  //   }
+  // }, [isPlaying]);
+
+  /* Audio has ended */
+  // const onEnded = useCallback(async (): Promise<void> => {
+  //   console.log('audio ended');
+  //   setCanplaythrough(false);
+  //   playNextTrack();
+  // }, []);
+
+  // const onPlay = useCallback(async (event: Event): Promise<void> => {
+  //   console.log('play or pause', event);
+  // }, []);
 
   const playPause = useCallback((): void => {
     const event = new CustomEvent('playPause', {
@@ -201,16 +250,17 @@ const PlayerControls = (): JSX.Element => {
       bubbles: false,
       cancelable: true,
     });
-    isPlaying && setIsPlaying(!isPlaying);
+    setIsPlaying(!isPlaying);
     waveSurferContainerRef.current!.dispatchEvent(event);
   }, [isPlaying]);
 
-  const handleVolumeChange = (volume: number): void => {
+  const handleVolumeChange = debounce((volume: number): void => {
     const event = new CustomEvent('setVolume', {
       detail: { volume },
       bubbles: false,
       cancelable: true,
     });
+    waveSurferContainerRef.current!.dispatchEvent(event);
     setPreferences((prev) => {
       return {
         ...prev,
@@ -223,8 +273,50 @@ const PlayerControls = (): JSX.Element => {
         },
       };
     });
-    waveSurferContainerRef.current!.dispatchEvent(event);
-  };
+  }, 500);
+
+  useEffect(() => {
+    console.info('init player controls!');
+    // if (!song) return;
+    // player.setSrc(song);
+
+    /* Media event handlers */
+    const mediaEvents = {
+      // loadstart: onLoadStart,
+      // canplaythrough: onCanPlayThrough,
+      // ended: onEnded,
+      // play: onPlay,
+    };
+
+    /* WS Events */
+    // const wsEvents: { [key: string]: unknown } = {
+    //   ready: () => {},
+    // };
+
+    /* Subscribe to Media events */
+    // Object.entries(mediaEvents).forEach(
+    //   ([event, listener]: [
+    //     event: string,
+    //     listener: ((event: Event) => Promise<void>) | (() => Promise<void>) | (() => Promise<void>),
+    //   ]) => player.getAudio().addEventListener(event, listener),
+    // );
+
+    return () => {
+      /* Unsubscribe from Media events */
+      // Object.entries(mediaEvents).forEach(
+      //   ([event, listener]: [
+      //     event: string,
+      //     listener:
+      //       | ((event: Event) => Promise<void>)
+      //       | (() => Promise<void>)
+      //       | (() => Promise<void>),
+      //   ]) => {
+      //     player.getAudio().removeEventListener(event, listener);
+      //   },
+      // );
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const volumeIcon = useMemo(() => {
     const { volume, muted } = preferences.behaviour.mediaPlayer;
@@ -266,6 +358,7 @@ const PlayerControls = (): JSX.Element => {
           </StyledPlayerLabel>
         </StyledInputCheck>
         <SpaceRight size="xs" />
+        <span style={{ color: 'white' }}>isPlaying: {isPlaying ? 'true' : 'false'}</span>
         <StyledButtonGroup>
           <StyledPlayerButton disabled={!track?.prev} onClick={console.log}>
             <MdSkipPrevious />
@@ -291,7 +384,20 @@ const PlayerControls = (): JSX.Element => {
       </StyledButtonGroup>
       <SpaceRight size="xl" />
       <div style={{ display: 'flex', gap: '1em', height: 'calc(100% - 6px)', width: '100%' }}>
-        {WaveSurferPlayer}
+        {/* {WaveSurferPlayer} */}
+        <WaveSurfer
+          ref={waveSurferContainerRef}
+          onPlay={onWsPlay}
+          onReady={onWsReady}
+          onFinish={onWsFinish}
+          onError={console.error}
+          options={{
+            height: 'auto',
+            waveColor: 'gray',
+            progressColor: 'white',
+            url: song,
+          }}
+        />
       </div>
       <SpaceRight size="xl" />
       <PlayTime>3:47</PlayTime>

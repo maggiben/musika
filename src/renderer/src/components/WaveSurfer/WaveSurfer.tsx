@@ -81,7 +81,8 @@ const WaveSurfer = memo(
           ready: (duration: number) => onReady && onReady({ ...getPlayerParams(), duration }),
           play: () => onPlay && onPlay(getPlayerParams()),
           finish: () => {
-            wavesurfer.stop();
+            /* do not auto stop */
+            // wavesurfer.stop();
             onFinish && onFinish(getPlayerParams());
           },
           error: (error) => onError && onError(error),

@@ -273,6 +273,34 @@ export const mergeDeep = <T>(...objects): T => {
 };
 
 /**
+ * @brief Retrieves the previous and next items in a circular array based on the given id.
+ *
+ * @tparam T The type of items in the array.
+ * @param list The array of items.
+ * @param id The id of the item to find.
+ * @return The previous and next items, or undefined if the item with the given id is not found.
+ */
+export const getCircularArrayItems = <T>(
+  list: T[],
+  prop: string = 'id',
+  value: string,
+): { prev: T; next: T } | undefined => {
+  const index = list.findIndex((item) => item[prop] === value);
+  if (index === -1) {
+    return; // Item with given id not found
+  }
+
+  const length = list.length;
+  const prevIndex = (index - 1 + length) % length; // Handle negative indexes
+  const nextIndex = (index + 1) % length;
+
+  return {
+    prev: list[prevIndex],
+    next: list[nextIndex],
+  };
+};
+
+/**
  * Retrieves a nested property from an object using a dot-separated path.
  *
  * @param {T} obj The object from which to retrieve the nested property.

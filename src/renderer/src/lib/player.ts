@@ -1,8 +1,9 @@
-interface PlayerOptions {
+export interface PlayerOptions {
   playbackRate?: number;
   audioOutputDevice?: string;
   volume?: number;
   muted?: boolean;
+  src?: string;
 }
 
 /**
@@ -87,6 +88,15 @@ class Player {
     await this.audio.setSinkId(deviceID);
   }
 
+  getSrc(): string {
+    return this.audio.src;
+  }
+
+  setSrc(src?: string): void {
+    if (!src) return;
+    this.audio.src = src;
+  }
+
   setCurrentTime(currentTime: number): void {
     this.audio.currentTime = currentTime;
   }
@@ -105,4 +115,9 @@ class Player {
  * one anyway)
  */
 
-export default new Player();
+export default new Player({
+  volume: 1,
+  playbackRate: 1,
+  audioOutputDevice: 'default',
+  muted: false,
+});
