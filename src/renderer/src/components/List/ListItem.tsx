@@ -209,7 +209,7 @@ export const ListItem = React.memo(
       const queueCursor = playerState.queue.findIndex((track) => track.id === item.id);
       if (item.filePath && window.library.checkPath(item.filePath)) {
         setPlayerState((prev) => ({ ...prev, status: 'play', queueCursor }));
-      } else if (item.filePath && !window.library.checkPath(item.filePath)) {
+      } else if (item.filePath && !window.library.checkPath(item.filePath) && item.url) {
         const messageBoxOptions = {
           type: 'question',
           buttons: ['Yes, please', 'No, thanks'],
@@ -220,8 +220,20 @@ export const ListItem = React.memo(
         };
 
         const result = await window.commands.showMessageBox(messageBoxOptions);
-        console.log('result', result, preferences.downloads.autoSave);
-      } else if (!item.filePath) {
+        if (result.response !== 0) return;
+        setPlayerState((prev) => ({ ...prev, status: 'play', queueCursor }));
+      } else if (!item.filePath && item.url) {
+        const messageBoxOptions = {
+          type: 'question',
+          buttons: ['Yes, please', 'No, thanks'],
+          defaultId: 0,
+          message: 'This media is external, download it ?',
+          checkboxLabel: 'Remember my answer',
+          checkboxChecked: true,
+        };
+
+        const result = await window.commands.showMessageBox(messageBoxOptions);
+        if (result.response !== 0) return;
         setPlayerState((prev) => ({ ...prev, status: 'play', queueCursor }));
       }
     };

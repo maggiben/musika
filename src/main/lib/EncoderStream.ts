@@ -279,9 +279,8 @@ export default class EncoderStream {
   }
 
   /* returns a new instance of FfmpegCommand */
-  public async setCoverArt(
-    image: string = '/Users/bmaggi/Downloads/cat.jpg',
-  ): Promise<ffmpeg.FfmpegCommand> {
+  public async setCoverArt(image?: string): Promise<ffmpeg.FfmpegCommand | undefined> {
+    if (!image) return undefined;
     const { outputStream } = this.options;
     if (!fs.existsSync(outputStream.path.toString()) || !outputStream.closed) {
       console.log('file unsaved or not closed');
@@ -326,6 +325,10 @@ export default class EncoderStream {
     }, this.command(inputStream));
     this.setMetadata(metadata, this.ffmpegCommand);
     this.stream = this.ffmpegCommand.pipe(outputStream, { end: true }); //end = true, close output stream after writing
+    // TODO: DOES NOT WORK When the stream has ended save cover art
+    // outputStream.once('close', () => {
+    //   this.setCoverArt(metadata.videoInfo.videoDetails.thumbnails[0]?.url);
+    // });
   }
 
   private setMetadata(

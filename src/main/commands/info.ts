@@ -36,10 +36,11 @@
 import ytdl from 'ytdl-core';
 import ytpl from '@distube/ytpl';
 import mockResponse from './__mocks__/search.response.json';
+import { loadPreferences } from '@main/lib/preferences';
 
-export default async function getVideoInfo(url: string): Promise<Record<string, unknown>> {
+export default async function getVideoInfo(source: string): Promise<Record<string, unknown>> {
   // Promise<ytdl.videoInfo>
-  if (url === 'test') {
+  if (source === 'test') {
     return new Promise((resolve) => {
       setTimeout(() => {
         return resolve(mockResponse as Record<string, unknown>);
@@ -47,23 +48,23 @@ export default async function getVideoInfo(url: string): Promise<Record<string, 
     });
   }
 
-  const playlistOptions = {
-    gl: 'US',
-    hl: 'en',
-    limit: Infinity,
-  };
-  try {
-    const playlistId = ytpl.validateID(url) && (await ytpl.getPlaylistID(url));
-    const videoId = ytdl.validateURL(url) && ytdl.getVideoID(url);
-    const videoInfo = await ytdl.getInfo(url);
-    const playlist = playlistId && (await ytpl(playlistId, playlistOptions));
+  const videoId = typeof source === 'string' && ytdl.getVideoID(source);
+  if (videoId) {
+    const preferences = await loadPreferences();
+    const videoInfo = await ytdl.getInfo(videoId, {
+      requestOptions: {
+        timeout: preferences.downloads.timeout,
+      },
+    });
+    const options = {
+      filter: preferences.downloads.filter as ytdl.Filter,
+      quality: preferences.downloads.quality,
+    };
+    const format = ytdl.chooseFormat(videoInfo.formats, options);
     return {
-      playlistId,
       videoId,
       videoInfo,
-      playlist,
+      format,
     };
-  } catch (error) {
-    throw new Error((error as Error).message);
   }
 }

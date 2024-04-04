@@ -1,5 +1,6 @@
 import 'styled-components';
 import type ytpl from '@distube/ytpl';
+import type ytdl from 'ytdl-core';
 import type ffmpeg from 'fluent-ffmpeg';
 import type { Innertube } from 'youtubei.js';
 export type { ISchedulerResult, ISchedulerMessage } from '@main/utils/Scheduler';
@@ -76,6 +77,7 @@ export interface IPlaylistItem
   album?: string;
   genre?: string[];
   filePath?: string;
+  format?: ytdl.videoFormat;
   author: {
     name: string;
     channelID: string;

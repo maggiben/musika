@@ -213,6 +213,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
     { videoInfo: ytdl.videoInfo; videoFormat: ytdl.videoFormat } | undefined
   > {
     const videoInfo = await this.getVideoInfo();
+    this.item.thumbnail = videoInfo.videoDetails.thumbnails[0]?.url;
     this.parentPort.postMessage({
       type: DownloadWorkerChannels.VIDEO_INFO,
       source: this.item,
@@ -566,7 +567,7 @@ export class DownloadWorker extends AsyncCreatable<IDownloadWorkerOptions> {
    * @returns {Promise<ytdl.videoInfo>} the video info object or undefined if it fails
    */
   private async getVideoInfo(): Promise<ytdl.videoInfo> {
-    return ytdl.getInfo(this.item.url, {
+    return ytdl.getInfo(this.item.id, {
       requestOptions: {
         timeout: this.timeout,
       },

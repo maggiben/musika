@@ -45,10 +45,10 @@ import type { IDownloadWorkerMessage, IPlaylistItem } from 'types/types';
 export default async function download(
   source: string | IPlaylistItem[],
   mainWindow?: BrowserWindow | null,
-): Promise<Record<string, unknown>> {
+): Promise<unknown> {
   const playlistId =
     typeof source === 'string' && ytpl.validateID(source) && (await ytpl.getPlaylistID(source));
-  const videoId = typeof source === 'string' && ytdl.validateURL(source) && ytdl.getVideoID(source);
+  const videoId = typeof source === 'string' && ytdl.getVideoID(source);
   const playlistItems = Array.isArray(source) && source.length && source;
   if (playlistId || playlistItems) {
     const preferences = await loadPreferences(mainWindow);
@@ -74,41 +74,100 @@ export default async function download(
         options: preferences.transcoding.options,
       },
     });
-    scheduler
-      .on(SchedulerChannels.WORKER_ONLINE, (message: IDownloadWorkerMessage) => {
-        console.log('worker online:', message.source.id);
-        mainWindow?.webContents.send(SchedulerChannels.WORKER_ONLINE, message);
-      })
-      .once(SchedulerChannels.PLAYLISTI_ITEMS, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(SchedulerChannels.PLAYLISTI_ITEMS, message);
-      })
-      .on(DownloadWorkerChannels.CONTENT_LENGTH, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(DownloadWorkerChannels.CONTENT_LENGTH, message);
-      })
-      .once(SchedulerChannels.FINISHED, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(SchedulerChannels.FINISHED, message);
-      })
-      .on(DownloadWorkerChannels.END, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(DownloadWorkerChannels.END, message);
-      })
-      .on(DownloadWorkerChannels.TIMEOUT, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(DownloadWorkerChannels.TIMEOUT, message);
-      })
-      .on(DownloadWorkerChannels.ENCODING_ERROR, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(DownloadWorkerChannels.ENCODING_ERROR, message);
-      })
-      .on(SchedulerChannels.WORKER_EXIT, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(SchedulerChannels.WORKER_EXIT, message);
-      })
-      .on(DownloadWorkerChannels.PROGRESS, (message: IDownloadWorkerMessage) => {
-        mainWindow?.webContents.send(DownloadWorkerChannels.PROGRESS, message);
-      });
-    scheduler.download();
-    ipcMain.once(SchedulerChannels.STOP, () => scheduler.stop());
+    return new Promise((resolve, reject) => {
+      scheduler
+        .on(SchedulerChannels.WORKER_ONLINE, (message: IDownloadWorkerMessage) => {
+          console.log('worker online:', message.source.id);
+          mainWindow?.webContents.send(SchedulerChannels.WORKER_ONLINE, message);
+        })
+        .once(SchedulerChannels.PLAYLISTI_ITEMS, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(SchedulerChannels.PLAYLISTI_ITEMS, message);
+        })
+        .on(DownloadWorkerChannels.CONTENT_LENGTH, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.CONTENT_LENGTH, message);
+        })
+        .once(SchedulerChannels.FINISHED, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(SchedulerChannels.FINISHED, message);
+          console.log('finished !', message);
+          resolve(message);
+        })
+        .on(DownloadWorkerChannels.END, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.END, message);
+        })
+        .on(DownloadWorkerChannels.TIMEOUT, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.TIMEOUT, message);
+        })
+        .on(DownloadWorkerChannels.ENCODING_ERROR, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.ENCODING_ERROR, message);
+        })
+        .on(SchedulerChannels.WORKER_EXIT, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(SchedulerChannels.WORKER_EXIT, message);
+        })
+        .on(DownloadWorkerChannels.PROGRESS, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.PROGRESS, message);
+        });
+      scheduler.download();
+      ipcMain.once(SchedulerChannels.STOP, () => reject(scheduler.stop()));
+    });
   }
-  return {
-    source,
-    playlistId,
-    videoId,
-  };
+  if (videoId) {
+    const preferences = await loadPreferences(mainWindow);
+    const scheduler = new Scheduler({
+      playlistItems: [{ id: videoId } as IPlaylistItem],
+      playlistOptions: {
+        gl: 'US',
+        hl: 'en',
+        limit: Infinity,
+      },
+      maxconnections: 1,
+      retries: preferences.downloads.retries,
+      timeout: preferences.downloads.timeout,
+      savePath: preferences.downloads.savePath,
+      downloadOptions: {
+        quality: preferences.downloads.quality,
+        filter: preferences.downloads.filter as ytdl.Filter,
+      },
+      encode: {
+        enabled: preferences.transcoding.enabled,
+        replace: preferences.transcoding.replace,
+        options: preferences.transcoding.options,
+      },
+    });
+    return new Promise((resolve, reject) => {
+      scheduler
+        .on(SchedulerChannels.WORKER_ONLINE, (message: IDownloadWorkerMessage) => {
+          console.log('worker online:', message.source.id);
+          mainWindow?.webContents.send(SchedulerChannels.WORKER_ONLINE, message);
+        })
+        .once(SchedulerChannels.PLAYLISTI_ITEMS, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(SchedulerChannels.PLAYLISTI_ITEMS, message);
+        })
+        .on(DownloadWorkerChannels.CONTENT_LENGTH, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.CONTENT_LENGTH, message);
+        })
+        .once(SchedulerChannels.FINISHED, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(SchedulerChannels.FINISHED, message);
+          console.log('finished !', message);
+          resolve(message);
+        })
+        .on(DownloadWorkerChannels.END, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.END, message);
+        })
+        .on(DownloadWorkerChannels.TIMEOUT, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.TIMEOUT, message);
+        })
+        .on(DownloadWorkerChannels.ENCODING_ERROR, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.ENCODING_ERROR, message);
+        })
+        .on(SchedulerChannels.WORKER_EXIT, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(SchedulerChannels.WORKER_EXIT, message);
+        })
+        .on(DownloadWorkerChannels.PROGRESS, (message: IDownloadWorkerMessage) => {
+          mainWindow?.webContents.send(DownloadWorkerChannels.PROGRESS, message);
+        });
+      scheduler.download();
+      ipcMain.once(SchedulerChannels.STOP, () => reject(scheduler.stop()));
+    });
+  }
+  return Promise.reject(new Error('download failed invalid source: ' + source));
 }

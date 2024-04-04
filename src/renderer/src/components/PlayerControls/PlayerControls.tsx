@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
+import { useRef, useCallback, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import {
@@ -14,6 +14,8 @@ import { preferencesState, playerState as currentPlayerState } from '@states/ato
 import InputRange from '@components/InputRange/InputRange';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { debounce, getCircularArrayItems } from '@shared/lib/utils';
+import type ytdl from 'ytdl-core';
+import { ITrack } from 'types/types';
 
 const PlayerControlsContainer = styled.div`
   --player-controls-height: 42px;
@@ -119,31 +121,94 @@ const PlayerControls = (): JSX.Element => {
   const waveSurferContainerRef = useRef<HTMLDivElement | null>(null);
   const song = useMemo(() => {
     const filePath = playerState.queue[playerState.queueCursor]?.filePath;
-    return filePath && window.library.parseUri(filePath, true);
+    const format = playerState.queue[playerState.queueCursor]?.['format'];
+    if (filePath) return window.library.parseUri(filePath, true);
+    if (format) return format.url;
+    return undefined;
   }, [playerState]);
 
-  const playNextTrack = (): void => {
-    /* TODO: take prev and next from a queue not from the list */
-    const currentTrackId = playerState.queue[playerState.queueCursor]?.id;
-    if (!currentTrackId) return;
-    const { next } = getCircularArrayItems(playerState.queue, 'id', currentTrackId) ?? {
+  /* TODO: take prev and next from a queue not from the list */
+  const { next, prev } = useMemo(() => {
+    const defaultValues = {
       next: undefined,
+      prev: undefined,
     };
+    const currentTrackId = playerState.queue[playerState.queueCursor]?.id;
+    if (!currentTrackId) return defaultValues;
+    return getCircularArrayItems(playerState.queue, 'id', currentTrackId) ?? defaultValues;
+  }, [playerState]);
+
+  const playNextTrack = async (): Promise<void> => {
     console.log('asked to playNextTrack:', next);
     if (!next) return;
-    const queueCursor = playerState.queue.findIndex((track) => track?.id === next.id);
-    console.log('play next track', next);
-    if (!next?.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
-      console.log('no file no external allowed');
-      // setTrack(next);
-    } else if (!next?.filePath && next?.url && preferences.behaviour.mediaPlayer.playExternal) {
-      console.log('will play remote', next?.url);
-      // const result = await window.commands.download(next?.url);
-      // console.log('playNextTrack.remote: ', next?.url, result);
-      // setTrack(next);
-    } else if (next?.filePath) {
+    const queueCursor = playerState.queue.findIndex((track) => track.id === next.id);
+    console.log('play next track', next, next.format);
+    if (!next.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
+      console.log('not a local file and no external allowed');
+      return;
+    } else if (!next.filePath && next.format) {
+      setPlayerState((prev) => ({ ...prev, queueCursor }));
+      return;
+    } else if (
+      !next.filePath &&
+      !next.format &&
+      next.url &&
+      preferences.behaviour.mediaPlayer.playExternal &&
+      !preferences.downloads.autoSave
+    ) {
+      console.log('will play remote but not download', next.url);
+      // Get the video info
+      const result = (await window.commands.getVideoInfo(next.id)) as {
+        videoId: string;
+        videoInfo: ytdl.videoInfo;
+        format: ytdl.videoFormat;
+      };
+      const newQueue = structuredClone(playerState.queue);
+      newQueue[queueCursor] = { ...newQueue[queueCursor], format: result.format } as ITrack;
+      console.log('playNextTrack.remote: ', next.title, result.videoInfo, result.format, newQueue);
+      setPlayerState((prev) => ({ ...prev, queue: newQueue, queueCursor }));
+      return;
+    } else if (
+      !next.filePath &&
+      next.url &&
+      preferences.behaviour.mediaPlayer.playExternal &&
+      preferences.downloads.autoSave
+    ) {
+      console.log('will play and save remote media', next.id);
+      // Get the video info
+      const result = (await window.commands.download(next.id)) as unknown;
+      console.log('result', result);
+      // const newQueue = structuredClone(playerState.queue);
+      // newQueue[queueCursor] = { ...newQueue[queueCursor], filePath: result.format } as ITrack;
+      // console.log('playNextTrack.remote: ', next.title, result.videoInfo, result.format, newQueue);
+      // setPlayerState((prev) => ({ ...prev, queue: newQueue, queueCursor }));
+      return;
+    } else if (next.filePath) {
       console.log('playNextTrack local file', next.filePath);
       setPlayerState((prev) => ({ ...prev, queueCursor }));
+      return;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  };
+
+  const playPrevTrack = async (): Promise<void> => {
+    console.log('asked to playPrevTrack:', prev);
+    if (!prev) return;
+    const queueCursor = playerState.queue.findIndex((track) => track.id === prev.id);
+    console.log('play prev track', prev);
+    if (!prev.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
+      console.log('not a local file and no external allowed');
+      return;
+    } else if (!prev.filePath && prev.url && preferences.behaviour.mediaPlayer.playExternal) {
+      console.log('will play remote', prev.url);
+      // const result = await window.commands.download(prev?.url);
+      // console.log('playprevTrack.remote: ', prev?.url, result);
+      // setTrack(prev);
+      return;
+    } else if (prev.filePath) {
+      console.log('playPrevTrack local file', prev.filePath);
+      setPlayerState((prev) => ({ ...prev, queueCursor }));
+      return;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   };
@@ -230,6 +295,7 @@ const PlayerControls = (): JSX.Element => {
 
   useEffect(() => {
     if (!song && playerState.status === 'play') {
+      console.log('Invalid song play next');
       playNextTrack();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -276,7 +342,7 @@ const PlayerControls = (): JSX.Element => {
         </StyledInputCheck>
         <SpaceRight size="xs" />
         <StyledButtonGroup>
-          <StyledPlayerButton /* disabled={!track?.prev} */ onClick={console.log}>
+          <StyledPlayerButton disabled={!prev} onClick={playPrevTrack}>
             <MdSkipPrevious />
           </StyledPlayerButton>
           <StyledPlayerButton
@@ -290,7 +356,7 @@ const PlayerControls = (): JSX.Element => {
               <MdPause />
             )}
           </StyledPlayerButton>
-          <StyledPlayerButton /* disabled={!track?.next} */ onClick={console.log}>
+          <StyledPlayerButton disabled={!next} onClick={playNextTrack}>
             <MdSkipNext />
           </StyledPlayerButton>
         </StyledButtonGroup>
