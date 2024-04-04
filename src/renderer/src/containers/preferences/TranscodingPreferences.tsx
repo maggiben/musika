@@ -285,7 +285,7 @@ const FfmpegBinaryOptions = (): JSX.Element => {
   const { t } = useTranslation();
   const preferences = useRecoilValue(preferencesState);
   const openFileDialog = async (): Promise<void> => {
-    const result = await window.commands.dialogs({
+    const result = await window.commands.showOpenDialog({
       defaultPath: preferences?.transcoding?.ffmpegPath,
       properties: ['openFile'],
     });

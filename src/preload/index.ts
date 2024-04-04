@@ -1,6 +1,7 @@
-import { ipcRenderer, contextBridge, shell } from 'electron';
+import { ipcRenderer, contextBridge, shell, OpenDialogOptions, MessageBoxOptions } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 import parseUri from '@main/utils/parseUri';
+import checkPath from '@main/utils/checkPath';
 import type { IPlaylist, IPreferences } from 'types/types';
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -21,6 +22,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('library', {
       showFileInFolder: (filePath: string) => shell.showItemInFolder(filePath),
       parseUri,
+      checkPath,
     });
     contextBridge.exposeInMainWorld('preferences', {
       loadPreferences: () => ipcRenderer.invoke('loadPreferences', {}),
@@ -46,7 +48,8 @@ if (process.contextIsolated) {
       getVideoInfo: (url: string) => ipcRenderer.invoke('getVideoInfo', url),
       download: (url: string) => ipcRenderer.invoke('download', url),
       search: (searchString: string) => ipcRenderer.invoke('search', searchString),
-      dialogs: (type: string) => ipcRenderer.invoke('dialogs', type),
+      showOpenDialog: (options: OpenDialogOptions) => ipcRenderer.invoke('showOpenDialog', options),
+      showMessageBox: (options: MessageBoxOptions) => ipcRenderer.invoke('showMessageBox', options),
       modal: (type: string, options?: Record<string, unknown>) =>
         ipcRenderer.invoke('modal', type, options),
       contextMenu: (type: string, options?: Record<string, unknown>) =>

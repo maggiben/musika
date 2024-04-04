@@ -18,7 +18,7 @@ const DownloadOptions = (): JSX.Element => {
   const { t } = useTranslation();
   const [preferences, setPreferences] = useRecoilState(preferencesState);
   const openFolderDialog = async (): Promise<void> => {
-    const result = await window.commands.dialogs({
+    const result = await window.commands.showOpenDialog({
       defaultPath: preferences?.downloads?.savePath,
       properties: ['openDirectory', 'createDirectory'],
     });

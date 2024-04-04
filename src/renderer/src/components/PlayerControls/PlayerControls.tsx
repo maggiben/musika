@@ -123,17 +123,15 @@ const PlayerControls = (): JSX.Element => {
   }, [playerState]);
 
   const playNextTrack = (): void => {
-    const queueCursor = playerState.queueCursor + 1;
     /* TODO: take prev and next from a queue not from the list */
-    const { next } = getCircularArrayItems(
-      playerState.queue,
-      'id',
-      playerState.queue[playerState.queueCursor].id,
-    ) ?? {
+    const currentTrackId = playerState.queue[playerState.queueCursor]?.id;
+    if (!currentTrackId) return;
+    const { next } = getCircularArrayItems(playerState.queue, 'id', currentTrackId) ?? {
       next: undefined,
     };
     console.log('asked to playNextTrack:', next);
     if (!next) return;
+    const queueCursor = playerState.queue.findIndex((track) => track?.id === next.id);
     console.log('play next track', next);
     if (!next?.filePath && !preferences.behaviour.mediaPlayer.playExternal) {
       console.log('no file no external allowed');
@@ -231,9 +229,11 @@ const PlayerControls = (): JSX.Element => {
   }, 500);
 
   useEffect(() => {
-    console.info('init player controls!');
+    if (!song && playerState.status === 'play') {
+      playNextTrack();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [song]);
 
   const volumeIcon = useMemo(() => {
     const { volume, muted } = preferences.behaviour.mediaPlayer;

@@ -36,7 +36,7 @@ const BehaviourPreferences = (): JSX.Element => {
   };
 
   const openFolderDialog = async (): Promise<void> => {
-    const result = await window.commands.dialogs({
+    const result = await window.commands.showOpenDialog({
       defaultPath: preferences?.advanced?.logs?.savePath,
       properties: ['openDirectory', 'promptToCreate'],
     });

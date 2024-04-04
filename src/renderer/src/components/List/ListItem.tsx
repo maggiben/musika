@@ -12,7 +12,7 @@ import { ClearButton } from '@components/Form/Form';
 import { SpaceRight } from '@components/Spacing/Spacing';
 import { IPlaylistItem } from 'types/types';
 import SelectAllCheckbox from './SelectAllCheckbox';
-import { playerState as currentPlayerState } from '@states/atoms';
+import { playerState as currentPlayerState, preferencesState } from '@states/atoms';
 
 const SongIndex = styled.span`
   user-select: none;
@@ -190,6 +190,7 @@ export const ListItem = React.memo(
     onItemClick,
     handleItemSelect,
   }: IListItemProps): JSX.Element | null => {
+    const [preferences, setPreferences] = useRecoilState(preferencesState)
     const [playerState, setPlayerState] = useRecoilState(currentPlayerState);
     const songIndex = padZeroes(index + 1, total.toString().split('').length);
     const duration =
@@ -203,10 +204,26 @@ export const ListItem = React.memo(
       );
     }, [playerState]);
 
-    const onItemDoubleClick = (item: IPlaylistItem): void => {
+    const onItemDoubleClick = async (item: IPlaylistItem): Promise<void> => {
       if (!item.id) return;
       const queueCursor = playerState.queue.findIndex((track) => track.id === item.id);
-      setPlayerState((prev) => ({ ...prev, status: 'play', queueCursor }));
+      if (item.filePath && window.library.checkPath(item.filePath)) {
+        setPlayerState((prev) => ({ ...prev, status: 'play', queueCursor }));
+      } else if (item.filePath && !window.library.checkPath(item.filePath)) {
+        const messageBoxOptions = {
+          type: 'question',
+          buttons: ['Yes, please', 'No, thanks'],
+          defaultId: 0,
+          message: 'Local media not found, download it ?',
+          checkboxLabel: 'Remember my answer',
+          checkboxChecked: true,
+        };
+
+        const result = await window.commands.showMessageBox(messageBoxOptions);
+        console.log('result', result, preferences.downloads.autoSave);
+      } else if (!item.filePath) {
+        setPlayerState((prev) => ({ ...prev, status: 'play', queueCursor }));
+      }
     };
 
     return (

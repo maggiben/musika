@@ -1,6 +1,6 @@
 import { ElectronAPI } from '@electron-toolkit/preload';
 import type { IPreferences, IPlaylistItem, IPlaylist } from 'types/types';
-import type { OpenDialogReturnValue, OpenDialogOptions } from 'electron';
+import type { OpenDialogReturnValue, OpenDialogOptions, MessageBoxReturnValue } from 'electron';
 
 interface IExtendedElectronApi extends ElectronAPI {
   ipcRenderer: IpcRenderer & {
@@ -21,9 +21,11 @@ export declare global {
     library: {
       showFileInFolder: (filePath: string) => void;
       parseUri: (uri: string, check?: boolean) => string | undefined;
+      checkPath: (pathOrUrl: string, mode?: number) => boolean;
     };
     commands: {
-      dialogs: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
+      showOpenDialog: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
+      showMessageBox: (options: MessageBoxOptions) => Promise<MessageBoxReturnValue>;
       getVideoInfo: (url: string) => Promise<Record<string, unknown>>;
       search: (searchString: string) => Promise<Record<string, unknown>>;
       download: (source: string | IPlaylistItem[]) => Promise<Record<string, unknown>>;

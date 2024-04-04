@@ -4,6 +4,7 @@ import {
   IpcMainInvokeEvent,
   BrowserWindow,
   OpenDialogOptions,
+  MessageBoxOptions,
 } from 'electron';
 import { Innertube } from 'youtubei.js';
 import { contextMenu } from './menu';
@@ -11,7 +12,7 @@ import getVideoInfo from './commands/info';
 import download from './commands/download';
 import search from './commands/search';
 import type { IPlaylist, IPreferences } from 'types/types';
-import { showOpenDialog } from './utils/dialogs';
+import { showOpenDialog, showMessageBox } from './utils/dialogs';
 import modal from './utils/modal';
 import { cloneJson } from '@shared/lib/utils';
 import { savePreferences, loadPreferences } from './lib/preferences';
@@ -20,8 +21,13 @@ import { loadPlaylist, savePlaylist } from './lib/playlist';
 export const setRpcHandlers = (mainWindow: BrowserWindow): void => {
   const focusedWindow = BrowserWindow.getFocusedWindow();
   const window = mainWindow === mainWindow ? mainWindow : focusedWindow;
-  ipcMain.handle('dialogs', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
+
+  ipcMain.handle('showOpenDialog', async (_event: IpcMainInvokeEvent, options: OpenDialogOptions) =>
     showOpenDialog(options),
+  );
+
+  ipcMain.handle('showMessageBox', async (_event: IpcMainInvokeEvent, options: MessageBoxOptions) =>
+    showMessageBox(options),
   );
 
   ipcMain.handle(
