@@ -37,7 +37,7 @@ import { EventEmitter } from 'stream';
 import { Worker, WorkerOptions } from 'worker_threads';
 import ytpl from '@distube/ytpl';
 // import { EncoderStream } from './EncoderStream';
-import type { IDownloadWorkerMessage } from '../lib/DownloadWorker';
+import { IDownloadWorkerMessage, DownloadWorkerChannels } from '../lib/DownloadWorker';
 import createWorker from '../workers/worker?nodeWorker';
 import { IPlaylistItem } from 'types/types';
 import type ytdl from 'ytdl-core';
@@ -369,6 +369,11 @@ export class Scheduler extends EventEmitter {
   ): void {
     const onMessageHandler = (message: IDownloadWorkerMessage): void => {
       this.emit(message.type, message);
+      /* set file path */
+      if (message.type === DownloadWorkerChannels.END) {
+        const { filePath } = message.source;
+        item.filePath = filePath;
+      }
     };
     const onExit = (code: number): void => {
       this.emit(SchedulerChannels.WORKER_EXIT, { source: item, details: { code } });

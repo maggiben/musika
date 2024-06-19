@@ -175,13 +175,27 @@ const PlayerControls = (): JSX.Element => {
       preferences.downloads.autoSave
     ) {
       console.log('will play and save remote media', next.id);
+      playPause();
       // Get the video info
-      const result = (await window.commands.download(next.id)) as unknown;
-      console.log('result', result);
-      // const newQueue = structuredClone(playerState.queue);
-      // newQueue[queueCursor] = { ...newQueue[queueCursor], filePath: result.format } as ITrack;
-      // console.log('playNextTrack.remote: ', next.title, result.videoInfo, result.format, newQueue);
-      // setPlayerState((prev) => ({ ...prev, queue: newQueue, queueCursor }));
+      const result = (await window.commands.download(next.id)) as {
+        details: {
+          item: {
+            id: string;
+            filePath: string;
+          };
+          code: number;
+        }[];
+      };
+      const [
+        {
+          item: { filePath },
+        },
+      ] = result.details;
+      console.info('downloaded file to:', filePath);
+      const newQueue = structuredClone(playerState.queue);
+      newQueue[queueCursor] = { ...newQueue[queueCursor], filePath } as ITrack;
+      setPlayerState((prev) => ({ ...prev, queue: newQueue, queueCursor }));
+      playPause();
       return;
     } else if (next.filePath) {
       console.log('playNextTrack local file', next.filePath);
@@ -190,6 +204,15 @@ const PlayerControls = (): JSX.Element => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   };
+
+  useEffect(() => {
+    console.log(
+      'playerState changed to file: ',
+      playerState.queueCursor,
+      playerState.queue[playerState.queueCursor]?.title,
+      playerState.queue[playerState.queueCursor]?.filePath,
+    );
+  }, [playerState]);
 
   const playPrevTrack = async (): Promise<void> => {
     console.log('asked to playPrevTrack:', prev);

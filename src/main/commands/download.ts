@@ -147,7 +147,6 @@ export default async function download(
         })
         .once(SchedulerChannels.FINISHED, (message: IDownloadWorkerMessage) => {
           mainWindow?.webContents.send(SchedulerChannels.FINISHED, message);
-          console.log('finished !', message);
           resolve(message);
         })
         .on(DownloadWorkerChannels.END, (message: IDownloadWorkerMessage) => {

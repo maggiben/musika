@@ -220,11 +220,12 @@ export const playerSelector = selector({
   key: 'playerSelector',
   get: async ({ get }): Promise<IPlayerState> => {
     const preferences = get(preferencesState);
-    const {
-      behaviour: { mediaPlayer },
-    } = preferences;
+    // const {
+    //   behaviour: { mediaPlayer },
+    // } = preferences;
     // const track = get(trackSelector);
     const { playlist } = get(playlistState);
+    console.log('in playerSelector getter', preferences.playlists, playlist);
     return {
       queue: playlist ? playlist.items : [],
       queueCursor: 0,

@@ -49,15 +49,15 @@ const WaveSurfer = memo(
 
       // On play button click
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      const onPlayPause = useCallback(() => wavesurfer?.playPause(), [wavesurfer]);
-
-      const onSetVolume = useCallback(
+      const handlePlayPause = useCallback(() => wavesurfer?.playPause(), [wavesurfer]);
+      const handlePlay = useCallback(() => wavesurfer?.play(), [wavesurfer]);
+      const handlePause = useCallback(() => wavesurfer?.pause(), [wavesurfer]);
+      const handleSetVolume = useCallback(
         ({ detail: { volume } }: CustomEvent<{ volume: number }>) =>
           wavesurfer?.setVolume(Math.round(volume / 10) / 10),
         [wavesurfer],
       ) as TWaveSurferListener;
-
-      const onSetMuted = useCallback(
+      const handleSetMuted = useCallback(
         ({ muted }: { muted: boolean }) => wavesurfer?.setMuted(muted),
         [wavesurfer],
       ) as TWaveSurferListener;
@@ -108,9 +108,11 @@ const WaveSurfer = memo(
 
         /* Player Events sent though DOM Container */
         const listeners = {
-          playPause: onPlayPause,
-          setVolume: onSetVolume,
-          setMuted: onSetMuted,
+          playPause: handlePlayPause,
+          play: handlePlay,
+          pause: handlePause,
+          setVolume: handleSetVolume,
+          setMuted: handleSetMuted,
         };
 
         Object.entries(listeners).forEach(
